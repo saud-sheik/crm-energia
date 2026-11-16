@@ -86,3 +86,4 @@ export interface ReviewCreditDecisionInput {
   declineReason?: string;
   notes?: string;
 }
+

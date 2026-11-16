@@ -107,3 +107,4 @@ module.exports = {
     await queryInterface.dropTable('CreditApplications').catch(() => {});
   }
 };
+

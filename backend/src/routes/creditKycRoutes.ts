@@ -20,3 +20,4 @@ router.post("/fallback-advance/:id", authMiddleware, activateAdvanceFallback);
 router.post("/confirm-advance/:id", authMiddleware, requireAdminOrManager, confirmAdvancePayment);
 
 export default router;
+
