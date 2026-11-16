@@ -164,3 +164,4 @@ export const recordCompanyCountersignature = async (req: Request, res: Response)
     return res.status(400).json({ error: err.message || "Failed to countersign rental contract" });
   }
 };
+

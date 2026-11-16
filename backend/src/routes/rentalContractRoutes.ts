@@ -22,3 +22,4 @@ router.post("/:id/sign-client", authMiddleware, recordClientSignature);
 router.post("/:id/sign-company", authMiddleware, requireAdminOrManager, recordCompanyCountersignature);
 
 export default router;
+

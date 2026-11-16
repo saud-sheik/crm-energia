@@ -85,3 +85,4 @@ export interface GenerateContractInput {
   siteLocation?: string;
   equipmentSummary?: string;
 }
+
