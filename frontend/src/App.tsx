@@ -67,6 +67,7 @@ import PublicFeedback from "./pages/PublicFeedback";
 import SiteInspections from "./pages/SiteInspections";
 import SiteInspectionForm from "./pages/SiteInspectionForm";
 import HeldEmails from "./pages/HeldEmails";
+import { RentalContractsManager } from "./modules/rental-contracts";
 
 const ProtectedRoute = () => {
   const { isAuthenticated } = useAuth();
@@ -151,6 +152,7 @@ function App() {
                 <Route path="/quotes/new" element={<QuotationBuilder />} />
                 <Route path="/quotes/:id" element={<QuoteDetail />} />
                 <Route path="/quotes" element={<QuoteHistory />} />
+                <Route path="/rental-contracts" element={<RentalContractsManager />} />
                 <Route path="/invoices" element={<Invoices />} />
                 <Route path="/invoices/:id" element={<InvoiceDetail />} />
                 <Route path="/price-book" element={<PriceBook />} />

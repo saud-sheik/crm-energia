@@ -1177,5 +1177,11 @@ router.post("/lead-filter/sender-rules", authMiddleware, requireAdminOrManager, 
 router.delete("/lead-filter/sender-rules/:id", authMiddleware, requireAdminOrManager, deleteSenderRule);
 
 
+// ==========================================
+// ENERGIA RENTAL CONTRACTS & LEGAL SLAS
+// ==========================================
+import rentalContractRoutes from "./rentalContractRoutes";
+router.use("/rental-contracts", rentalContractRoutes);
+
 export default router;
 
