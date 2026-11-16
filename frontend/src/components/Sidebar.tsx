@@ -4,7 +4,7 @@ import {
   ClipboardCheck, LayoutDashboard, Home, Inbox, Trello, FileText, Receipt,
   Users, BarChart, Settings, Clock, ChevronLeft, 
   ChevronRight, MessageSquare, CheckSquare, Search, Bell, Sparkles, LogOut, ChevronDown, Layers, Package, Building2, LifeBuoy, Target,
-  UserCheck, Shield, Briefcase, Megaphone, Wrench, ShieldAlert
+  UserCheck, Shield, Briefcase, Megaphone, Wrench, ShieldAlert, Zap
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
@@ -95,6 +95,7 @@ export function Sidebar({
         { label: "Opportunities", path: "/opportunities", icon: Target },
         { label: "Pipeline", path: "/pipeline", icon: Trello },
         { label: "Quotes", path: "/quotes", icon: FileText },
+        { label: "Rental CPQ (Energia)", path: "/rental-cpq/builder", icon: Zap },
       ]
     },
     { label: "Approval Queue & Limits", path: "/approvals", icon: Shield },

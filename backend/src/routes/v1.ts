@@ -1177,5 +1177,11 @@ router.post("/lead-filter/sender-rules", authMiddleware, requireAdminOrManager, 
 router.delete("/lead-filter/sender-rules/:id", authMiddleware, requireAdminOrManager, deleteSenderRule);
 
 
+// ==========================================
+// ENERGIA RENTAL CPQ ENGINE
+// ==========================================
+import rentalCpqRoutes from "./rentalCpqRoutes";
+router.use("/rental-cpq", rentalCpqRoutes);
+
 export default router;
 

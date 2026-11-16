@@ -67,6 +67,7 @@ import PublicFeedback from "./pages/PublicFeedback";
 import SiteInspections from "./pages/SiteInspections";
 import SiteInspectionForm from "./pages/SiteInspectionForm";
 import HeldEmails from "./pages/HeldEmails";
+import { RentalQuotationBuilder } from "./modules/rental-cpq";
 
 const ProtectedRoute = () => {
   const { isAuthenticated } = useAuth();
@@ -149,6 +150,7 @@ function App() {
                 
                 {/* Quotations Workspace */}
                 <Route path="/quotes/new" element={<QuotationBuilder />} />
+                <Route path="/rental-cpq/builder" element={<RentalQuotationBuilder />} />
                 <Route path="/quotes/:id" element={<QuoteDetail />} />
                 <Route path="/quotes" element={<QuoteHistory />} />
                 <Route path="/invoices" element={<Invoices />} />
