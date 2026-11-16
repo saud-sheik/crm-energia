@@ -79,7 +79,7 @@ export const createRentalQuote = async (req: Request, res: Response) => {
 
 export const getRentalQuoteDetails = async (req: Request, res: Response) => {
   try {
-    const { quoteId } = req.params;
+    const quoteId = String(req.params.quoteId);
 
     const quote = await Quote.findByPk(quoteId, {
       include: [

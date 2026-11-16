@@ -20,7 +20,7 @@ export const getContracts = async (req: Request, res: Response) => {
 
 export const getContractById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const contract = await RentalContractService.getContractById(id);
     if (!contract) {
       return res.status(404).json({ error: "Rental contract not found" });
@@ -90,7 +90,7 @@ export const generateContract = async (req: Request, res: Response) => {
 
 export const submitLegalReview = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const contract = await RentalContractService.submitForLegalReview(id);
     return res.json({
       success: true,
@@ -105,7 +105,7 @@ export const submitLegalReview = async (req: Request, res: Response) => {
 
 export const approveLegalReview = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const reviewerUserId = (req as any).user?.id;
     const contract = await RentalContractService.approveLegalReview(id, reviewerUserId);
     return res.json({
@@ -121,7 +121,7 @@ export const approveLegalReview = async (req: Request, res: Response) => {
 
 export const recordClientSignature = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { signatoryName, signatoryTitle, signatureData } = req.body;
 
     const contract = await RentalContractService.recordClientSignature({
@@ -144,7 +144,7 @@ export const recordClientSignature = async (req: Request, res: Response) => {
 
 export const recordCompanyCountersignature = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { signatureData } = req.body;
     const companyUserId = (req as any).user?.id;
 

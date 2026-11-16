@@ -96,7 +96,7 @@ export const createBooking = async (req: Request, res: Response) => {
 
 export const updateBookingStatus = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { status } = req.body;
 
     if (!status || !["RESERVED", "DISPATCHED_ON_HIRE", "COMPLETED", "CANCELLED"].includes(status)) {

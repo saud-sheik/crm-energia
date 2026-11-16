@@ -21,7 +21,7 @@ export const getCreditQueue = async (req: Request, res: Response) => {
 
 export const getDealCreditStatus = async (req: Request, res: Response) => {
   try {
-    const { dealId } = req.params;
+    const dealId = String(req.params.dealId);
     const application = await CreditKycService.getDealApplication(dealId);
     return res.json({
       success: true,
@@ -82,7 +82,7 @@ export const submitCreditApplication = async (req: Request, res: Response) => {
 
 export const reviewCreditApplication = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { status, approvedCreditLimit, approvedPaymentTerms, declineReason, notes } = req.body;
     const reviewerUserId = (req as any).user?.id;
 
@@ -112,7 +112,7 @@ export const reviewCreditApplication = async (req: Request, res: Response) => {
 
 export const activateAdvanceFallback = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { notes } = req.body;
 
     const application = await CreditKycService.activateAdvancePaymentFallback(id, notes);
@@ -129,7 +129,7 @@ export const activateAdvanceFallback = async (req: Request, res: Response) => {
 
 export const confirmAdvancePayment = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const application = await CreditKycService.confirmAdvancePaymentReceived(id);
     return res.json({
       success: true,
