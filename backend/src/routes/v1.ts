@@ -1183,5 +1183,11 @@ router.delete("/lead-filter/sender-rules/:id", authMiddleware, requireAdminOrMan
 import rentalCpqRoutes from "./rentalCpqRoutes";
 router.use("/rental-cpq", rentalCpqRoutes);
 
+// ==========================================
+// ENERGIA CREDIT CHECK & KYC MANAGEMENT
+// ==========================================
+import creditKycRoutes from "./creditKycRoutes";
+router.use("/credit-kyc", creditKycRoutes);
+
 export default router;
 

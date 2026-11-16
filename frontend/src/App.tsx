@@ -68,6 +68,7 @@ import SiteInspections from "./pages/SiteInspections";
 import SiteInspectionForm from "./pages/SiteInspectionForm";
 import HeldEmails from "./pages/HeldEmails";
 import { RentalQuotationBuilder } from "./modules/rental-cpq";
+import { CreditKycDesk } from "./modules/credit-kyc";
 
 const ProtectedRoute = () => {
   const { isAuthenticated } = useAuth();
@@ -176,6 +177,7 @@ function App() {
                 
                 {/* Operations, Approvals & Governance */}
                 <Route path="/approvals" element={<ApprovalQueue />} />
+                <Route path="/credit-kyc" element={<CreditKycDesk />} />
                 <Route path="/rules" element={<AssignmentRules />} />
                 <Route path="/salespersons" element={<SalespersonTracker />} />
                 <Route path="/salespersons/:id" element={<SalespersonDetail />} />

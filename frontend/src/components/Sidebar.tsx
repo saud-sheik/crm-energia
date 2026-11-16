@@ -4,7 +4,7 @@ import {
   ClipboardCheck, LayoutDashboard, Home, Inbox, Trello, FileText, Receipt,
   Users, BarChart, Settings, Clock, ChevronLeft, 
   ChevronRight, MessageSquare, CheckSquare, Search, Bell, Sparkles, LogOut, ChevronDown, Layers, Package, Building2, LifeBuoy, Target,
-  UserCheck, Shield, Briefcase, Megaphone, Wrench, ShieldAlert, Zap
+  UserCheck, Shield, Briefcase, Megaphone, Wrench, ShieldAlert, Zap, FileCheck
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
@@ -99,6 +99,7 @@ export function Sidebar({
       ]
     },
     { label: "Approval Queue & Limits", path: "/approvals", icon: Shield },
+    { label: "Credit & KYC Desk", path: "/credit-kyc", icon: FileCheck },
     { 
       label: "CRM", 
       icon: Building2,
