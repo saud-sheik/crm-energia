@@ -70,6 +70,7 @@ import HeldEmails from "./pages/HeldEmails";
 import { RentalQuotationBuilder } from "./modules/rental-cpq";
 import { CreditKycDesk } from "./modules/credit-kyc";
 import { RentalContractsManager } from "./modules/rental-contracts";
+import { FleetAvailabilityDesk } from "./modules/fleet-availability";
 
 const ProtectedRoute = () => {
   const { isAuthenticated } = useAuth();
@@ -190,6 +191,7 @@ function App() {
                 <Route path="/rep-portal" element={<RepPortal />} />
                 <Route path="/manager-portal" element={<ManagerPortal />} />
                 <Route path="/ai-reports" element={<AIReports />} />
+                <Route path="/fleet-availability" element={<FleetAvailabilityDesk />} />
                 <Route path="/settings" element={<Settings />} />
                 
                 {/* Legacy Aliases */}

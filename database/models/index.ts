@@ -4098,6 +4098,57 @@ RentalContract.belongsTo(Account, { foreignKey: "accountId", as: "account", cons
 RentalContract.belongsTo(User, { foreignKey: "companySignatoryUserId", as: "companySignatory", constraints: false });
 RentalContract.belongsTo(User, { foreignKey: "legalReviewedByUserId", as: "legalReviewer", constraints: false });
 
+export class AssetBooking extends Model {
+  public id!: string;
+  public assetId!: string;
+  public dealId!: string | null;
+  public quoteId!: string | null;
+  public customerId!: string | null;
+  public bookingStatus!: "RESERVED" | "DISPATCHED_ON_HIRE" | "COMPLETED" | "CANCELLED";
+  public startDate!: Date;
+  public endDate!: Date;
+  public siteLocation!: string | null;
+  public assignedOperatorName!: string | null;
+  public notes!: string | null;
+  public createdAt!: Date;
+  public updatedAt!: Date;
+}
+
+AssetBooking.init(
+  {
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    assetId: { type: DataTypes.UUID, allowNull: false },
+    dealId: { type: DataTypes.UUID, allowNull: true },
+    quoteId: { type: DataTypes.UUID, allowNull: true },
+    customerId: { type: DataTypes.UUID, allowNull: true },
+    bookingStatus: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "RESERVED"
+    },
+    startDate: { type: DataTypes.DATE, allowNull: false },
+    endDate: { type: DataTypes.DATE, allowNull: false },
+    siteLocation: { type: DataTypes.STRING, allowNull: true },
+    assignedOperatorName: { type: DataTypes.STRING, allowNull: true },
+    notes: { type: DataTypes.TEXT, allowNull: true }
+  },
+  {
+    sequelize,
+    modelName: "AssetBooking",
+    tableName: "AssetBookings"
+  }
+);
+
+// Associations for AssetBooking
+Asset.hasMany(AssetBooking, { foreignKey: "assetId", as: "bookings", constraints: false });
+AssetBooking.belongsTo(Asset, { foreignKey: "assetId", as: "asset", constraints: false });
+
+Deal.hasMany(AssetBooking, { foreignKey: "dealId", as: "bookings", constraints: false });
+AssetBooking.belongsTo(Deal, { foreignKey: "dealId", as: "deal", constraints: false });
+
+Account.hasMany(AssetBooking, { foreignKey: "customerId", as: "assetBookings", constraints: false });
+AssetBooking.belongsTo(Account, { foreignKey: "customerId", as: "customer", constraints: false });
+
 export { sequelize };
 
 

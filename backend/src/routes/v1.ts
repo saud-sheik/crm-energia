@@ -1196,5 +1196,11 @@ router.use("/credit-kyc", creditKycRoutes);
 import rentalContractRoutes from "./rentalContractRoutes";
 router.use("/rental-contracts", rentalContractRoutes);
 
+// ==========================================
+// ENERGIA FLEET AVAILABILITY & BOOKING CALENDAR
+// ==========================================
+import fleetAvailabilityRoutes from "./fleetAvailabilityRoutes";
+router.use("/fleet-availability", fleetAvailabilityRoutes);
+
 export default router;
 

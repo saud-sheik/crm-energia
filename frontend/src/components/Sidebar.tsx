@@ -4,7 +4,7 @@ import {
   ClipboardCheck, LayoutDashboard, Home, Inbox, Trello, FileText, Receipt,
   Users, BarChart, Settings, Clock, ChevronLeft, 
   ChevronRight, MessageSquare, CheckSquare, Search, Bell, Sparkles, LogOut, ChevronDown, Layers, Package, Building2, LifeBuoy, Target,
-  UserCheck, Shield, Briefcase, Megaphone, Wrench, ShieldAlert, Zap, FileCheck
+  UserCheck, Shield, Briefcase, Megaphone, Wrench, ShieldAlert, Zap, FileCheck, CalendarClock
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
@@ -107,6 +107,7 @@ export function Sidebar({
       subItems: [
         { label: "Accounts", path: "/accounts", icon: Building2 },
         { label: "Contacts", path: "/contacts", icon: Users },
+        { label: "Fleet Availability (Energia)", path: "/fleet-availability", icon: CalendarClock },
         { label: "Business Users", path: "/salespersons", icon: UserCheck },
         { label: "Work Orders", path: "/work-orders", icon: Wrench },
       ]
