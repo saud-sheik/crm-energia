@@ -59,6 +59,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import SupportTickets from "./pages/SupportTickets";
 import FieldService from "./pages/FieldService";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { BrandProvider } from "./context/BrandContext";
 import { Navigate, Outlet } from "react-router-dom";
 
 import QuoteDetail from "./pages/QuoteDetail";
@@ -105,8 +106,9 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+      <BrandProvider>
+        <AuthProvider>
+          <Routes>
           <Route path="/quote" element={<PublicQuoteRequest />} />
           <Route path="/q/:token" element={<PublicQuoteReview />} />
           <Route path="/feedback/:token" element={<PublicFeedback />} />
@@ -216,7 +218,8 @@ function App() {
           </Route>
         </Routes>
       </AuthProvider>
-    </BrowserRouter>
+    </BrandProvider>
+  </BrowserRouter>
   );
 }
 

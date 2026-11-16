@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
+import { useBrand } from "../context/BrandContext";
 import { leadFilterApi } from "../api";
 import { AttendanceClockWidget } from "./AttendanceClockWidget";
 
@@ -38,6 +39,7 @@ export function Sidebar({
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { brand, brandMode, setBrandMode, toggleBrandMode } = useBrand();
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem("sidebar_collapsed") === "true";
@@ -77,7 +79,50 @@ export function Sidebar({
     { label: "Work Orders", path: "/purchase-orders", icon: Layers },
   ];
 
-  const standardNavItems: NavItem[] = [
+  const energiaNavItems: NavItem[] = [
+    { label: "Dashboard", path: "/", icon: LayoutDashboard },
+    { 
+      label: "Rental Operations", 
+      icon: Zap,
+      subItems: [
+        { label: "Rental CPQ Builder", path: "/rental-cpq/builder", icon: Zap },
+        { label: "Fleet Availability", path: "/fleet-availability", icon: CalendarClock },
+        { label: "Credit & KYC Desk", path: "/credit-kyc", icon: Shield },
+        { label: "Rental Contracts & SLAs", path: "/rental-contracts", icon: FileCheck },
+      ]
+    },
+    { 
+      label: "Sales & Projects", 
+      icon: Briefcase,
+      subItems: [
+        { label: "Leads", path: "/leads", icon: Users },
+        { label: "Site Inspections", path: "/site-inspections", icon: ClipboardCheck },
+        ...(isFilterRoleAllowed ? [{ 
+          label: "Held Emails", 
+          path: "/held-emails", 
+          icon: ShieldAlert, 
+          badge: needsReviewCount > 0 ? String(needsReviewCount) : undefined 
+        }] : []),
+        { label: "Opportunities", path: "/opportunities", icon: Target },
+        { label: "Pipeline", path: "/pipeline", icon: Trello },
+        { label: "Standard Quotes", path: "/quotes", icon: FileText },
+      ]
+    },
+    { label: "Approval Limits", path: "/approvals", icon: Shield },
+    { 
+      label: "Accounts & Assets", 
+      icon: Building2,
+      subItems: [
+        { label: "Client Accounts", path: "/accounts", icon: Building2 },
+        { label: "Contacts", path: "/contacts", icon: Users },
+        { label: "Engineers & Staff", path: "/salespersons", icon: UserCheck },
+        { label: "Work Orders", path: "/work-orders", icon: Wrench },
+      ]
+    },
+    { label: "Settings", path: "/master-data/requirements", icon: Settings },
+  ];
+
+  const nexusNavItems: NavItem[] = [
     { label: "Dashboard", path: "/", icon: LayoutDashboard },
     { 
       label: "Sales Division", 
@@ -95,25 +140,23 @@ export function Sidebar({
         { label: "Opportunities", path: "/opportunities", icon: Target },
         { label: "Pipeline", path: "/pipeline", icon: Trello },
         { label: "Quotes", path: "/quotes", icon: FileText },
-        { label: "Rental CPQ (Energia)", path: "/rental-cpq/builder", icon: Zap },
-        { label: "Rental Contracts (Energia)", path: "/rental-contracts", icon: FileCheck },
       ]
     },
     { label: "Approval Queue & Limits", path: "/approvals", icon: Shield },
-    { label: "Credit & KYC Desk", path: "/credit-kyc", icon: FileCheck },
     { 
       label: "CRM", 
       icon: Building2,
       subItems: [
         { label: "Accounts", path: "/accounts", icon: Building2 },
         { label: "Contacts", path: "/contacts", icon: Users },
-        { label: "Fleet Availability (Energia)", path: "/fleet-availability", icon: CalendarClock },
         { label: "Business Users", path: "/salespersons", icon: UserCheck },
         { label: "Work Orders", path: "/work-orders", icon: Wrench },
       ]
     },
     { label: "Settings", path: "/master-data/requirements", icon: Settings },
   ];
+
+  const standardNavItems = brand.isEnergia ? energiaNavItems : nexusNavItems;
 
   const primaryNavItems = userRole === "site_manager"
     ? siteManagerNavItems
@@ -123,6 +166,8 @@ export function Sidebar({
 
   // Track open dropdowns (default open for active route)
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({
+    "Rental Operations": true,
+    "Sales & Projects": true,
     "Sales Division": true,
     "Governance & Approvals": true,
     "CRM": false,
@@ -149,7 +194,23 @@ export function Sidebar({
       {/* Sidebar Header */}
       <div className="p-4 border-b border-slate-100 dark:border-slate-800 space-y-3">
         <div className="flex items-center justify-between">
-          {!isCollapsed && <div className="flex items-center gap-2.5">
+          {!isCollapsed && (
+            brand.isEnergia ? (
+              <div className="flex items-center gap-2.5">
+                <div className="h-8 px-2 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-center shadow-sm">
+                  <img src="/energia-logo.png" alt="ENERGIA" className="h-4.5 w-auto max-w-[90px] object-contain" />
+                </div>
+                <div>
+                  <span className="font-black text-xs tracking-wider text-slate-900 dark:text-white block leading-none">
+                    ENERGIA
+                  </span>
+                  <span className="text-[9px] font-bold text-[#ED1A53] tracking-wider block mt-0.5">
+                    Fleet & Power CRM
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2.5">
                 <div className={`w-8 h-8 rounded-xl text-white flex items-center justify-center font-black text-xs shadow-md ${
                   userRole === "sales_rep" 
                     ? "bg-gradient-to-tr from-purple-600 via-indigo-600 to-emerald-500 shadow-purple-500/30" 
@@ -168,16 +229,23 @@ export function Sidebar({
                   </span>
                 </div>
               </div>
-            }
-            {isCollapsed && (
-              <div className={`w-8 h-8 rounded-xl text-white flex items-center justify-center font-black text-xs mx-auto shadow-md ${
-                userRole === "sales_rep"
+            )
+          )}
+          {isCollapsed && (
+            <button
+              onClick={toggleBrandMode}
+              title={`Switch CRM Brand (Current: ${brand.appName})`}
+              className={`w-8 h-8 rounded-xl text-white flex items-center justify-center font-black text-xs mx-auto shadow-md transition-transform hover:scale-105 ${
+                brand.isEnergia
+                  ? "bg-gradient-to-tr from-[#ED1A53] to-[#B00F38] shadow-[#ED1A53]/30"
+                  : userRole === "sales_rep"
                   ? "bg-gradient-to-tr from-purple-600 to-emerald-500 shadow-purple-500/30"
                   : "bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-blue-500/20"
-              }`}>
-                NX
-              </div>
-            )}
+              }`}
+            >
+              {brand.badgeText}
+            </button>
+          )}
           <button
             onClick={toggleCollapse}
             className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors hidden sm:block"
@@ -186,6 +254,36 @@ export function Sidebar({
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
         </div>
+
+        {/* Dynamic CRM Brand Switcher Pill */}
+        {!isCollapsed && (
+          <div className="flex bg-slate-100 dark:bg-slate-800/90 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700/60 shadow-inner">
+            <button
+              type="button"
+              onClick={() => setBrandMode("energia")}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-[11px] rounded-md transition-all font-bold ${
+                brand.isEnergia 
+                  ? "bg-[#ED1A53] text-white shadow-sm font-extrabold" 
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
+              }`}
+            >
+              <Zap className="w-3 h-3 text-current" />
+              <span>Energia</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setBrandMode("nexus")}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-[11px] rounded-md transition-all font-bold ${
+                brand.isNexus 
+                  ? "bg-blue-600 text-white shadow-sm font-extrabold" 
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
+              }`}
+            >
+              <Building2 className="w-3 h-3 text-current" />
+              <span>Nexus</span>
+            </button>
+          </div>
+        )}
 
         {/* Global Search & AI Quick Triggers in Sidebar */}
         <div className="space-y-1.5 pt-1">
