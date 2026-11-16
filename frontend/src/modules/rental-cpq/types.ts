@@ -59,3 +59,4 @@ export interface RentalCalculationBreakdown {
   finalTotalAmount: number;
   estimatedFuelUsageDailyLiters: number;
 }
+

@@ -16,3 +16,4 @@ router.post("/quotes", authMiddleware, createRentalQuote);
 router.get("/quotes/:quoteId", authMiddleware, getRentalQuoteDetails);
 
 export default router;
+

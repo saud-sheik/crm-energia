@@ -53,3 +53,4 @@ export const rentalCpqApi = {
     return res.json();
   }
 };
+

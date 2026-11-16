@@ -108,3 +108,4 @@ export const getRentalQuoteDetails = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Failed to fetch rental quote details", details: err.message });
   }
 };
+
