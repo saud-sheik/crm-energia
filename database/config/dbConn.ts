@@ -33,7 +33,7 @@ export function isLocalDatabaseHost(urlStr?: string): boolean {
 
 const isLocalhost = isLocalDatabaseHost(process.env.DATABASE_URL);
 
-export const sequelize = (process.env.USE_SQLITE === "true" && !process.env.DATABASE_URL)
+export const sequelize = (process.env.USE_SQLITE === "true" || !process.env.DATABASE_URL)
   ? new Sequelize({
       dialect: "sqlite",
       storage: sqlitePath,
