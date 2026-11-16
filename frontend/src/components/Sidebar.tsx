@@ -96,6 +96,7 @@ export function Sidebar({
         { label: "Pipeline", path: "/pipeline", icon: Trello },
         { label: "Quotes", path: "/quotes", icon: FileText },
         { label: "Rental CPQ (Energia)", path: "/rental-cpq/builder", icon: Zap },
+        { label: "Rental Contracts (Energia)", path: "/rental-contracts", icon: FileCheck },
       ]
     },
     { label: "Approval Queue & Limits", path: "/approvals", icon: Shield },

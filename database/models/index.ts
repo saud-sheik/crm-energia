@@ -3991,6 +3991,113 @@ CreditApplication.belongsTo(Account, { foreignKey: "accountId", as: "account", c
 
 CreditApplication.belongsTo(User, { foreignKey: "reviewedByUserId", as: "reviewer", constraints: false });
 
+export class RentalContract extends Model {
+  public id!: string;
+  public contractNumber!: string;
+  public dealId!: string;
+  public quoteId!: string | null;
+  public accountId!: string | null;
+  public status!: "DRAFT" | "LEGAL_REVIEW" | "AWAITING_CLIENT_SIGNATURE" | "AWAITING_COMPANY_SIGNATURE" | "ACTIVE" | "TERMINATED" | "EXPIRED";
+  public contractStartDate!: Date;
+  public contractEndDate!: Date;
+  public totalContractValue!: number;
+  public monthlyRecurringRate!: number | null;
+  public securityDepositAmount!: number;
+  public breakdownResponseSlaHours!: number;
+  public backupUnitCommitment!: boolean;
+  public insuranceResponsibility!: string;
+  public damageLiabilityTerms!: string | null;
+  public siteLocation!: string | null;
+  public equipmentSummary!: string | null;
+  public clientSignatoryName!: string | null;
+  public clientSignatoryTitle!: string | null;
+  public clientSignedAt!: Date | null;
+  public clientSignatureData!: string | null;
+  public companySignatoryUserId!: string | null;
+  public companySignedAt!: Date | null;
+  public companySignatureData!: string | null;
+  public legalReviewedByUserId!: string | null;
+  public legalReviewedAt!: Date | null;
+  public contractPdfUrl!: string | null;
+  public termsAccepted!: boolean;
+  public createdAt!: Date;
+  public updatedAt!: Date;
+}
+
+RentalContract.init(
+  {
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    contractNumber: { type: DataTypes.STRING, allowNull: false, unique: true },
+    dealId: { type: DataTypes.UUID, allowNull: false },
+    quoteId: { type: DataTypes.UUID, allowNull: true },
+    accountId: { type: DataTypes.UUID, allowNull: true },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "DRAFT"
+    },
+    contractStartDate: { type: DataTypes.DATE, allowNull: false },
+    contractEndDate: { type: DataTypes.DATE, allowNull: false },
+    totalContractValue: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: false,
+      defaultValue: 0
+    },
+    monthlyRecurringRate: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: true
+    },
+    securityDepositAmount: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: false,
+      defaultValue: 0
+    },
+    breakdownResponseSlaHours: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 4
+    },
+    backupUnitCommitment: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    insuranceResponsibility: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "CLIENT_COMPREHENSIVE"
+    },
+    damageLiabilityTerms: { type: DataTypes.TEXT, allowNull: true },
+    siteLocation: { type: DataTypes.STRING, allowNull: true },
+    equipmentSummary: { type: DataTypes.TEXT, allowNull: true },
+    clientSignatoryName: { type: DataTypes.STRING, allowNull: true },
+    clientSignatoryTitle: { type: DataTypes.STRING, allowNull: true },
+    clientSignedAt: { type: DataTypes.DATE, allowNull: true },
+    clientSignatureData: { type: DataTypes.TEXT, allowNull: true },
+    companySignatoryUserId: { type: DataTypes.UUID, allowNull: true },
+    companySignedAt: { type: DataTypes.DATE, allowNull: true },
+    companySignatureData: { type: DataTypes.TEXT, allowNull: true },
+    legalReviewedByUserId: { type: DataTypes.UUID, allowNull: true },
+    legalReviewedAt: { type: DataTypes.DATE, allowNull: true },
+    contractPdfUrl: { type: DataTypes.STRING, allowNull: true },
+    termsAccepted: { type: DataTypes.BOOLEAN, defaultValue: false }
+  },
+  {
+    sequelize,
+    modelName: "RentalContract",
+    tableName: "RentalContracts"
+  }
+);
+
+// Associations for RentalContract
+Deal.hasOne(RentalContract, { foreignKey: "dealId", as: "rentalContract", constraints: false });
+RentalContract.belongsTo(Deal, { foreignKey: "dealId", as: "deal", constraints: false });
+
+Account.hasMany(RentalContract, { foreignKey: "accountId", as: "rentalContracts", constraints: false });
+RentalContract.belongsTo(Account, { foreignKey: "accountId", as: "account", constraints: false });
+
+RentalContract.belongsTo(User, { foreignKey: "companySignatoryUserId", as: "companySignatory", constraints: false });
+RentalContract.belongsTo(User, { foreignKey: "legalReviewedByUserId", as: "legalReviewer", constraints: false });
+
 export { sequelize };
 
 

@@ -1178,6 +1178,7 @@ router.delete("/lead-filter/sender-rules/:id", authMiddleware, requireAdminOrMan
 
 
 // ==========================================
+// ==========================================
 // ENERGIA RENTAL CPQ ENGINE
 // ==========================================
 import rentalCpqRoutes from "./rentalCpqRoutes";
@@ -1188,6 +1189,12 @@ router.use("/rental-cpq", rentalCpqRoutes);
 // ==========================================
 import creditKycRoutes from "./creditKycRoutes";
 router.use("/credit-kyc", creditKycRoutes);
+
+// ==========================================
+// ENERGIA RENTAL CONTRACTS & LEGAL SLAS
+// ==========================================
+import rentalContractRoutes from "./rentalContractRoutes";
+router.use("/rental-contracts", rentalContractRoutes);
 
 export default router;
 
