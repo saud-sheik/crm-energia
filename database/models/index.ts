@@ -3881,6 +3881,116 @@ TeamBreakPolicy.init(
   }
 );
 
+export class CreditApplication extends Model {
+  public id!: string;
+  public dealId!: string;
+  public accountId!: string | null;
+  public quoteId!: string | null;
+  public status!: "PENDING_REVIEW" | "APPROVED" | "DECLINED" | "ADVANCE_PAYMENT_REQUIRED";
+  public requestedCreditLimit!: number;
+  public approvedCreditLimit!: number | null;
+  public requestedPaymentTerms!: string;
+  public approvedPaymentTerms!: string | null;
+  public tradeLicenseNumber!: string | null;
+  public commercialRegistrationNumber!: string | null;
+  public vatRegistrationNumber!: string | null;
+  public kycDocuments!: string | null;
+  public reviewedByUserId!: string | null;
+  public reviewedAt!: Date | null;
+  public declineReason!: string | null;
+  public notes!: string | null;
+  public fallbackToAdvancePayment!: boolean;
+  public advancePaymentReceived!: boolean;
+  public createdAt!: Date;
+  public updatedAt!: Date;
+}
+
+CreditApplication.init(
+  {
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    dealId: { type: DataTypes.UUID, allowNull: false },
+    accountId: { type: DataTypes.UUID, allowNull: true },
+    quoteId: { type: DataTypes.UUID, allowNull: true },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "PENDING_REVIEW"
+    },
+    requestedCreditLimit: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: false,
+      defaultValue: 0
+    },
+    approvedCreditLimit: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: true
+    },
+    requestedPaymentTerms: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "30_DAYS"
+    },
+    approvedPaymentTerms: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    tradeLicenseNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    commercialRegistrationNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    vatRegistrationNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    kycDocuments: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    reviewedByUserId: {
+      type: DataTypes.UUID,
+      allowNull: true
+    },
+    reviewedAt: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    declineReason: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    notes: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    fallbackToAdvancePayment: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    advancePaymentReceived: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
+  },
+  {
+    sequelize,
+    modelName: "CreditApplication",
+    tableName: "CreditApplications"
+  }
+);
+
+// Associations for CreditApplication
+Deal.hasOne(CreditApplication, { foreignKey: "dealId", as: "creditApplication", constraints: false });
+CreditApplication.belongsTo(Deal, { foreignKey: "dealId", as: "deal", constraints: false });
+
+Account.hasMany(CreditApplication, { foreignKey: "accountId", as: "creditApplications", constraints: false });
+CreditApplication.belongsTo(Account, { foreignKey: "accountId", as: "account", constraints: false });
+
+CreditApplication.belongsTo(User, { foreignKey: "reviewedByUserId", as: "reviewer", constraints: false });
+
 export { sequelize };
 
 

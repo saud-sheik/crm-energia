@@ -1177,5 +1177,11 @@ router.post("/lead-filter/sender-rules", authMiddleware, requireAdminOrManager, 
 router.delete("/lead-filter/sender-rules/:id", authMiddleware, requireAdminOrManager, deleteSenderRule);
 
 
+// ==========================================
+// ENERGIA CREDIT CHECK & KYC MANAGEMENT
+// ==========================================
+import creditKycRoutes from "./creditKycRoutes";
+router.use("/credit-kyc", creditKycRoutes);
+
 export default router;
 
