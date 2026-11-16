@@ -1177,5 +1177,11 @@ router.post("/lead-filter/sender-rules", authMiddleware, requireAdminOrManager, 
 router.delete("/lead-filter/sender-rules/:id", authMiddleware, requireAdminOrManager, deleteSenderRule);
 
 
+// ==========================================
+// ENERGIA FLEET AVAILABILITY & BOOKING CALENDAR
+// ==========================================
+import fleetAvailabilityRoutes from "./fleetAvailabilityRoutes";
+router.use("/fleet-availability", fleetAvailabilityRoutes);
+
 export default router;
 
