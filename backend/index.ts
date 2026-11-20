@@ -1,4 +1,6 @@
 import "dotenv/config";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { createServer } from "./server";
 import { Database, sequelize } from "@nexus-crm/database";
 import { checkOverdueTasks } from "./src/services/notificationService";
@@ -18,9 +20,81 @@ server.on("error", (err: any) => {
   process.exit(1);
 });
 
+async function ensureDatabaseInitialized() {
+  try {
+    console.log("[STARTUP] Ensuring database schema is synchronized...");
+    await sequelize.sync();
+    console.log("[STARTUP] Database schema synchronized successfully.");
+
+    if (sequelize.models.User) {
+      const adminCount = await sequelize.models.User.count({ where: { email: "admin@nexus.com" } });
+      if (adminCount === 0) {
+        const hashedPassword = await bcrypt.hash("password123", 10);
+        await sequelize.models.User.create({
+          id: crypto.randomUUID(),
+          name: "Sophia Martinez",
+          email: "admin@nexus.com",
+          password: hashedPassword,
+          role: "admin",
+          department: "Executive Management",
+          territory: "Global Headquarters",
+          isAvailable: true,
+          maxOpenLeads: 100
+        });
+        await sequelize.models.User.create({
+          id: crypto.randomUUID(),
+          name: "Sales Rep 1",
+          email: "salesperson1@nexus.com",
+          password: hashedPassword,
+          role: "sales_rep",
+          department: "Sales",
+          territory: "Riyadh",
+          isAvailable: true,
+          maxOpenLeads: 50
+        });
+        await sequelize.models.User.create({
+          id: crypto.randomUUID(),
+          name: "Sales Rep 2",
+          email: "salesperson2@nexus.com",
+          password: hashedPassword,
+          role: "sales_rep",
+          department: "Sales",
+          territory: "Jubail",
+          isAvailable: true,
+          maxOpenLeads: 50
+        });
+        console.log("[STARTUP] Auto-created demo accounts: admin@nexus.com, salesperson1@nexus.com, salesperson2@nexus.com");
+      }
+    }
+
+    if (sequelize.models.Asset) {
+      const assetsToSeed = [
+        { id: 'gen-500-01', name: 'Caterpillar C15 Heavy Soundproof (500 kVA)', type: 'Generator', serialNumber: 'CAT-8891', status: 'Available', condition: 'Excellent' },
+        { id: 'gen-500-02', name: 'Caterpillar C15 Prime Power (500 kVA)', type: 'Generator', serialNumber: 'CAT-8892', status: 'Available', condition: 'Excellent' },
+        { id: 'gen-1000-04', name: 'MTU Mega 16V2000 Containerized (1000 kVA)', type: 'Generator', serialNumber: 'MTU-104', status: 'Available', condition: 'Excellent' },
+        { id: 'gen-1000-05', name: 'MTU Mega 16V2000 Containerized (1000 kVA)', type: 'Generator', serialNumber: 'MTU-105', status: 'Available', condition: 'Good' },
+        { id: 'gen-250-18', name: 'Perkins 1506A Soundproof Canopy (250 kVA)', type: 'Generator', serialNumber: 'PRK-218', status: 'Available', condition: 'Excellent' },
+        { id: 'gen-250-19', name: 'Perkins 1506A Soundproof Canopy (250 kVA)', type: 'Generator', serialNumber: 'PRK-219', status: 'Available', condition: 'Excellent' },
+        { id: 'gen-60-44', name: 'Cummins 4BTA Trailer Auxiliary (60 kVA)', type: 'Generator', serialNumber: 'CUM-644', status: 'Available', condition: 'Excellent' },
+        { id: 'gen-500-09', name: 'Caterpillar C15 Heavy Soundproof (500 kVA)', type: 'Generator', serialNumber: 'CAT-8909', status: 'Available', condition: 'Good' }
+      ];
+      for (const a of assetsToSeed) {
+        await sequelize.models.Asset.findOrCreate({
+          where: { id: a.id },
+          defaults: a
+        });
+      }
+      console.log("[STARTUP] Initialized generator fleet assets in database.");
+    }
+  } catch (err) {
+    console.error("[STARTUP] Auto-init error:", err);
+  }
+}
+
 const startServer = async () => {
   try {
     await Database.createConnection();
+    await ensureDatabaseInitialized();
     // Models are synced via Sequelize migrations. Safely sync tables if needed.
     if (sequelize.models.WhatsAppLog) {
       await sequelize.models.WhatsAppLog.sync().catch(err => console.error("Failed to sync WhatsAppLog model:", err));
