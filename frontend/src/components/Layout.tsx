@@ -26,7 +26,7 @@ export function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, token } = useAuth();
-  const { brand } = useBrand();
+  const { brand, themeColor } = useBrand();
 
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -207,7 +207,9 @@ export function Layout() {
   return (
     <OrbitProvider>
       <div className={`flex flex-col h-screen w-full font-sans overflow-hidden transition-colors duration-300 ${
-        brand.isEnergia ? "bg-[#FAF6F8] text-slate-900" : "bg-[#F8FAFC] dark:bg-slate-950 text-slate-900 dark:text-slate-100"
+        brand.isEnergia 
+          ? (themeColor === "sky" ? "bg-[#F0F7FC] text-slate-900" : "bg-[#FAF6F8] text-slate-900")
+          : "bg-[#F8FAFC] dark:bg-slate-950 text-slate-900 dark:text-slate-100"
       }`}>
         {/* MAIN CONTENT AREA CONTAINER WITH PERSISTENT SIDEBAR */}
         <div className="flex-1 flex overflow-hidden relative">
@@ -216,15 +218,25 @@ export function Layout() {
             onOpenAi={() => openAssist()}
           />
           <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-            {/* Ambient Logo Pink Tint at Top Background */}
+            {/* Ambient Top Background */}
             {brand.isEnergia && (
-              <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-[#ED1A53]/12 via-[#ED1A53]/3 to-transparent pointer-events-none z-0" />
+              <div className={`absolute top-0 left-0 right-0 h-96 pointer-events-none z-0 ${
+                themeColor === "sky"
+                  ? "bg-gradient-to-b from-[#7BBDE8]/20 via-[#7BBDE8]/6 to-transparent"
+                  : "bg-gradient-to-b from-[#ED1A53]/12 via-[#ED1A53]/3 to-transparent"
+              }`} />
             )}
 
             {brand.isEnergia && (
-              <header className="h-16 shrink-0 bg-white/75 backdrop-blur-md border-b border-[#ED1A53]/15 z-30 flex items-center justify-between px-6 shadow-[0_4px_20px_rgba(237,26,83,0.04)] relative">
+              <header className={`h-16 shrink-0 bg-white/75 backdrop-blur-md z-30 flex items-center justify-between px-6 relative transition-colors ${
+                themeColor === "sky"
+                  ? "border-b border-[#7BBDE8]/30 shadow-[0_4px_20px_rgba(123,189,232,0.06)]"
+                  : "border-b border-[#ED1A53]/15 shadow-[0_4px_20px_rgba(237,26,83,0.04)]"
+              }`}>
                 <div className="flex items-center gap-4 flex-1 max-w-2xl">
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/90 border border-[#ED1A53]/20 shadow-xs">
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/90 border shadow-xs ${
+                    themeColor === "sky" ? "border-sky-200/70" : "border-[#ED1A53]/20"
+                  }`}>
                     <div className="relative flex items-center justify-center">
                       <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                       <span className="absolute w-3 h-3 rounded-full bg-emerald-500/40 animate-ping"></span>
@@ -238,11 +250,15 @@ export function Layout() {
                   <button
                     type="button"
                     onClick={() => setIsCommandPaletteOpen(true)}
-                    className="flex-1 flex items-center gap-2.5 px-3.5 py-1.5 bg-white/90 hover:bg-white border border-[#ED1A53]/15 shadow-xs rounded-xl text-slate-600 text-xs font-medium transition cursor-text text-left"
+                    className={`flex-1 flex items-center gap-2.5 px-3.5 py-1.5 bg-white/90 hover:bg-white border shadow-xs rounded-xl text-slate-600 text-xs font-medium transition cursor-text text-left ${
+                      themeColor === "sky" ? "border-sky-200/70 hover:border-sky-300" : "border-[#ED1A53]/15 hover:border-[#ED1A53]/30"
+                    }`}
                   >
-                    <Search className="w-4 h-4 text-[#ED1A53] shrink-0" />
+                    <Search className={`w-4 h-4 shrink-0 ${themeColor === "sky" ? "text-[#144A7E]" : "text-[#ED1A53]"}`} />
                     <span className="truncate">Search generator serial, CR license, contract # or client...</span>
-                    <kbd className="ml-auto px-1.5 py-0.5 text-[9px] font-mono bg-rose-50 border border-rose-200/60 rounded text-[#ED1A53]">Ctrl+K</kbd>
+                    <kbd className={`ml-auto px-1.5 py-0.5 text-[9px] font-mono border rounded ${
+                      themeColor === "sky" ? "bg-sky-50 border-sky-200/80 text-[#144A7E]" : "bg-rose-50 border-rose-200/60 text-[#ED1A53]"
+                    }`}>Ctrl+K</kbd>
                   </button>
                 </div>
 
@@ -258,7 +274,11 @@ export function Layout() {
                           openAssist();
                         }
                       }}
-                      className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#ED1A53] via-[#D81248] to-[#B00F38] hover:from-[#f0295f] hover:to-[#960a2d] text-white shadow-md shadow-[#ED1A53]/25 border border-white/25 transition-all cursor-pointer group active:scale-95"
+                      className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-white shadow-md border transition-all cursor-pointer group active:scale-95 ${
+                        themeColor === "sky"
+                          ? "bg-gradient-to-r from-[#144A7E] via-[#0E355C] to-[#0A2744] hover:from-[#185591] hover:to-[#0D3054] shadow-[#0E355C]/35 border-white/20"
+                          : "bg-gradient-to-r from-[#ED1A53] via-[#D81248] to-[#B00F38] hover:from-[#f0295f] hover:to-[#960a2d] shadow-[#ED1A53]/25 border-white/25"
+                      }`}
                       title="Open Volvi Copilot (Industrial RAG & Alerts)"
                     >
                       <div className="w-5 h-5 rounded-lg bg-white/20 flex items-center justify-center text-amber-300 group-hover:scale-110 transition-transform">
@@ -271,7 +291,11 @@ export function Layout() {
                             e.stopPropagation();
                             setIsTopNotifOpen(prev => !prev);
                           }}
-                          className="px-1.5 py-0.2 rounded-full bg-white text-[#ED1A53] text-[10px] font-black shadow-xs ring-1 ring-white/30 ml-0.5 animate-pulse cursor-pointer hover:bg-rose-50"
+                          className={`px-1.5 py-0.2 rounded-full text-[10px] font-black shadow-xs ring-1 ring-white/30 ml-0.5 animate-pulse cursor-pointer ${
+                            themeColor === "sky"
+                              ? "bg-white text-[#0E355C] hover:bg-sky-50"
+                              : "bg-white text-[#ED1A53] hover:bg-rose-50"
+                          }`}
                           title="Toggle Task Notification Pop-up"
                         >
                           {unreadCount}
@@ -286,15 +310,25 @@ export function Layout() {
 
                     {/* TOP TASK NOTIFICATION POP-UP ANCHORED RIGHT UNDER BUTTON */}
                     {isTopNotifOpen && activeTaskNotification && (
-                      <div className="absolute top-full right-0 mt-2.5 z-50 w-96 max-w-sm bg-white dark:bg-slate-900 border-2 border-[#ED1A53]/35 rounded-2xl shadow-[0_20px_50px_rgba(237,26,83,0.22)] p-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className={`absolute top-full right-0 mt-2.5 z-50 w-96 max-w-sm bg-white dark:bg-slate-900 border-2 rounded-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-200 ${
+                        themeColor === "sky"
+                          ? "border-[#7BBDE8]/60 shadow-[0_20px_50px_rgba(14,53,92,0.18)]"
+                          : "border-[#ED1A53]/35 shadow-[0_20px_50px_rgba(237,26,83,0.22)]"
+                      }`}>
                         {/* Header */}
                         <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-100 dark:border-slate-800">
                           <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-lg bg-[#ED1A53]/10 flex items-center justify-center text-[#ED1A53]">
+                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+                              themeColor === "sky" ? "bg-[#144A7E]/10 text-[#144A7E]" : "bg-[#ED1A53]/10 text-[#ED1A53]"
+                            }`}>
                               <Sparkles className="w-3.5 h-3.5 animate-pulse" />
                             </div>
                             <div className="flex items-center gap-1.5">
-                              <span className="font-mono text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-50 text-[#ED1A53] border border-rose-200/60">
+                              <span className={`font-mono text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                                themeColor === "sky"
+                                  ? "bg-sky-50 text-[#0E355C] border-sky-200/70"
+                                  : "bg-rose-50 text-[#ED1A53] border-rose-200/60"
+                              }`}>
                                 {activeTaskNotification.badge}
                               </span>
                               <span className="text-[10px] font-bold text-slate-400">Action Required</span>
@@ -331,7 +365,11 @@ export function Layout() {
                                 navigate(activeTaskNotification.link);
                               }
                             }}
-                            className="flex-1 py-2 px-3.5 bg-gradient-to-r from-[#ED1A53] to-[#B00F38] hover:from-[#d81248] hover:to-[#960a2d] text-white text-xs font-black rounded-xl shadow-md shadow-[#ED1A53]/25 flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+                            className={`flex-1 py-2 px-3.5 text-white text-xs font-black rounded-xl shadow-md flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer ${
+                              themeColor === "sky"
+                                ? "bg-gradient-to-r from-[#144A7E] to-[#0E355C] hover:from-[#185591] hover:to-[#0D3054] shadow-[#0E355C]/25"
+                                : "bg-gradient-to-r from-[#ED1A53] to-[#B00F38] hover:from-[#d81248] hover:to-[#960a2d] shadow-[#ED1A53]/25"
+                            }`}
                           >
                             <span>{activeTaskNotification.actionLabel}</span>
                             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -353,14 +391,20 @@ export function Layout() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-3 pl-3 border-l border-[#ED1A53]/15">
+                  <div className={`flex items-center gap-3 pl-3 border-l ${
+                    themeColor === "sky" ? "border-sky-200" : "border-[#ED1A53]/15"
+                  }`}>
                     <div className="text-right hidden sm:block">
                       <div className="text-xs font-bold text-slate-900 leading-tight">
                         {user?.name || "Sophia Martinez"}
                       </div>
                       <div className="flex items-center justify-end gap-1.5 mt-0.5">
                         <span className="text-[10px] text-slate-500 font-medium">Regional Fleet & Commercial Director</span>
-                        <span className="px-1.5 py-0.2 rounded bg-rose-50 text-[#ED1A53] border border-rose-200 text-[9px] font-extrabold">
+                        <span className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold ${
+                          themeColor === "sky"
+                            ? "bg-sky-100 text-[#0E355C] border border-sky-300"
+                            : "bg-rose-50 text-[#ED1A53] border border-rose-200"
+                        }`}>
                           Admin / Lvl 4
                         </span>
                       </div>

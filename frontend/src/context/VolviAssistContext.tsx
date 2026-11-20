@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef, ReactNode } fro
 import { useNavigate, useLocation } from "react-router-dom";
 import { Bot, Zap, ArrowRight, Minus, Maximize2, Pause, Play, X, ArrowUpRight, ChevronDown } from "lucide-react";
 import { useAuth } from "./AuthContext";
+import { useBrand } from "./BrandContext";
 
 export type VolviTab = "copilot" | "alerts" | "playbook";
 
@@ -195,6 +196,7 @@ function getRouteDefaultGuidance(pathname: string): VolviStepGuidance {
 }
 
 export function VolviAssistProvider({ children }: { children: ReactNode }) {
+  const { themeColor } = useBrand();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, token } = useAuth();
@@ -672,7 +674,11 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={handleActionClick}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#ED1A53] via-[#C71042] to-[#ED1A53] hover:from-[#d81548] hover:to-[#b00d38] text-white font-black text-xs shadow-lg shadow-[#ED1A53]/35 transition-all cursor-pointer active:scale-95"
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-black text-xs shadow-lg transition-all cursor-pointer active:scale-95 ${
+                    themeColor === "sky"
+                      ? "bg-gradient-to-r from-[#144A7E] via-[#0E355C] to-[#0A2744] hover:from-[#185591] hover:to-[#0D3054] shadow-[#0E355C]/35 border border-white/20"
+                      : "bg-gradient-to-r from-[#ED1A53] via-[#C71042] to-[#ED1A53] hover:from-[#d81548] hover:to-[#b00d38] shadow-[#ED1A53]/35"
+                  }`}
                 >
                   <span>{displayedGuidance.actionLabel}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -707,7 +713,7 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
 
               {/* 8-Stage Lifecycle Progress Segment */}
               <div className="mt-3.5 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/60">
-                <span className="font-bold text-rose-200">
+                <span className={`font-bold ${themeColor === "sky" ? "text-sky-300" : "text-rose-200"}`}>
                   Lifecycle Progress
                 </span>
                 <div className="flex items-center gap-1">
@@ -720,7 +726,9 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
                         title={`Step ${step.num}: ${step.name}`}
                         className={`h-1.5 rounded-full transition-all ${
                           isCurrent
-                            ? "w-4 bg-[#ED1A53] ring-2 ring-[#ED1A53]/50 animate-pulse"
+                            ? (themeColor === "sky"
+                                ? "w-4 bg-[#7BBDE8] ring-2 ring-[#7BBDE8]/50 animate-pulse"
+                                : "w-4 bg-[#ED1A53] ring-2 ring-[#ED1A53]/50 animate-pulse")
                             : isDone
                             ? "w-2 bg-emerald-400"
                             : "w-1.5 bg-white/20"

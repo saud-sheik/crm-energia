@@ -47,6 +47,7 @@ import {
   Layers as LayersIcon
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useBrand } from "../../context/BrandContext";
 import { useVolviAssist } from "../../context/VolviAssistContext";
 import { siteInspectionApi } from "../../api/siteInspection";
 import { rentalContractApi } from "../rental-contracts/rentalContractApi";
@@ -313,6 +314,7 @@ export const CALENDAR_WEEKS = [
 
 export default function FleetAvailabilityDesk() {
   const { token } = useAuth();
+  const { themeColor } = useBrand();
   const { triggerGuidance } = useVolviAssist();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -645,16 +647,32 @@ export default function FleetAvailabilityDesk() {
   });
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-[#FDF1F4] via-[#FFF9FA] to-[#F5F6FA] dark:bg-[#0B0F17] text-[#0B1C30] dark:text-slate-100 p-3 lg:p-5 space-y-3.5 font-sans relative overflow-hidden">
-      {/* Ambient Logo Pink Ambient Tint at the Top */}
-      <div className="absolute top-0 right-10 w-[550px] h-[320px] bg-gradient-to-b from-[#ED1A53]/15 via-[#ED1A53]/5 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
-      <div className="absolute top-4 left-1/4 w-[380px] h-[220px] bg-[#ED1A53]/8 rounded-full blur-2xl pointer-events-none -z-0" />
+    <div className={`w-full min-h-screen ${
+      themeColor === "sky"
+        ? "bg-gradient-to-b from-[#F0F7FC] via-[#F5FAFE] to-[#EBF4FA] text-slate-900"
+        : "bg-gradient-to-b from-[#FDF1F4] via-[#FFF9FA] to-[#F5F6FA] text-[#0B1C30]"
+    } dark:bg-[#0B0F17] dark:text-slate-100 p-3 lg:p-5 space-y-3.5 font-sans relative overflow-hidden`}>
+      {/* Ambient Top Glow */}
+      <div className={`absolute top-0 right-10 w-[550px] h-[320px] rounded-full blur-3xl pointer-events-none -z-0 ${
+        themeColor === "sky"
+          ? "bg-gradient-to-b from-[#7BBDE8]/25 via-[#7BBDE8]/8 to-transparent"
+          : "bg-gradient-to-b from-[#ED1A53]/15 via-[#ED1A53]/5 to-transparent"
+      }`} />
+      <div className={`absolute top-4 left-1/4 w-[380px] h-[220px] rounded-full blur-2xl pointer-events-none -z-0 ${
+        themeColor === "sky"
+          ? "bg-[#7BBDE8]/15"
+          : "bg-[#ED1A53]/8"
+      }`} />
 
       {/* 1. TOP HEADER & OPERATIONAL GREETING */}
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
         <div>
           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-            <span className="px-2 py-0.5 rounded-full bg-rose-100/80 text-[#ED1A53] dark:text-rose-400 font-mono text-[10px] uppercase tracking-widest font-extrabold border border-[#ED1A53]/25 shadow-2xs">
+            <span className={`px-2 py-0.5 rounded-full font-mono text-[10px] uppercase tracking-widest font-extrabold border shadow-2xs ${
+              themeColor === "sky"
+                ? "bg-sky-100/90 text-[#0E355C] border-sky-300/60 dark:text-sky-300"
+                : "bg-rose-100/80 text-[#ED1A53] dark:text-rose-400 border-[#ED1A53]/25"
+            }`}>
               Fleet Core V3.8
             </span>
             <span className="text-slate-500 dark:text-slate-400 text-xs">• Live Synced 12s ago</span>
@@ -676,10 +694,14 @@ export default function FleetAvailabilityDesk() {
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setIsGanttModalOpen(true)}
-            className="px-3 py-1.5 rounded-xl bg-white/95 hover:bg-white dark:bg-slate-900 border border-[#ED1A53]/25 text-slate-800 dark:text-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_2px_8px_rgba(237,26,83,0.04)] active:scale-95"
+            className={`px-3 py-1.5 rounded-xl bg-white/95 hover:bg-white dark:bg-slate-900 border text-slate-800 dark:text-slate-200 text-xs font-bold transition flex items-center gap-1.5 active:scale-95 ${
+              themeColor === "sky"
+                ? "border-sky-200 hover:border-sky-300 shadow-[0_2px_8px_rgba(123,189,232,0.12)]"
+                : "border-[#ED1A53]/25 shadow-[0_2px_8px_rgba(237,26,83,0.04)]"
+            }`}
             title="Open Master 12-Week Rolling Gantt Matrix"
           >
-            <Maximize2 className="w-3.5 h-3.5 text-[#ED1A53]" />
+            <Maximize2 className={`w-3.5 h-3.5 ${themeColor === "sky" ? "text-[#144A7E]" : "text-[#ED1A53]"}`} />
             <span>Open Multi-Hub Gantt</span>
           </button>
           <button
@@ -691,7 +713,11 @@ export default function FleetAvailabilityDesk() {
           </button>
           <button
             onClick={() => setIsBookingModalOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#ED1A53] to-[#B00F38] hover:from-[#d81248] hover:to-[#960a2d] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-[#ED1A53]/25 active:scale-95"
+            className={`px-3.5 py-1.5 rounded-xl text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 ${
+              themeColor === "sky"
+                ? "bg-gradient-to-r from-[#144A7E] via-[#0E355C] to-[#0A2744] hover:from-[#185591] hover:to-[#0D3054] shadow-[#0E355C]/35 border border-white/20"
+                : "bg-gradient-to-r from-[#ED1A53] to-[#B00F38] hover:from-[#d81248] hover:to-[#960a2d] shadow-[#ED1A53]/25"
+            }`}
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Create Spot Reservation</span>
@@ -703,14 +729,18 @@ export default function FleetAvailabilityDesk() {
       <section className="relative z-10">
         <div className="flex items-center justify-between mb-2 px-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#ED1A53] animate-pulse" />
+            <span className={`w-2 h-2 rounded-full animate-pulse ${
+              themeColor === "sky" ? "bg-[#144A7E]" : "bg-[#ED1A53]"
+            }`} />
             <span className="text-[11px] uppercase tracking-wider font-extrabold text-slate-600 dark:text-slate-300">
               Commercial & Fleet Health • Executive North-Star KPIs
             </span>
           </div>
           <span
             onClick={() => navigate("/rental-contracts")}
-            className="text-[11px] text-[#ED1A53] font-bold cursor-pointer hover:underline"
+            className={`text-[11px] font-bold cursor-pointer hover:underline ${
+              themeColor === "sky" ? "text-[#144A7E]" : "text-[#ED1A53]"
+            }`}
           >
             380 Active Asset Manifest ▾
           </span>
@@ -902,25 +932,39 @@ export default function FleetAvailabilityDesk() {
       {/* 3. ZONE 2: PERFORMANCE SHOWCASE GRID (MAROON & BENTO ACCENTS) */}
       <section className="relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-          {/* A. Left Sky Blue Speedometer Card (lg:col-span-4) */}
+          {/* A. Left Speedometer Card (lg:col-span-4) */}
           <div
             onClick={() => setIsDiagnosticsModalOpen(true)}
-            className="lg:col-span-4 rounded-[24px] bg-gradient-to-b from-[#7BBDE8] via-[#65AEE4] to-[#4F9FDA] text-slate-900 p-5 shadow-[0_16px_36px_-8px_rgba(123,189,232,0.35)] relative overflow-hidden flex flex-col justify-between cursor-pointer group hover:scale-[1.01] transition-transform border border-sky-300/50"
+            className={`lg:col-span-4 rounded-[24px] p-5 relative overflow-hidden flex flex-col justify-between cursor-pointer group hover:scale-[1.01] transition-transform ${
+              themeColor === "sky"
+                ? "bg-gradient-to-b from-[#7BBDE8] via-[#65AEE4] to-[#4F9FDA] text-slate-900 shadow-[0_16px_36px_-8px_rgba(123,189,232,0.35)] border border-sky-300/50"
+                : "bg-gradient-to-b from-[#2B081B] via-[#200614] to-[#15030D] text-white shadow-[0_25px_80px_rgba(20,2,12,0.95),0_0_50px_rgba(237,26,83,0.18)] border border-[#ED1A53]/35"
+            }`}
           >
             {/* Ambient Background Warm Glow */}
             <div className="absolute top-0 right-0 w-36 h-36 bg-white/20 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="flex items-center justify-between relative z-10 pb-2 border-b border-sky-300/40">
+            <div className={`flex items-center justify-between relative z-10 pb-2 border-b ${
+              themeColor === "sky" ? "border-sky-300/40" : "border-white/10"
+            }`}>
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-300 animate-pulse shadow-sm shadow-amber-300/50" />
                 <div>
-                  <span className="text-xs sm:text-[13px] font-black tracking-wider uppercase text-sky-950 block leading-tight">
+                  <span className={`text-xs sm:text-[13px] font-black tracking-wider uppercase block leading-tight ${
+                    themeColor === "sky" ? "text-sky-950" : "text-white"
+                  }`}>
                     Active Fleet Performance
                   </span>
-                  <span className="text-[10px] font-semibold text-sky-950/75">Real-time Load Balancing</span>
+                  <span className={`text-[10px] font-semibold ${
+                    themeColor === "sky" ? "text-sky-950/75" : "text-slate-300"
+                  }`}>Real-time Load Balancing</span>
                 </div>
               </div>
-              <div className="w-7 h-7 rounded-full bg-white/30 flex items-center justify-center text-sky-950 group-hover:bg-white/40 transition">
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center transition ${
+                themeColor === "sky"
+                  ? "bg-white/30 text-sky-950 group-hover:bg-white/40"
+                  : "bg-white/10 text-white group-hover:bg-white/20"
+              }`}>
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </div>
             </div>
@@ -934,7 +978,7 @@ export default function FleetAvailabilityDesk() {
                     cy="80"
                     r="62"
                     fill="transparent"
-                    stroke="rgba(255, 255, 255, 0.4)"
+                    stroke={themeColor === "sky" ? "rgba(255, 255, 255, 0.4)" : "rgba(255, 255, 255, 0.15)"}
                     strokeWidth="13"
                     strokeDasharray="390"
                     strokeDashoffset="195"
@@ -954,8 +998,12 @@ export default function FleetAvailabilityDesk() {
                   />
                 </svg>
                 <div className="absolute bottom-1 flex flex-col items-center">
-                  <span className="text-2xl font-black tracking-tight text-sky-950">90%</span>
-                  <span className="text-[9px] font-extrabold text-sky-950/80 uppercase tracking-widest">
+                  <span className={`text-2xl font-black tracking-tight ${
+                    themeColor === "sky" ? "text-sky-950" : "text-white"
+                  }`}>90%</span>
+                  <span className={`text-[9px] font-extrabold uppercase tracking-widest ${
+                    themeColor === "sky" ? "text-sky-950/80" : "text-slate-400"
+                  }`}>
                     Load Factor
                   </span>
                 </div>
@@ -963,8 +1011,12 @@ export default function FleetAvailabilityDesk() {
             </div>
 
             {/* Bottom Financial & Asset Stat -> Navigates to /invoices */}
-            <div className="relative z-10 border-t border-sky-300/40 pt-3">
-              <span className="text-[11px] text-sky-950/80 font-bold uppercase tracking-wider block">
+            <div className={`relative z-10 border-t pt-3 ${
+              themeColor === "sky" ? "border-sky-300/40" : "border-white/10"
+            }`}>
+              <span className={`text-[11px] font-bold uppercase tracking-wider block ${
+                themeColor === "sky" ? "text-sky-950/80" : "text-slate-400"
+              }`}>
                 Total Active Contract Valuation
               </span>
               <div
@@ -972,19 +1024,25 @@ export default function FleetAvailabilityDesk() {
                   e.stopPropagation();
                   navigate("/invoices");
                 }}
-                className="text-2xl font-black text-sky-950 tracking-tight mt-0.5 hover:text-white transition"
+                className={`text-2xl font-black tracking-tight mt-0.5 transition ${
+                  themeColor === "sky" ? "text-sky-950 hover:text-white" : "text-white hover:text-amber-400"
+                }`}
                 title="Open Invoices & Billing Desk"
               >
                 SAR 24,850,000
               </div>
-              <div className="flex items-center justify-between text-[10px] text-sky-950/80 mt-1">
+              <div className={`flex items-center justify-between text-[10px] mt-1 ${
+                themeColor === "sky" ? "text-sky-950/80" : "text-slate-400"
+              }`}>
                 <span>342 Units Dispatched • GPS Sat: Locked</span>
                 <span
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsDiagnosticsModalOpen(true);
                   }}
-                  className="text-amber-800 font-extrabold group-hover:underline"
+                  className={`${
+                    themeColor === "sky" ? "text-amber-800" : "text-amber-400"
+                  } font-extrabold group-hover:underline`}
                 >
                   Deep Diagnostics ↗
                 </span>
@@ -997,13 +1055,21 @@ export default function FleetAvailabilityDesk() {
             {/* Top Stacked Card: Dispatched Power Peak */}
             <div
               onClick={() => setIsDiagnosticsModalOpen(true)}
-              className="flex-1 p-4 rounded-[20px] bg-white dark:bg-slate-900 border-2 border-rose-200 dark:border-rose-950/60 hover:border-[#ED1A53] shadow-[0_6px_20px_rgba(237,26,83,0.06)] hover:shadow-[0_10px_28px_rgba(237,26,83,0.15)] flex flex-col justify-between cursor-pointer transition"
+              className={`flex-1 p-4 rounded-[20px] bg-white dark:bg-slate-900 border-2 flex flex-col justify-between cursor-pointer transition ${
+                themeColor === "sky"
+                  ? "border-sky-200 dark:border-sky-950/60 hover:border-sky-400 shadow-[0_6px_20px_rgba(123,189,232,0.1)] hover:shadow-[0_10px_28px_rgba(123,189,232,0.2)]"
+                  : "border-rose-200 dark:border-rose-950/60 hover:border-[#ED1A53] shadow-[0_6px_20px_rgba(237,26,83,0.06)] hover:shadow-[0_10px_28px_rgba(237,26,83,0.15)]"
+              }`}
               title="Inspect Real-time Load Factor & Electrical Telemetry"
             >
               {/* Distinct High-Contrast Header Bar */}
               <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200/60 flex items-center justify-center text-[#ED1A53] shadow-sm">
+                  <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shadow-sm ${
+                    themeColor === "sky"
+                      ? "bg-sky-50 dark:bg-sky-950/50 border-sky-200/60 text-[#144A7E]"
+                      : "bg-rose-50 dark:bg-rose-950/50 border-rose-200/60 text-[#ED1A53]"
+                  }`}>
                     <Zap className="w-4 h-4 stroke-[2.5]" />
                   </div>
                   <div>
@@ -1025,7 +1091,7 @@ export default function FleetAvailabilityDesk() {
                 </div>
                 <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1">
                   <span>Peak: <b className="text-slate-700 dark:text-slate-300">158 MW</b></span>
-                  <span className="text-[#ED1A53] font-bold">50.0 Hz Stable</span>
+                  <span className={`font-bold ${themeColor === "sky" ? "text-[#144A7E]" : "text-[#ED1A53]"}`}>50.0 Hz Stable</span>
                 </div>
               </div>
             </div>
@@ -1079,7 +1145,11 @@ export default function FleetAvailabilityDesk() {
           >
             <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200/60 flex items-center justify-center text-[#ED1A53] shadow-sm">
+                <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shadow-sm ${
+                  themeColor === "sky"
+                    ? "bg-sky-50 dark:bg-sky-950/50 border-sky-200/60 text-[#144A7E]"
+                    : "bg-rose-50 dark:bg-rose-950/50 border border-rose-200/60 text-[#ED1A53]"
+                }`}>
                   <BarChart3 className="w-4 h-4 stroke-[2.5]" />
                 </div>
                 <div>
@@ -1094,18 +1164,30 @@ export default function FleetAvailabilityDesk() {
                   e.stopPropagation();
                   setIsGanttModalOpen(true);
                 }}
-                className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-[#ED1A53] hover:text-white text-[11px] font-bold text-[#ED1A53] dark:text-rose-300 transition flex items-center gap-1 border border-rose-200/50"
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 border ${
+                  themeColor === "sky"
+                    ? "bg-sky-50 hover:bg-[#144A7E] hover:text-white text-[#144A7E] border-sky-200/60"
+                    : "bg-rose-50 hover:bg-[#ED1A53] hover:text-white text-[#ED1A53] dark:text-rose-300 border-rose-200/50"
+                }`}
               >
                 <span>Full Gantt</span>
                 <ArrowUpRight className="w-3 h-3" />
               </button>
             </div>
 
-            {/* Floating Tooltip Pill (Sky Blue Styled) */}
+            {/* Floating Tooltip Pill */}
             <div className="relative mt-4 mb-1">
-              <div className="absolute -top-6 left-[22%] -translate-x-1/2 bg-[#7BBDE8] text-sky-950 text-[9px] font-black px-2 py-0.5 rounded shadow-md flex items-center gap-1 z-10 pointer-events-none border border-sky-300">
+              <div className={`absolute -top-6 left-[22%] -translate-x-1/2 text-[9px] font-black px-2 py-0.5 rounded shadow-md flex items-center gap-1 z-10 pointer-events-none border ${
+                themeColor === "sky"
+                  ? "bg-[#7BBDE8] text-sky-950 border-sky-300"
+                  : "bg-slate-900 text-white border-slate-700"
+              }`}>
                 <span>Mar 2026: 90% Peak</span>
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#7BBDE8] rotate-45 border-r border-b border-sky-300" />
+                <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rotate-45 border-r border-b ${
+                  themeColor === "sky"
+                    ? "bg-[#7BBDE8] border-sky-300"
+                    : "bg-slate-900 border-slate-700"
+                }`} />
               </div>
 
               {/* 8 Modern Rounded Vertical Pillars */}
@@ -1126,14 +1208,20 @@ export default function FleetAvailabilityDesk() {
                         style={{ height: bar.height }}
                         className={`w-full rounded-full transition-all duration-300 group-hover:opacity-90 ${
                           bar.active
-                            ? "bg-gradient-to-t from-[#7BBDE8] via-[#5BA4DC] to-[#3B8BC8] shadow-md shadow-[#7BBDE8]/30"
-                            : "bg-[#E1EFF8] hover:bg-[#D0E5F5] dark:bg-slate-800"
+                            ? (themeColor === "sky"
+                                ? "bg-gradient-to-t from-[#7BBDE8] via-[#5BA4DC] to-[#3B8BC8] shadow-md shadow-[#7BBDE8]/30"
+                                : "bg-gradient-to-t from-[#ED1A53] via-[#D81248] to-[#45142B] shadow-md shadow-[#ED1A53]/30")
+                            : (themeColor === "sky"
+                                ? "bg-[#E1EFF8] hover:bg-[#D0E5F5] dark:bg-slate-800"
+                                : "bg-rose-50 hover:bg-rose-100 dark:bg-slate-800")
                         }`}
                       />
                     </div>
                     <span
                       className={`text-[10px] font-semibold ${
-                        bar.active ? "text-[#3B8BC8] dark:text-sky-400 font-extrabold" : "text-slate-400"
+                        bar.active 
+                          ? (themeColor === "sky" ? "text-[#144A7E] font-black" : "text-[#ED1A53] font-black")
+                          : "text-slate-400"
                       }`}
                     >
                       {bar.month}
@@ -1146,7 +1234,9 @@ export default function FleetAvailabilityDesk() {
             {/* Bottom Insight */}
             <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
               <span>Peak: <b className="text-slate-700 dark:text-slate-200">March (90%)</b> • 14 Off-Hire Expirations (42 MVA) in Q2</span>
-              <span className="text-[#ED1A53] dark:text-rose-400 font-bold hover:underline flex items-center gap-0.5">
+              <span className={`font-bold hover:underline flex items-center gap-0.5 ${
+                themeColor === "sky" ? "text-[#144A7E] dark:text-sky-300" : "text-[#ED1A53] dark:text-rose-400"
+              }`}>
                 <span>12-Week Gantt</span>
                 <ArrowUpRight className="w-3 h-3" />
               </span>
@@ -1159,8 +1249,14 @@ export default function FleetAvailabilityDesk() {
       <section className="relative z-10">
         <div className="flex items-center justify-between mb-2.5 px-1">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200/60 flex items-center justify-center text-[#ED1A53] shadow-sm">
-              <Radio className="w-4 h-4 stroke-[2.5] text-[#ED1A53] animate-pulse" />
+            <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shadow-sm ${
+              themeColor === "sky"
+                ? "bg-sky-50 dark:bg-sky-950/50 border-sky-200/60 text-[#144A7E]"
+                : "bg-rose-50 dark:bg-rose-950/50 border border-rose-200/60 text-[#ED1A53]"
+            }`}>
+              <Radio className={`w-4 h-4 stroke-[2.5] animate-pulse ${
+                themeColor === "sky" ? "text-[#144A7E]" : "text-[#ED1A53]"
+              }`} />
             </div>
             <div>
               <span className="text-xs sm:text-[13px] font-black uppercase tracking-wider text-slate-900 dark:text-white block leading-tight">
@@ -1173,7 +1269,11 @@ export default function FleetAvailabilityDesk() {
           </div>
           <button
             onClick={() => navigate("/rental-contracts")}
-            className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-[#ED1A53] hover:text-white text-[11px] font-bold text-[#ED1A53] dark:text-rose-300 transition flex items-center gap-1 border border-rose-200/50"
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 border ${
+              themeColor === "sky"
+                ? "bg-sky-50 hover:bg-[#144A7E] hover:text-white text-[#144A7E] border-sky-200/60"
+                : "bg-rose-50 hover:bg-[#ED1A53] hover:text-white text-[#ED1A53] dark:text-rose-300 border border-rose-200/50"
+            }`}
           >
             <span>View All Contracts</span>
             <ArrowUpRight className="w-3 h-3" />

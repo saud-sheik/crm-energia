@@ -41,7 +41,7 @@ export function Sidebar({
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { brand } = useBrand();
+  const { brand, themeColor, setThemeColor } = useBrand();
   const { unreadCount } = useVolviAssist();
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -50,15 +50,10 @@ export function Sidebar({
   });
 
   type SidebarTheme = "velvet" | "sky";
-
-  const [sidebarTheme, setSidebarTheme] = useState<SidebarTheme>(() => {
-    const saved = localStorage.getItem("sidebar_theme");
-    return saved === "velvet" ? "velvet" : "sky";
-  });
+  const sidebarTheme = themeColor;
 
   const toggleTheme = (newTheme: SidebarTheme) => {
-    setSidebarTheme(newTheme);
-    localStorage.setItem("sidebar_theme", newTheme);
+    setThemeColor(newTheme);
   };
 
   const [showClockPopover, setShowClockPopover] = useState(false);

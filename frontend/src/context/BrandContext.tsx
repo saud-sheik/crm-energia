@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 export type BrandMode = "nexus" | "energia";
+export type ThemeColor = "sky" | "velvet";
 
 export interface BrandConfig {
   mode: BrandMode;
@@ -19,11 +20,23 @@ interface BrandContextType {
   setBrandMode: (mode: BrandMode) => void;
   toggleBrandMode: () => void;
   brand: BrandConfig;
+  themeColor: ThemeColor;
+  setThemeColor: (theme: ThemeColor) => void;
 }
 
 const BrandContext = createContext<BrandContextType | undefined>(undefined);
 
 export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [themeColor, setThemeColorState] = useState<ThemeColor>(() => {
+    const saved = localStorage.getItem("sidebar_theme");
+    return saved === "velvet" ? "velvet" : "sky";
+  });
+
+  const setThemeColor = (theme: ThemeColor) => {
+    setThemeColorState(theme);
+    localStorage.setItem("sidebar_theme", theme);
+  };
+
   const [brandMode, setBrandModeState] = useState<BrandMode>(() => {
     const saved = localStorage.getItem("crm_brand_mode");
     if (saved === "energia" || saved === "nexus") {
@@ -81,7 +94,7 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       };
 
   return (
-    <BrandContext.Provider value={{ brandMode, setBrandMode, toggleBrandMode, brand }}>
+    <BrandContext.Provider value={{ brandMode, setBrandMode, toggleBrandMode, brand, themeColor, setThemeColor }}>
       {children}
     </BrandContext.Provider>
   );
