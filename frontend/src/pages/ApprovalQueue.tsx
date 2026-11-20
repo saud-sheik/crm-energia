@@ -297,31 +297,31 @@ export default function ApprovalQueue() {
   ) : null;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-surface h-[calc(100vh-64px)] relative">
+    <div className="flex-1 overflow-y-auto h-[calc(100vh-64px)] relative text-slate-900 animate-fade-in">
       <div className="max-w-[1440px] mx-auto p-8 flex flex-col gap-6 h-full">
         
-        {/* Header & Tabs */}
-        <div className="flex justify-between items-center bg-surface-bright p-5 rounded-xl border border-outline-variant shadow-xs">
+        {/* Header & Tabs (Elevated White Card) */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-[24px] border-2 border-[#DDDCE3] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.06)] text-slate-900">
           <div>
-            <h1 className="text-2xl font-bold text-on-surface flex items-center gap-2.5">
-              <Shield className="w-7 h-7 text-primary" />
+            <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2.5">
+              <Shield className="w-7 h-7 text-[#DC2626]" />
               {isRep ? "My Approval Requests" : "Hierarchical Quotation Approval Center"}
             </h1>
-            <p className="text-xs text-on-surface-variant mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               {isRep 
                 ? "Track your submitted quote approval requests and approval history."
                 : "3-Level Approval Hierarchy: Sales Rep → Team Lead → Admin with dynamic limit, discount & margin governance."}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-surface-container-low p-1.5 rounded-lg border border-outline-variant">
+          <div className="flex items-center gap-1.5 bg-slate-200/70 p-1 rounded-xl border border-slate-300/80">
             {allowedTabs.includes("queue") && (
               <button
                 onClick={() => setActiveTab("queue")}
-                className={`px-4 py-2 text-xs font-bold rounded-md transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
                   activeTab === "queue" 
-                    ? "bg-primary text-white shadow-xs" 
-                    : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container"
+                    ? "bg-[#45142B] text-white shadow-sm font-extrabold" 
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                 }`}
               >
                 <ClipboardList className="w-4 h-4" />
@@ -331,10 +331,10 @@ export default function ApprovalQueue() {
             {allowedTabs.includes("policy") && (
               <button
                 onClick={() => setActiveTab("policy")}
-                className={`px-4 py-2 text-xs font-bold rounded-md transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
                   activeTab === "policy" 
-                    ? "bg-primary text-white shadow-xs" 
-                    : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container"
+                    ? "bg-[#45142B] text-white shadow-sm font-extrabold" 
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                 }`}
               >
                 <Sliders className="w-4 h-4" />
@@ -344,10 +344,10 @@ export default function ApprovalQueue() {
             {allowedTabs.includes("profiles") && (
               <button
                 onClick={() => setActiveTab("profiles")}
-                className={`px-4 py-2 text-xs font-bold rounded-md transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
                   activeTab === "profiles" 
-                    ? "bg-primary text-white shadow-xs" 
-                    : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container"
+                    ? "bg-[#45142B] text-white shadow-sm font-extrabold" 
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                 }`}
               >
                 <Users className="w-4 h-4" />
@@ -357,10 +357,10 @@ export default function ApprovalQueue() {
             {allowedTabs.includes("audit") && (
               <button
                 onClick={() => setActiveTab("audit")}
-                className={`px-4 py-2 text-xs font-bold rounded-md transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
                   activeTab === "audit" 
-                    ? "bg-primary text-white shadow-xs" 
-                    : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container"
+                    ? "bg-[#45142B] text-white shadow-sm font-extrabold" 
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                 }`}
               >
                 <History className="w-4 h-4" />
@@ -372,14 +372,14 @@ export default function ApprovalQueue() {
 
         {/* TAB 1: PENDING APPROVALS QUEUE */}
         {activeTab === "queue" && (
-          <section className="flex-1 flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+          <section className="flex-1 flex flex-col bg-white rounded-[24px] border-2 border-[#DDDCE3] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.06)] overflow-hidden text-slate-900">
+            <div className="p-4 border-b border-slate-300 flex justify-between items-center bg-slate-200/80 backdrop-blur-sm">
               <div className="flex items-center gap-3">
                 <span className="bg-amber-50 text-amber-700 border border-amber-200 text-xs px-3 py-1 rounded-full font-bold">
                   {approvals?.filter((item: any) => item.status === 'Pending').length || 0} Approvals Pending
                 </span>
                 {updateApprovalMutation.isError && (
-                  <span className="text-xs text-error font-semibold bg-error/10 border border-error/20 px-3 py-1 rounded">
+                  <span className="text-xs text-rose-700 font-semibold bg-rose-50 border border-rose-200 px-3 py-1 rounded">
                     {updateApprovalMutation.error?.message}
                   </span>
                 )}
@@ -419,8 +419,8 @@ export default function ApprovalQueue() {
 
             <div className="flex-1 overflow-y-auto">
               <table className="w-full text-left border-collapse">
-                <thead className="sticky top-0 bg-surface-container-high z-10">
-                  <tr className="text-[12px] font-bold tracking-wider text-on-surface-variant uppercase border-b border-outline-variant">
+                <thead className="sticky top-0 bg-slate-200/90 backdrop-blur-sm z-10">
+                  <tr className="text-[11px] font-bold tracking-wider text-slate-700 uppercase border-b border-slate-300 font-mono">
                     <th className="p-4">Customer & Quote</th>
                     <th className="p-4">Sales Rep</th>
                     <th className="p-4">Quote Value</th>
@@ -430,7 +430,7 @@ export default function ApprovalQueue() {
                     <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-outline-variant text-xs font-medium">
+                <tbody className="divide-y divide-slate-200/80 text-xs font-medium">
                   {loadingApprovals ? (
                     <tr>
                       <td colSpan={7} className="p-8 text-center text-on-surface-variant animate-pulse">Loading queue...</td>
@@ -594,7 +594,7 @@ export default function ApprovalQueue() {
 
         {/* TAB 2: ADMIN GLOBAL POLICY */}
         {activeTab === "policy" && (
-          <section className="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant shadow-xs max-w-3xl">
+          <section className="bg-white p-8 rounded-[24px] border border-white shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] max-w-3xl text-slate-900">
             <h2 className="text-xl font-bold text-on-surface mb-2 flex items-center gap-2">
               <Sliders className="w-5 h-5 text-primary" /> Global Approval Policy Ceilings (Admin)
             </h2>
@@ -731,8 +731,8 @@ export default function ApprovalQueue() {
           }) || [];
 
           return (
-            <section className="flex-1 flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-outline-variant bg-surface-bright flex justify-between items-center flex-wrap gap-3">
+            <section className="flex-1 flex flex-col bg-white rounded-[24px] border-2 border-[#DDDCE3] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.06)] overflow-hidden text-slate-900">
+              <div className="p-4 border-b border-slate-300 bg-slate-200/80 backdrop-blur-sm flex justify-between items-center flex-wrap gap-3">
                 <div>
                   <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
                     <Users className="w-5 h-5 text-primary" /> Sales Representative Approval Authority Profiles
@@ -1113,8 +1113,8 @@ export default function ApprovalQueue() {
 
         {/* TAB 4: AUDIT TRAIL */}
         {activeTab === "audit" && (
-          <section className="flex-1 flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-outline-variant bg-surface-bright">
+          <section className="flex-1 flex flex-col bg-white rounded-[24px] border-2 border-[#DDDCE3] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.06)] overflow-hidden text-slate-900">
+            <div className="p-4 border-b border-slate-300 bg-slate-200/80 backdrop-blur-sm">
               <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
                 <History className="w-5 h-5 text-primary" /> Approval Evaluation Audit Log
               </h2>

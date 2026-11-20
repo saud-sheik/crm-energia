@@ -746,6 +746,7 @@ router.get("/activities/overdue", authMiddleware, getOverdueTasks);
 // ==========================================
 // MASTER DATA
 // ==========================================
+router.get("/requirements", authMiddleware, getRequirements);
 router.get("/master-data/requirements", authMiddleware, getRequirements);
 router.post("/master-data/requirements", authMiddleware, createRequirement);
 router.put("/master-data/requirements/:id", authMiddleware, updateRequirement);

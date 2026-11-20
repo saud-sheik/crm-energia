@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Package, Plus, Search, Filter, RefreshCw, Calendar, Clock,
   CheckCircle2, AlertTriangle, Truck, ShieldAlert, FileText, User,
@@ -14,9 +14,18 @@ export default function AssetTracking() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const [searchParams] = useSearchParams();
+  const initialStatus = searchParams.get("status") || "all";
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(initialStatus);
   const [typeFilter, setTypeFilter] = useState("all");
+
+  useEffect(() => {
+    const s = searchParams.get("status");
+    if (s && s !== statusFilter) {
+      setStatusFilter(s);
+    }
+  }, [searchParams]);
 
   // Modal & History state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -211,34 +220,36 @@ export default function AssetTracking() {
   };
 
   return (
-    <div className="p-6 max-w-[1440px] mx-auto min-h-screen space-y-6 bg-slate-50/50 animate-fade-in">
+    <div className="p-6 md:p-8 max-w-[1440px] mx-auto space-y-6 animate-fade-in font-sans">
       
       {/* ─── HEADER & ACTIONS ────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
-              <Package className="w-5 h-5" />
-            </span>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Asset & Equipment Tracking</h1>
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-slate-100/90 border border-slate-200/80 flex items-center justify-center text-[#DC2626] shadow-sm">
+              <Package className="w-5 h-5 text-[#DC2626]" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">Asset & Equipment Tracking</h1>
+              <p className="text-xs text-slate-500 font-medium">
+                Monitor deployed hardware, control panels, sensors, and maintenance schedules linked to customers.
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            Monitor deployed hardware, control panels, sensors, and maintenance schedules linked to customers.
-          </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => refetch()}
-            className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
+            className="p-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
             title="Refresh asset inventory"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-4 h-4 text-slate-600" />
           </button>
 
           <button
             onClick={openAddModal}
-            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2.5 bg-[#45142B] hover:bg-[#320e1f] text-white rounded-xl text-xs font-bold transition-all shadow-xs active:scale-95 flex items-center gap-2 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Register New Asset</span>
@@ -248,33 +259,143 @@ export default function AssetTracking() {
 
       {/* ─── KPI SUMMARY METRICS ────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-2xs space-y-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Tracked Assets</span>
-          <p className="text-2xl font-black text-slate-900">{totalAssetsCount}</p>
-          <span className="text-[11px] text-slate-500 font-semibold">Active equipment inventory</span>
+        {/* Total Assets */}
+        <div className="bg-white rounded-[24px] p-5 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 shadow-2xs">
+              <Package className="w-5 h-5" />
+            </div>
+            {/* Top-Right Circular Progress Gauge */}
+            <div className="relative flex items-center justify-center">
+              <svg className="w-11 h-11 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#E2E8F0" strokeWidth="3" />
+                <circle
+                  cx="18" cy="18" r="14" fill="none"
+                  stroke="#4F46E5"
+                  strokeWidth="3.2"
+                  strokeDasharray="88"
+                  strokeDashoffset="0"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="absolute text-[10px] font-black text-indigo-700">100%</span>
+            </div>
+          </div>
+          <div className="mt-3">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Tracked Assets</span>
+            <div className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight mt-0.5">{totalAssetsCount}</div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+            <span>Equipment inventory</span>
+            <span className="text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full text-[10px]">Managed</span>
+          </div>
         </div>
 
-        <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-2xs space-y-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Deployed On-Site</span>
-          <p className="text-2xl font-black text-emerald-600">{deployedCount}</p>
-          <span className="text-[11px] text-emerald-600 font-semibold">Operating at customer facilities</span>
+        {/* Deployed On-Site */}
+        <div className="bg-white rounded-[24px] p-5 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 shadow-2xs">
+              <Truck className="w-5 h-5" />
+            </div>
+            {/* Top-Right Circular Progress Gauge */}
+            <div className="relative flex items-center justify-center">
+              <svg className="w-11 h-11 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#E2E8F0" strokeWidth="3" />
+                <circle
+                  cx="18" cy="18" r="14" fill="none"
+                  stroke="#10B981"
+                  strokeWidth="3.2"
+                  strokeDasharray="88"
+                  strokeDashoffset={totalAssetsCount > 0 ? String(88 - (88 * Math.min(100, Math.round((deployedCount / totalAssetsCount) * 100))) / 100) : "88"}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="absolute text-[10px] font-black text-emerald-700">
+                {totalAssetsCount > 0 ? `${Math.round((deployedCount / totalAssetsCount) * 100)}%` : "0%"}
+              </span>
+            </div>
+          </div>
+          <div className="mt-3">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Deployed On-Site</span>
+            <div className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight mt-0.5">{deployedCount}</div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-700">
+            <span>Operating at facilities</span>
+            <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full text-[10px]">Active</span>
+          </div>
         </div>
 
-        <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-2xs space-y-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">In Storage / Demos</span>
-          <p className="text-2xl font-black text-indigo-600">{inStorageCount}</p>
-          <span className="text-[11px] text-slate-500 font-semibold">Available for assignment</span>
+        {/* In Storage */}
+        <div className="bg-white rounded-[24px] p-5 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-2xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-700 shadow-2xs">
+              <Building2 className="w-5 h-5" />
+            </div>
+            {/* Top-Right Circular Progress Gauge */}
+            <div className="relative flex items-center justify-center">
+              <svg className="w-11 h-11 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#E2E8F0" strokeWidth="3" />
+                <circle
+                  cx="18" cy="18" r="14" fill="none"
+                  stroke="#06B6D4"
+                  strokeWidth="3.2"
+                  strokeDasharray="88"
+                  strokeDashoffset={totalAssetsCount > 0 ? String(88 - (88 * Math.min(100, Math.round((inStorageCount / totalAssetsCount) * 100))) / 100) : "88"}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="absolute text-[10px] font-black text-cyan-700">
+                {totalAssetsCount > 0 ? `${Math.round((inStorageCount / totalAssetsCount) * 100)}%` : "0%"}
+              </span>
+            </div>
+          </div>
+          <div className="mt-3">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">In Storage / Demos</span>
+            <div className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight mt-0.5">{inStorageCount}</div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-cyan-700">
+            <span>Available for dispatch</span>
+            <span className="text-cyan-700 font-bold bg-cyan-50 px-2 py-0.5 rounded-full text-[10px]">Ready</span>
+          </div>
         </div>
 
-        <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-2xs space-y-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Under Maintenance</span>
-          <p className="text-2xl font-black text-rose-600">{maintenanceCount}</p>
-          <span className="text-[11px] text-rose-600 font-semibold">Calibration or service required</span>
+        {/* Under Maintenance */}
+        <div className="bg-white rounded-[24px] p-5 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-700 shadow-2xs">
+              <Wrench className="w-5 h-5" />
+            </div>
+            {/* Top-Right Circular Progress Gauge */}
+            <div className="relative flex items-center justify-center">
+              <svg className="w-11 h-11 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#E2E8F0" strokeWidth="3" />
+                <circle
+                  cx="18" cy="18" r="14" fill="none"
+                  stroke="#F59E0B"
+                  strokeWidth="3.2"
+                  strokeDasharray="88"
+                  strokeDashoffset={totalAssetsCount > 0 ? String(88 - (88 * Math.min(100, Math.round((maintenanceCount / totalAssetsCount) * 100))) / 100) : "88"}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="absolute text-[10px] font-black text-amber-700">
+                {totalAssetsCount > 0 ? `${Math.round((maintenanceCount / totalAssetsCount) * 100)}%` : "0%"}
+              </span>
+            </div>
+          </div>
+          <div className="mt-3">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Under Maintenance</span>
+            <div className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight mt-0.5">{maintenanceCount}</div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-700">
+            <span>Calibration & service</span>
+            <span className="text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded-full text-[10px]">Service</span>
+          </div>
         </div>
       </div>
 
       {/* ─── SEARCH & FILTERS TOOLBAR ───────────────────────────────────────── */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-2xs flex flex-col lg:flex-row gap-4 items-center justify-between">
+      <div className="bg-white rounded-[24px] border border-white p-4 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] flex flex-col lg:flex-row gap-4 items-center justify-between text-slate-900">
         <div className="relative w-full lg:w-80">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
@@ -282,17 +403,17 @@ export default function AssetTracking() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search asset name, serial number, type..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="w-full bg-slate-50 border border-slate-200/80 rounded-xl pl-10 pr-4 py-2 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#45142B] focus:ring-2 focus:ring-[#45142B]/10"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500">Status:</span>
+            <span className="text-xs font-bold text-slate-600">Status:</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+              className="bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-[#45142B] cursor-pointer"
             >
               <option value="all">All Statuses</option>
               <option value="Deployed">Deployed</option>
@@ -304,11 +425,11 @@ export default function AssetTracking() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500">Type:</span>
+            <span className="text-xs font-bold text-slate-600">Type:</span>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+              className="bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-[#45142B] cursor-pointer"
             >
               <option value="all">All Equipment Types</option>
               <option value="Control Panel">Control Panel</option>
@@ -322,32 +443,32 @@ export default function AssetTracking() {
       </div>
 
       {/* ─── ASSETS TABLE ────────────────────────────────────────────────────── */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
+      <div className="bg-white rounded-[24px] border border-white shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] overflow-hidden text-slate-900">
         {isLoading ? (
           <div className="p-12 text-center text-xs font-bold text-slate-500 animate-pulse">
             Loading equipment & asset inventory...
           </div>
         ) : assets.length === 0 ? (
           <div className="p-12 text-center space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-white/80 text-slate-500 border border-slate-200 flex items-center justify-center mx-auto">
               <Package className="w-6 h-6" />
             </div>
             <h3 className="text-sm font-bold text-slate-900">No assets found</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            <p className="text-xs text-slate-600 max-w-sm mx-auto font-medium">
               No equipment matching your criteria. Register new hardware or clear filters to view inventory.
             </p>
             <button
               onClick={openAddModal}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition-all cursor-pointer"
+              className="px-4 py-2 bg-[#DC2626] text-white rounded-xl text-xs font-bold hover:bg-[#B91C1C] transition-all cursor-pointer shadow-md active:scale-95"
             >
               Register Asset
             </button>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left divide-y divide-slate-100 text-xs">
+            <table className="w-full text-left divide-y divide-slate-200/70 text-xs">
               <thead>
-                <tr className="bg-slate-50/70 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                <tr className="bg-slate-200/80 text-slate-700 font-mono font-bold uppercase tracking-wider text-[11px] border-b border-slate-300">
                   <th className="py-3 px-4">Equipment Name</th>
                   <th className="py-3 px-4">Serial Number</th>
                   <th className="py-3 px-4">Status</th>
@@ -357,12 +478,12 @@ export default function AssetTracking() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
+              <tbody className="divide-y divide-slate-200/70 font-medium">
                 {assets.map((asset: any) => (
-                  <tr key={asset.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={asset.id} className="hover:bg-white/60 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="font-bold text-slate-900">{asset.name}</div>
-                      <span className="text-[10px] font-extrabold text-indigo-600 px-2 py-0.5 bg-indigo-50 rounded border border-indigo-100 mt-1 inline-block">
+                      <span className="text-[10px] font-extrabold text-[#45142B] px-2 py-0.5 bg-white/90 rounded border border-slate-300 mt-1 inline-block">
                         {asset.type}
                       </span>
                     </td>
@@ -377,9 +498,9 @@ export default function AssetTracking() {
                       {asset.customer ? (
                         <button
                           onClick={() => navigate(`/accounts`)}
-                          className="font-bold text-indigo-600 hover:underline text-left flex items-center gap-1"
+                          className="font-bold text-slate-900 hover:text-[#ED1A53] hover:underline text-left flex items-center gap-1"
                         >
-                          <Building2 className="w-3 h-3" />
+                          <Building2 className="w-3 h-3 text-slate-400" />
                           <span>{asset.customer.name}</span>
                         </button>
                       ) : (
@@ -605,7 +726,7 @@ export default function AssetTracking() {
                 <button
                   type="submit"
                   disabled={saveAssetMutation.isPending}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-2xs cursor-pointer"
+                  className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl shadow-md active:scale-95 cursor-pointer"
                 >
                   {saveAssetMutation.isPending ? "Saving..." : editingAsset ? "Update Asset" : "Register Asset"}
                 </button>

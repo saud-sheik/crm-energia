@@ -142,3 +142,44 @@ export const confirmAdvancePayment = async (req: Request, res: Response) => {
   }
 };
 
+export const requestPublicKycLink = async (req: Request, res: Response) => {
+  try {
+    const { dealId, recipientEmail, recipientPhone, channel } = req.body;
+    if (!dealId) {
+      return res.status(400).json({ error: "dealId is required" });
+    }
+    const result = await CreditKycService.generatePublicKycLink({
+      dealId,
+      recipientEmail,
+      recipientPhone,
+      channel
+    });
+    return res.json(result);
+  } catch (err: any) {
+    console.error("[creditKycController.requestPublicKycLink] Error:", err);
+    return res.status(500).json({ error: err.message || "Failed to generate KYC link" });
+  }
+};
+
+export const getPublicKycData = async (req: Request, res: Response) => {
+  try {
+    const token = String(req.params.token);
+    const data = await CreditKycService.getPublicKycData(token);
+    return res.json({ success: true, data });
+  } catch (err: any) {
+    console.error("[creditKycController.getPublicKycData] Error:", err);
+    return res.status(404).json({ error: err.message || "KYC link invalid or expired" });
+  }
+};
+
+export const submitPublicKyc = async (req: Request, res: Response) => {
+  try {
+    const token = String(req.params.token);
+    const result = await CreditKycService.submitPublicKyc(token, req.body);
+    return res.json(result);
+  } catch (err: any) {
+    console.error("[creditKycController.submitPublicKyc] Error:", err);
+    return res.status(500).json({ error: err.message || "Failed to submit KYC verification" });
+  }
+};
+

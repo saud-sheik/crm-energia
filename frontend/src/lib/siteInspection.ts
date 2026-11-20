@@ -438,8 +438,8 @@ export function getInspectionRag(inspection: SiteInspectionRecord): {
     rag: "ON_TRACK",
     label: "On Track",
     countdown,
-    badgeBg: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800",
-    dotColor: "bg-emerald-500",
+    badgeBg: "bg-[#F8F4F6] text-[#551938] border-[#E5D4DE] dark:bg-slate-800 dark:text-rose-200 dark:border-slate-700",
+    dotColor: "bg-[#6E1C47]",
   };
 }
 

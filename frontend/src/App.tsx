@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { SalesLayout } from "./components/SalesLayout";
+import { VolviAssistProvider } from "./context/VolviAssistContext";
 
 // Page Imports
 import ManagementDashboard from "./pages/ManagementDashboard";
@@ -59,11 +60,12 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import SupportTickets from "./pages/SupportTickets";
 import FieldService from "./pages/FieldService";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { BrandProvider } from "./context/BrandContext";
+import { BrandProvider, useBrand } from "./context/BrandContext";
 import { Navigate, Outlet } from "react-router-dom";
 
 import QuoteDetail from "./pages/QuoteDetail";
 import PublicQuoteReview from "./pages/PublicQuoteReview";
+import PublicClientKyc from "./pages/PublicClientKyc";
 import PublicFeedback from "./pages/PublicFeedback";
 import SiteInspections from "./pages/SiteInspections";
 import SiteInspectionForm from "./pages/SiteInspectionForm";
@@ -83,11 +85,15 @@ const RoleBasedLayout = () => {
   return <Layout />;
 };
 
-/** Redirect / to initial landing dashboard (My Work / Operational Dashboard) */
+/** Redirect / to initial landing dashboard (Fleet Schedule & Telemetry for Energia, My Work for Nexus) */
 const RoleBasedHome = () => {
   const { user } = useAuth();
+  const { brand } = useBrand();
   if (user?.role === "site_manager" || user?.role === "ops_manager") {
     return <Navigate to="/site-inspections" replace />;
+  }
+  if (brand.isEnergia) {
+    return <FleetAvailabilityDesk />;
   }
   return <MyDashboard />;
 };
@@ -108,9 +114,11 @@ function App() {
     <BrowserRouter>
       <BrandProvider>
         <AuthProvider>
-          <Routes>
+          <VolviAssistProvider>
+            <Routes>
           <Route path="/quote" element={<PublicQuoteRequest />} />
           <Route path="/q/:token" element={<PublicQuoteReview />} />
+          <Route path="/kyc/:token" element={<PublicClientKyc />} />
           <Route path="/feedback/:token" element={<PublicFeedback />} />
           <Route path="/login" element={<Login />} />
           
@@ -217,6 +225,7 @@ function App() {
             </Route>
           </Route>
         </Routes>
+          </VolviAssistProvider>
       </AuthProvider>
     </BrandProvider>
   </BrowserRouter>

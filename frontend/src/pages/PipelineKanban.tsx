@@ -1,7 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, Plus, Filter, MoreVertical, View, List, CheckCircle2, XCircle, X, Clock, Calendar, CheckSquare, ChevronRight, Building2, AlertTriangle, ShieldAlert, Target, User } from "lucide-react";
+import { Search, Plus, Filter, MoreVertical, View, List, CheckCircle2, XCircle, X, Clock, Calendar, CheckSquare, ChevronRight, Building2, AlertTriangle, ShieldAlert, Target, User, FileText, Sparkles } from "lucide-react";
 import { formatCurrency, formatCurrencyCompact } from "../utils/currency";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { StageEvidenceModal } from "../components/StageEvidenceModal";
@@ -227,7 +227,7 @@ export default function PipelineKanban() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-slate-50 min-h-screen overflow-hidden">
+    <div className="flex-1 flex flex-col h-full min-h-screen overflow-hidden text-slate-900 animate-fade-in">
       <StageEvidenceModal
         isOpen={evidenceModal.isOpen}
         onClose={() => setEvidenceModal((prev) => ({ ...prev, isOpen: false }))}
@@ -247,44 +247,44 @@ export default function PipelineKanban() {
         }}
       />
 
-      <header className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between shrink-0 shadow-2xs">
+      <header className="px-8 py-5 flex items-center justify-between shrink-0">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-slate-100/90 text-[#DC2626] border border-white/40 shadow-sm flex items-center justify-center font-bold">
               <Target className="w-5 h-5" />
             </span>
             <div>
-              <h1 className="text-xl font-black text-slate-900 tracking-tight">Sales Pipeline</h1>
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">Sales Pipeline</h1>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Track your commercial sales process from enquiry to close
+                Track your commercial sales process from enquiry to close across all KSA depots.
               </p>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="text-right mr-2 hidden sm:block">
-            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Pipeline</div>
-            <div className="text-sm font-black text-slate-900">{formatCurrency(totalValue)}</div>
+          <div className="text-right mr-2 hidden sm:block p-2 px-3 rounded-xl bg-white border border-white shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12)]">
+            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Pipeline</div>
+            <div className="text-base font-black text-slate-900 font-mono">{formatCurrency(totalValue)}</div>
           </div>
 
           <button 
             onClick={() => setShowAddDealModal(true)}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-extrabold text-xs rounded-xl shadow-md shadow-red-600/20 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-4 h-4" /> <span>+ Add Opportunity</span>
           </button>
         </div>
       </header>
 
-      <section className="bg-white border-b border-slate-200/80 px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
-        <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200 shrink-0">
+      <section className="bg-white border-2 border-[#EED5DE] rounded-[24px] mx-8 py-3 px-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0 shadow-[0_12px_28px_-6px_rgba(140,22,60,0.06)] text-slate-900">
+        <div className="bg-slate-200/70 p-1 rounded-xl flex items-center gap-1 border border-slate-300/80 shrink-0">
           <button
             onClick={() => setActiveTab("leads")}
             className={`px-5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === "leads"
-                ? "bg-amber-500 text-white shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
+                ? "bg-[#45142B] text-white shadow-sm font-extrabold"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
             }`}
           >
             Leads ({leads.length})
@@ -293,8 +293,8 @@ export default function PipelineKanban() {
             onClick={() => setActiveTab("opportunities")}
             className={`px-5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === "opportunities"
-                ? "bg-blue-600 text-white shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
+                ? "bg-[#45142B] text-white shadow-sm font-extrabold"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
             }`}
           >
             Opportunities ({openDeals.length})
@@ -303,8 +303,8 @@ export default function PipelineKanban() {
             onClick={() => setActiveTab("deals")}
             className={`px-5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === "deals"
-                ? "bg-emerald-600 text-white shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
+                ? "bg-[#45142B] text-white shadow-sm font-extrabold"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
             }`}
           >
             Won / Deals ({closedDeals.length})
@@ -382,7 +382,7 @@ export default function PipelineKanban() {
               });
 
               return (
-                <div key={st} className="w-80 shrink-0 bg-white/70 rounded-2xl p-3 border border-slate-200/90 flex flex-col min-h-[550px] shadow-2xs">
+                <div key={st} className="w-80 shrink-0 bg-white rounded-[24px] p-3.5 border border-white flex flex-col min-h-[550px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10)] text-slate-900">
                   <div className="p-2.5 rounded-xl border bg-amber-50/70 border-amber-200 mb-3 flex items-center justify-between">
                     <span className="text-xs font-bold text-amber-900">{stageLabel}</span>
                     <span className="text-[10px] font-bold bg-white text-amber-800 px-2 py-0.5 rounded-full border border-amber-200 shadow-2xs">
@@ -424,6 +424,25 @@ export default function PipelineKanban() {
                               </div>
                             )}
                           </div>
+
+                          {lead.siteInspectionStatus === "APPROVED" && (
+                            <div className="pt-2 border-t border-emerald-100 flex items-center justify-between">
+                              <span className="font-mono text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                Survey Approved
+                              </span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/rental-cpq/builder?leadId=${lead.id}&kVA=350`);
+                                }}
+                                className="text-[10px] font-bold text-[#ED1A53] hover:underline cursor-pointer flex items-center gap-1"
+                              >
+                                <span>Quote in CPQ</span>
+                                <span className="text-xs">↗</span>
+                              </button>
+                            </div>
+                          )}
 
                           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                             <span className="text-[10px] font-medium text-slate-400">
@@ -478,7 +497,7 @@ export default function PipelineKanban() {
                     key={stage.id || stage.name}
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, stage.id || stage.name, stage.name)}
-                    className="w-72 shrink-0 bg-white/70 rounded-2xl p-3 border border-slate-200/90 flex flex-col min-h-[550px] shadow-2xs"
+                    className="w-72 shrink-0 bg-white rounded-[24px] p-3.5 border-2 border-[#EED5DE] flex flex-col min-h-[550px] shadow-[0_12px_28px_-6px_rgba(140,22,60,0.05)] text-slate-900"
                   >
                     <div className={`p-2.5 rounded-xl border ${colorScheme.bg} ${colorScheme.border} mb-3`}>
                       <div className="flex items-center justify-between">
@@ -496,7 +515,7 @@ export default function PipelineKanban() {
 
                     <div className="space-y-2.5 flex-1 overflow-y-auto pr-0.5">
                       {filteredDeals.length === 0 ? (
-                        <div className="h-32 border-2 border-dashed border-slate-200/80 rounded-xl flex items-center justify-center text-[11px] text-slate-400 font-medium">
+                        <div className="h-32 border-2 border-dashed border-[#E5D4DE] rounded-2xl flex items-center justify-center text-[11px] text-slate-400 font-medium bg-[#FAF6F8]/40">
                           Drag deals here
                         </div>
                       ) : (
@@ -506,10 +525,10 @@ export default function PipelineKanban() {
                             draggable
                             onDragStart={(e) => handleDragStart(e, deal.id)}
                             onClick={() => navigate(`/opportunities/${deal.id}`)}
-                            className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs hover:border-blue-500 hover:shadow-sm cursor-grab active:cursor-grabbing transition-all space-y-2 group"
+                            className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs hover:border-[#ED1A53] hover:shadow-md cursor-grab active:cursor-grabbing transition-all space-y-2 group"
                           >
                             <div className="flex items-start justify-between gap-2">
-                              <h4 className="text-xs font-bold text-slate-900 group-hover:text-blue-700 leading-snug">
+                              <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#ED1A53] leading-snug transition-colors">
                                 {deal.name}
                               </h4>
                               <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">

@@ -16,7 +16,8 @@ import {
   RefreshCw,
   MessageSquareQuote,
   Download,
-  AlertCircle
+  AlertCircle,
+  ChevronRight
 } from "lucide-react";
 
 interface QuoteLineItem {
@@ -288,11 +289,25 @@ export default function PublicQuoteReview() {
           </div>
         </header>
 
-        {/* Success Action Alert */}
+        {/* Success Action Alert & Next Step Bridge */}
         {actionSuccessMessage && (
-          <div className="p-4 bg-emerald-950/60 border border-emerald-800/80 rounded-xl flex items-start gap-3 text-emerald-200">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 mt-0.5 shrink-0" />
-            <p className="text-sm font-medium">{actionSuccessMessage}</p>
+          <div className="p-5 bg-emerald-950/70 border-2 border-emerald-500/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-emerald-100 shadow-xl shadow-emerald-950/40">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="w-6 h-6 text-emerald-400 mt-0.5 shrink-0" />
+              <div>
+                <h4 className="font-black text-sm uppercase tracking-wide text-emerald-300">
+                  Quotation Confirmed & Accepted
+                </h4>
+                <p className="text-xs text-emerald-200/90 mt-0.5">{actionSuccessMessage}</p>
+              </div>
+            </div>
+            <a
+              href={`/kyc/${token}`}
+              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black shadow-lg transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            >
+              <span>Next: Complete Company KYC & Advance Deposit</span>
+              <ChevronRight className="w-4 h-4" />
+            </a>
           </div>
         )}
 

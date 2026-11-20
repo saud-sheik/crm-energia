@@ -4,11 +4,13 @@ import {
   ClipboardCheck, LayoutDashboard, Home, Inbox, Trello, FileText, Receipt,
   Users, BarChart, Settings, Clock, ChevronLeft, 
   ChevronRight, MessageSquare, CheckSquare, Search, Bell, Sparkles, LogOut, ChevronDown, Layers, Package, Building2, LifeBuoy, Target,
-  UserCheck, Shield, Briefcase, Megaphone, Wrench, ShieldAlert, Zap, FileCheck, CalendarClock
+  UserCheck, Shield, Briefcase, Megaphone, Wrench, ShieldAlert, Zap, FileCheck, CalendarClock, ShieldCheck,
+  Bot
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { useBrand } from "../context/BrandContext";
+import { useVolviAssist } from "../context/VolviAssistContext";
 import { leadFilterApi } from "../api";
 import { AttendanceClockWidget } from "./AttendanceClockWidget";
 
@@ -39,11 +41,16 @@ export function Sidebar({
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { brand, brandMode, setBrandMode, toggleBrandMode } = useBrand();
+  const { brand } = useBrand();
+  const { unreadCount } = useVolviAssist();
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
-    return localStorage.getItem("sidebar_collapsed") === "true";
+    const saved = localStorage.getItem("sidebar_collapsed");
+    return saved !== null ? saved === "true" : false;
   });
+
+  const [showClockPopover, setShowClockPopover] = useState(false);
+  const [hoveredPillar, setHoveredPillar] = useState<string | null>(null);
 
   const toggleCollapse = () => {
     setIsCollapsed(prev => {
@@ -82,41 +89,31 @@ export function Sidebar({
   const energiaNavItems: NavItem[] = [
     { label: "Dashboard", path: "/", icon: LayoutDashboard },
     { 
-      label: "Rental Operations", 
-      icon: Zap,
-      subItems: [
-        { label: "Rental CPQ Builder", path: "/rental-cpq/builder", icon: Zap },
-        { label: "Fleet Availability", path: "/fleet-availability", icon: CalendarClock },
-        { label: "Credit & KYC Desk", path: "/credit-kyc", icon: Shield },
-        { label: "Rental Contracts & SLAs", path: "/rental-contracts", icon: FileCheck },
-      ]
-    },
-    { 
-      label: "Sales & Projects", 
+      label: "Commercial Pipeline", 
       icon: Briefcase,
       subItems: [
-        { label: "Leads", path: "/leads", icon: Users },
-        { label: "Site Inspections", path: "/site-inspections", icon: ClipboardCheck },
-        ...(isFilterRoleAllowed ? [{ 
-          label: "Held Emails", 
-          path: "/held-emails", 
-          icon: ShieldAlert, 
-          badge: needsReviewCount > 0 ? String(needsReviewCount) : undefined 
-        }] : []),
-        { label: "Opportunities", path: "/opportunities", icon: Target },
-        { label: "Pipeline", path: "/pipeline", icon: Trello },
-        { label: "Standard Quotes", path: "/quotes", icon: FileText },
+        { label: "1. Inbound Leads", path: "/leads", icon: Users },
+        { label: "2. Technical Sizing", path: "/site-inspections", icon: ClipboardCheck },
+        { label: "3. Sales Pipeline", path: "/pipeline", icon: Trello },
+        { label: "4. Rental CPQ Quoting", path: "/rental-cpq/builder", icon: Zap },
       ]
     },
-    { label: "Approval Limits", path: "/approvals", icon: Shield },
     { 
-      label: "Accounts & Assets", 
+      label: "Operations & Fulfilment", 
+      icon: Shield,
+      subItems: [
+        { label: "5. Credit & KYC Desk", path: "/credit-kyc", icon: Shield },
+        { label: "6. Contracts & SLAs", path: "/rental-contracts", icon: FileCheck },
+        { label: "7. Fleet Yard & Dispatch", path: "/fleet-availability", icon: CalendarClock },
+        { label: "8. Approval Queue", path: "/approvals", icon: ShieldCheck },
+      ]
+    },
+    { 
+      label: "Accounts & Master Data", 
       icon: Building2,
       subItems: [
         { label: "Client Accounts", path: "/accounts", icon: Building2 },
-        { label: "Contacts", path: "/contacts", icon: Users },
-        { label: "Engineers & Staff", path: "/salespersons", icon: UserCheck },
-        { label: "Work Orders", path: "/work-orders", icon: Wrench },
+        { label: "Fleet Work Orders", path: "/purchase-orders", icon: Layers },
       ]
     },
     { label: "Settings", path: "/master-data/requirements", icon: Settings },
@@ -166,10 +163,13 @@ export function Sidebar({
 
   // Track open dropdowns (default open for active route)
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({
+    "Commercial Pipeline": true,
+    "Operations & Fulfilment": true,
     "Rental Operations": true,
     "Sales & Projects": true,
     "Sales Division": true,
     "Governance & Approvals": true,
+    "Accounts & Master Data": false,
     "CRM": false,
   });
 
@@ -187,145 +187,87 @@ export function Sidebar({
 
   return (
     <aside
-      className={`bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between transition-all duration-300 z-20 shrink-0 select-none ${
-        isCollapsed ? "w-16" : "w-64"
+      className={`flex flex-col justify-between transition-all duration-300 select-none bg-[#45142B] text-slate-100 shrink-0 ${
+        isCollapsed
+          ? "w-[72px] my-3 ml-3 rounded-[32px] border border-[#ED1A53]/30 shadow-[0_16px_40px_rgba(69,20,43,0.35)] h-[calc(100%-24px)]"
+          : "w-64 my-3 ml-3 rounded-[28px] border border-[#ED1A53]/30 shadow-[0_16px_40px_rgba(69,20,43,0.35)] h-[calc(100%-24px)]"
       }`}
     >
       {/* Sidebar Header */}
-      <div className="p-4 border-b border-slate-100 dark:border-slate-800 space-y-3">
-        <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            brand.isEnergia ? (
-              <div className="flex items-center gap-2.5">
-                <div className="h-8 px-2 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-center shadow-sm">
-                  <img src="/energia-logo.png" alt="ENERGIA" className="h-4.5 w-auto max-w-[90px] object-contain" />
-                </div>
-                <div>
-                  <span className="font-black text-xs tracking-wider text-slate-900 dark:text-white block leading-none">
-                    ENERGIA
-                  </span>
-                  <span className="text-[9px] font-bold text-[#ED1A53] tracking-wider block mt-0.5">
-                    Fleet & Power CRM
-                  </span>
-                </div>
+      <div className="p-3.5 border-b border-[#5e1c3b] space-y-3 relative z-10">
+        <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"}`}>
+          {!isCollapsed ? (
+            <div className="flex items-center gap-2.5">
+              {/* High-Contrast Luxury White Pill Container */}
+              <div className="h-10 px-3 rounded-xl bg-white shadow-md shadow-black/20 border border-white/50 flex items-center justify-center shrink-0">
+                <img 
+                  src="/energia-logo-cropped.png" 
+                  alt="ENERGIA" 
+                  className="h-4.5 w-auto max-w-[105px] object-contain" 
+                />
               </div>
-            ) : (
-              <div className="flex items-center gap-2.5">
-                <div className={`w-8 h-8 rounded-xl text-white flex items-center justify-center font-black text-xs shadow-md ${
-                  userRole === "sales_rep" 
-                    ? "bg-gradient-to-tr from-purple-600 via-indigo-600 to-emerald-500 shadow-purple-500/30" 
-                    : "bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-blue-500/20"
-                }`}>
-                  NX
-                </div>
-                <div>
-                  <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white block leading-none">
-                    NEXUS CRM
-                  </span>
-                  <span className={`text-[10px] font-bold block ${
-                    userRole === "sales_rep" ? "text-purple-600 dark:text-purple-400" : "text-blue-600 dark:text-blue-400"
-                  }`}>
-                    {userRole === "sales_rep" ? "Sales OS Rep" : "Workspace OS"}
-                  </span>
-                </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[9px] font-black uppercase tracking-wider text-rose-200/90 leading-tight">
+                  KSA Operations
+                </span>
+                <span className="text-[10px] font-extrabold text-[#ED1A53] tracking-wider uppercase mt-0.5 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#ED1A53] animate-pulse" />
+                  Fleet Core
+                </span>
               </div>
-            )
-          )}
-          {isCollapsed && (
-            <button
-              onClick={toggleBrandMode}
-              title={`Switch CRM Brand (Current: ${brand.appName})`}
-              className={`w-8 h-8 rounded-xl text-white flex items-center justify-center font-black text-xs mx-auto shadow-md transition-transform hover:scale-105 ${
-                brand.isEnergia
-                  ? "bg-gradient-to-tr from-[#ED1A53] to-[#B00F38] shadow-[#ED1A53]/30"
-                  : userRole === "sales_rep"
-                  ? "bg-gradient-to-tr from-purple-600 to-emerald-500 shadow-purple-500/30"
-                  : "bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-blue-500/20"
-              }`}
+            </div>
+          ) : (
+            <div
+              title="ENERGIA KSA Operations"
+              className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto shadow-md transition-all hover:scale-105 bg-white p-1 border border-white/50 shadow-black/20"
             >
-              {brand.badgeText}
-            </button>
+              <img 
+                src="/energia-icon.png" 
+                alt="ENERGIA" 
+                className="w-full h-full object-contain rounded-lg" 
+              />
+            </div>
           )}
-          <button
-            onClick={toggleCollapse}
-            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors hidden sm:block"
-            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
         </div>
 
-        {/* Dynamic CRM Brand Switcher Pill */}
-        {!isCollapsed && (
-          <div className="flex bg-slate-100 dark:bg-slate-800/90 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700/60 shadow-inner">
-            <button
-              type="button"
-              onClick={() => setBrandMode("energia")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-[11px] rounded-md transition-all font-bold ${
-                brand.isEnergia 
-                  ? "bg-[#ED1A53] text-white shadow-sm font-extrabold" 
-                  : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
-              }`}
-            >
-              <Zap className="w-3 h-3 text-current" />
-              <span>Energia</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setBrandMode("nexus")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-[11px] rounded-md transition-all font-bold ${
-                brand.isNexus 
-                  ? "bg-blue-600 text-white shadow-sm font-extrabold" 
-                  : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
-              }`}
-            >
-              <Building2 className="w-3 h-3 text-current" />
-              <span>Nexus</span>
-            </button>
-          </div>
-        )}
-
         {/* Global Search & AI Quick Triggers in Sidebar */}
-        <div className="space-y-1.5 pt-1">
+        <div className="space-y-1.5 pt-0.5">
           {onOpenSearch && (
             <button
               onClick={onOpenSearch}
-              className={`w-full flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl px-2.5 py-2 text-xs font-bold transition-all ${
+              className={`w-full flex items-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/15 text-white/90 hover:text-white border border-white/10 shadow-2xs rounded-xl px-2.5 py-2 text-xs font-bold transition-all group cursor-pointer ${
                 isCollapsed ? "justify-center" : ""
               }`}
               title="Search (Ctrl+K)"
             >
-              <Search className="w-4 h-4 text-blue-600 shrink-0" />
+              <Search className="w-3.5 h-3.5 text-[#ED1A53] shrink-0" />
               {!isCollapsed && (
                 <div className="flex-1 flex justify-between items-center">
-                  <span>Search...</span>
-                  <kbd className="px-1.5 py-0.5 text-[9px] font-mono bg-white dark:bg-slate-900 border rounded text-slate-400">Ctrl+K</kbd>
+                  <span className="text-white/70 font-semibold">Search...</span>
+                  <kbd className="px-1.5 py-0.5 text-[9px] font-mono bg-white/10 border border-white/20 rounded text-white/70">Ctrl+K</kbd>
                 </div>
               )}
             </button>
           )}
 
-          <div className="flex gap-1">
+          <div className="flex">
             {onOpenAi && (
               <button
                 onClick={onOpenAi}
-                className={`flex-1 flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl px-2.5 py-1.5 text-xs font-bold transition-all ${
+                className={`w-full flex items-center justify-between bg-white/10 backdrop-blur-md hover:bg-white/15 text-white border border-white/10 shadow-2xs rounded-xl px-2.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
                   isCollapsed ? "justify-center" : ""
                 }`}
-                title="AI Copilot"
+                title="Volvi Copilot (Industrial RAG & Alerts)"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 animate-pulse" />
-                {!isCollapsed && <span>AI Copilot</span>}
-              </button>
-            )}
-
-            {onOpenNotifications && (
-              <button
-                onClick={onOpenNotifications}
-                className="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 rounded-xl transition-colors shrink-0"
-                title="Notifications"
-              >
-                <Bell className="w-4 h-4" />
+                <div className="flex items-center gap-2">
+                  <Bot className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                  {!isCollapsed && <span className="font-extrabold text-white">Volvi Copilot</span>}
+                </div>
+                {!isCollapsed && unreadCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-[#ED1A53] text-white text-[9px] font-black shadow-xs">
+                    {unreadCount}
+                  </span>
+                )}
               </button>
             )}
           </div>
@@ -333,7 +275,7 @@ export function Sidebar({
       </div>
 
       {/* 5 Core Pillars Navigation List */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-1.5 no-scrollbar">
+      <div className="flex-1 overflow-y-auto p-2 space-y-1.5 no-scrollbar relative z-10">
         {primaryNavItems.map((item) => {
           const Icon = item.icon;
           const hasSubItems = item.subItems && item.subItems.length > 0;
@@ -343,41 +285,110 @@ export function Sidebar({
             ? (location.pathname === item.path || (item.path !== "/" && location.pathname.startsWith(item.path)))
             : (item.subItems?.some(sub => location.pathname === sub.path || (sub.path !== "/" && location.pathname.startsWith(sub.path))) || false);
 
+          if (isCollapsed) {
+            const targetPath = hasSubItems ? item.subItems![0].path : item.path!;
+            return (
+              <div
+                key={item.label}
+                className="relative group flex justify-center py-1"
+                onMouseEnter={() => hasSubItems && setHoveredPillar(item.label)}
+                onMouseLeave={() => hasSubItems && setHoveredPillar(null)}
+              >
+                <Link
+                  to={targetPath}
+                  className={`w-11 h-11 rounded-[16px] flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                    isItemActive
+                      ? "bg-gradient-to-tr from-[#ED1A53] via-[#DC1449] to-[#B00F38] text-white shadow-md shadow-[#ED1A53]/40 border border-white/25 scale-105"
+                      : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-white/10 hover:scale-105"
+                  }`}
+                  title={item.label}
+                >
+                  <Icon className="w-5 h-5" />
+                </Link>
+
+                {/* Floating Tooltip if no subitems */}
+                {!hasSubItems && (
+                  <div className="hidden group-hover:flex absolute left-[64px] top-2 z-50 bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg border border-slate-700 pointer-events-none">
+                    {item.label}
+                  </div>
+                )}
+
+                {/* Floating Sub-navigation Flyout */}
+                {hasSubItems && hoveredPillar === item.label && (
+                  <div className="absolute left-[64px] top-0 z-50 min-w-[210px] bg-white rounded-2xl p-2 shadow-[0_16px_36px_-6px_rgba(30,41,59,0.25)] border border-slate-200 text-slate-800 animate-in fade-in zoom-in-95">
+                    <div className="px-3 py-1.5 border-b border-slate-100 flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">{item.label}</span>
+                      <span className="text-[10px] font-bold text-[#ED1A53]">Switches</span>
+                    </div>
+                    <div className="mt-1 space-y-0.5">
+                      {item.subItems!.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isSubActive = location.pathname === sub.path || (sub.path !== "/" && location.pathname.startsWith(sub.path));
+                        return (
+                          <Link
+                            key={sub.path}
+                            to={sub.path}
+                            className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                              isSubActive
+                                ? "bg-[#45142B] text-white shadow-2xs font-extrabold"
+                                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <SubIcon className="w-3.5 h-3.5" />
+                              <span>{sub.label}</span>
+                            </div>
+                            {sub.badge && (
+                              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-rose-500 text-white">
+                                {sub.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           if (hasSubItems) {
             return (
-              <div key={item.label} className="space-y-1">
+              <div 
+                key={item.label} 
+                className={`rounded-2xl transition-all duration-200 ${
+                  isItemActive 
+                    ? "bg-[#5C1A3C] border border-[#ED1A53]/50 shadow-md" 
+                    : "bg-[#501533]/80 hover:bg-[#5C1A3C] border border-[#7A244E]/40 shadow-2xs"
+                } p-1.5`}
+              >
                 <button
                   type="button"
-                  onClick={() => {
-                    if (isCollapsed) {
-                      toggleCollapse();
-                    }
-                    toggleDropdown(item.label);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-xs transition-all group cursor-pointer ${
+                  onClick={() => toggleDropdown(item.label)}
+                  className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl font-bold text-xs transition-all group cursor-pointer ${
                     isItemActive
-                      ? "bg-primary/10 text-primary dark:bg-primary/20"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
+                      ? "text-white bg-[#6E1C47]/60 shadow-2xs"
+                      : "text-white/90 hover:text-white hover:bg-white/10"
                   }`}
-                  title={isCollapsed ? item.label : undefined}
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className={`p-1 rounded-lg transition-colors ${
-                      isItemActive ? "text-primary font-black" : "text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white"
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className={`p-1.5 rounded-lg transition-colors ${
+                      isItemActive 
+                        ? "text-[#ED1A53] bg-white shadow-2xs" 
+                        : "text-white/90 group-hover:text-white bg-white/10 shadow-2xs"
                     }`}>
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-3.5 h-3.5" />
                     </div>
-                    {!isCollapsed && <span className="truncate">{item.label}</span>}
+                    <span className="truncate font-extrabold">{item.label}</span>
                   </div>
 
-                  {!isCollapsed && (
-                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isDropdownOpen ? "rotate-0" : "-rotate-90"}`} />
-                  )}
+                  <ChevronDown className={`w-3.5 h-3.5 text-white/60 transition-transform duration-200 ${isDropdownOpen ? "rotate-0" : "-rotate-90"}`} />
                 </button>
 
                 {/* Sub-items list */}
-                {isDropdownOpen && !isCollapsed && (
-                  <div className="pl-4 pr-1 py-1 space-y-1 ml-3 border-l-2 border-slate-200 dark:border-slate-800">
+                {isDropdownOpen && (
+                  <div className="mt-1.5 space-y-1 p-1 bg-[#340C20] rounded-xl border border-[#5E163B]/60 shadow-inner">
                     {item.subItems!.map((sub) => {
                       const SubIcon = sub.icon;
                       const isSubActive = location.pathname === sub.path || (sub.path !== "/" && location.pathname.startsWith(sub.path));
@@ -386,19 +397,19 @@ export function Sidebar({
                         <Link
                           key={sub.path}
                           to={sub.path}
-                          className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                          className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                             isSubActive
-                              ? "bg-primary text-white shadow-2xs font-bold"
-                              : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900"
+                              ? "bg-gradient-to-r from-[#ED1A53] via-[#DC1449] to-[#B00F38] text-white shadow-md shadow-[#ED1A53]/30 font-extrabold border border-white/20"
+                              : "text-white/80 hover:text-white hover:bg-white/10"
                           }`}
                         >
-                          <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="flex items-center gap-2 min-w-0">
                             <SubIcon className="w-3.5 h-3.5 shrink-0" />
                             <span className="truncate">{sub.label}</span>
                           </div>
                           {sub.badge && (
                             <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
-                              isSubActive ? "bg-white text-primary" : "bg-amber-500 text-white"
+                              isSubActive ? "bg-white text-[#ED1A53]" : "bg-rose-500 text-white"
                             }`}>
                               {sub.badge}
                             </span>
@@ -416,60 +427,183 @@ export function Sidebar({
             <Link
               key={item.path}
               to={item.path!}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all group relative ${
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-2xl font-bold text-xs transition-all group cursor-pointer ${
                 isItemActive
-                  ? "bg-primary text-white shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
+                  ? "bg-gradient-to-r from-[#ED1A53] via-[#DC1449] to-[#B00F38] text-white shadow-md shadow-[#ED1A53]/30 border border-white/20"
+                  : "bg-[#501533]/80 hover:bg-[#5C1A3C] text-white/90 hover:text-white border border-[#7A244E]/40 shadow-2xs"
               }`}
-              title={isCollapsed ? item.label : undefined}
             >
-              <div className={`p-1 rounded-lg transition-colors ${
-                isItemActive ? "text-white" : "text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white"
+              <div className={`p-1.5 rounded-lg transition-colors ${
+                isItemActive ? "text-white bg-white/20" : "text-white/80 group-hover:text-white bg-white/10 shadow-2xs"
               }`}>
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5" />
               </div>
 
-              {!isCollapsed && (
-                <div className="flex-1 flex items-center justify-between">
-                  <span className="truncate">{item.label}</span>
-                  {item.badge && (
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      {item.badge}
-                    </span>
-                  )}
-                </div>
-              )}
+              <div className="flex-1 flex items-center justify-between">
+                <span className="truncate font-extrabold">{item.label}</span>
+                {item.badge && (
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    {item.badge}
+                  </span>
+                )}
+              </div>
             </Link>
           );
         })}
+
+        {/* Collapse/Expand Arrow Button (Positioned Below Settings) */}
+        <div className={`pt-1.5 flex ${isCollapsed ? "justify-center" : "px-1"}`}>
+          <button
+            type="button"
+            onClick={toggleCollapse}
+            className={`transition-all duration-200 cursor-pointer flex items-center ${
+              isCollapsed
+                ? "w-11 h-11 rounded-[16px] justify-center bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 hover:scale-105"
+                : "w-full gap-2.5 px-3 py-2 rounded-2xl bg-white/5 hover:bg-white/15 text-white/70 hover:text-white border border-white/10 text-xs font-bold"
+            }`}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="w-4 h-4 text-white/90" />
+            ) : (
+              <>
+                <ChevronLeft className="w-4 h-4 text-white/90 shrink-0" />
+                <span className="truncate">Collapse Sidebar</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
-      {/* Sidebar Footer User Info & Shift Status */}
-      <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-2">
-        {!isCollapsed && (
-          <div className="pb-1">
-            <AttendanceClockWidget variant="sidebar" />
-          </div>
-        )}
-        {!isCollapsed ? (
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-black text-xs flex items-center justify-center border border-blue-200 dark:border-blue-800 shrink-0">
-                {user?.name?.charAt(0) || "U"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{user?.name || "Logged User"}</p>
-                <p className="text-[10px] text-slate-400 truncate uppercase font-extrabold">{user?.role?.replace("_", " ") || "Sales Rep"}</p>
-              </div>
+      {/* Active Fleet Ratio Widget */}
+      {brand.isEnergia && !isCollapsed && (
+        <Link
+          to="/fleet-availability"
+          title="Click to view Fleet Availability & Telemetry Desk"
+          className="mx-3 mb-2 p-3 bg-white/10 backdrop-blur-md hover:bg-white/15 rounded-2xl border border-white/15 shadow-2xs hover:shadow-md transition-all duration-300 block group cursor-pointer relative overflow-hidden z-10"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+              </span>
+              <span className="text-[10px] uppercase tracking-wider text-white/70 font-extrabold group-hover:text-white transition-colors">
+                Active Fleet Ratio
+              </span>
             </div>
-            <button onClick={() => logout()} className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg transition-colors" title="Sign Out">
-              <LogOut className="w-4 h-4" />
+            <span className="text-[11px] font-black text-[#ED1A53] flex items-center gap-1">
+              90% On-Hire
+              <ChevronRight className="w-3 h-3 text-[#ED1A53] transform group-hover:translate-x-0.5 transition-transform" />
+            </span>
+          </div>
+          
+          <div className="w-full bg-black/30 h-1.5 rounded-full overflow-hidden mb-2 p-0.5">
+            <div 
+              className="bg-gradient-to-r from-[#ED1A53] to-rose-500 h-full rounded-full transition-all duration-500 shadow-xs shadow-[#ED1A53]/50" 
+              style={{ width: "90%" }}
+            ></div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/10">
+            <div>
+              <span className="block text-[9px] uppercase tracking-wider text-white/60 font-bold">Units Deployed</span>
+              <span className="text-xs font-black text-white">342 <span className="text-white/50 font-normal">/ 380</span></span>
+            </div>
+            <div className="text-right">
+              <span className="block text-[9px] uppercase tracking-wider text-white/60 font-bold">Live Grid</span>
+              <span className="text-xs font-black text-emerald-400">142.8 MW</span>
+            </div>
+          </div>
+        </Link>
+      )}
+
+      {/* Sidebar Footer User Info & Shift Status ("Buttons on Down") */}
+      <div className="p-2 border-t border-[#5e1c3b] bg-black/20 space-y-1.5 relative z-10">
+        {!isCollapsed ? (
+          <>
+            <div className="pb-1">
+              <AttendanceClockWidget variant="sidebar" dark={true} />
+            </div>
+            <div className="flex items-center justify-between gap-2.5 pt-1 border-t border-white/10">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="relative shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#8F0D30] via-[#541837] to-[#360515] text-white font-black text-xs flex items-center justify-center border border-white/30 shadow-sm">
+                    {user?.name?.charAt(0) || "U"}
+                  </div>
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-[#45142B]"></span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-extrabold text-white truncate">{user?.name || "Sophia Martinez"}</p>
+                  <p className="text-[10px] text-white/60 truncate uppercase font-bold tracking-wider">
+                    {user?.role?.replace("_", " ") || "Admin / Lvl 4"}
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => logout()} 
+                className="p-1.5 text-white/60 hover:text-rose-400 hover:bg-white/10 rounded-xl border border-transparent transition-all cursor-pointer" 
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center gap-1.5">
+            {/* Shift Clock Trigger Popover */}
+            <div className="relative">
+              <button
+                onClick={() => setShowClockPopover(v => !v)}
+                className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/10 transition-all cursor-pointer relative"
+                title="Shift Attendance Clock"
+              >
+                <Clock className="w-4 h-4 text-white" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              </button>
+              {showClockPopover && (
+                <div className="absolute left-[64px] bottom-0 z-50 w-72 bg-[#45142B] border border-[#5e1c3b] p-3 rounded-2xl shadow-2xl text-white">
+                  <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-2">
+                    <span className="text-xs font-bold text-white">Shift Attendance</span>
+                    <button onClick={() => setShowClockPopover(false)} className="text-white/60 hover:text-white text-xs cursor-pointer">✕</button>
+                  </div>
+                  <AttendanceClockWidget variant="sidebar" dark={true} />
+                </div>
+              )}
+            </div>
+
+            {/* Volvi Assist Button (Unified Hub) */}
+            {onOpenAi && (
+              <button
+                onClick={onOpenAi}
+                className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-amber-300 flex items-center justify-center border border-white/10 transition-all cursor-pointer relative"
+                title="Volvi Copilot (Industrial RAG & Alerts)"
+              >
+                <Bot className="w-4 h-4 text-amber-300" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#ED1A53] animate-pulse" />
+                )}
+              </button>
+            )}
+
+            {/* Settings Gear */}
+            <Link
+              to="/settings"
+              className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center border border-white/10 transition-all cursor-pointer"
+              title="Settings & Configurations"
+            >
+              <Settings className="w-4 h-4" />
+            </Link>
+
+            {/* User Avatar with Sign Out */}
+            <button 
+              onClick={() => logout()} 
+              className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8F0D30] via-[#541837] to-[#360515] text-white font-black text-xs flex items-center justify-center border border-white/30 shadow-sm hover:ring-2 hover:ring-rose-500/50 transition-all cursor-pointer mt-0.5" 
+              title={`Signed in as ${user?.name || 'User'} · Click to Sign Out`}
+            >
+              {user?.name?.charAt(0) || "U"}
             </button>
           </div>
-        ) : (
-          <button onClick={() => logout()} className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-black text-xs flex items-center justify-center mx-auto border border-blue-200 dark:border-blue-800" title="Sign Out">
-            {user?.name?.charAt(0) || "U"}
-          </button>
         )}
       </div>
     </aside>

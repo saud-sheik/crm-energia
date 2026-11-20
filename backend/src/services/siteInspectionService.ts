@@ -673,9 +673,8 @@ export async function validateForSubmit(
   }
 
   const activeServices = (inspection.services || []).filter((s: any) => s.isActive);
-  if (activeServices.length === 0) {
-    errors.push("At least one active waste service scope (Sewage, General, or Hazardous) must be selected.");
-  } else {
+  // For industrial power and fleet rentals, waste services are optional. Only validate if services are active.
+  if (activeServices.length > 0) {
     for (const svc of activeServices) {
       if (!svc.facilityId && !svc.facilityName) {
         errors.push(`Disposal facility is required for active ${svc.serviceType} service.`);
@@ -829,21 +828,74 @@ export async function reviewInspection(
     });
 
     if (lead) {
-      await lead.update({ siteInspectionStatus: "APPROVED" });
+      await lead.update({ 
+        siteInspectionStatus: "APPROVED",
+        status: "QUALIFIED",
+      });
 
-      // Notify lead owner
+      // Extract recommended kVA from telemetry if available
+      let recKva = 250;
+      if (inspection.observations && inspection.observations.includes("--- ENERGIA_POWER_TELEMETRY ---")) {
+        try {
+          const telemetryStr = inspection.observations.split("--- ENERGIA_POWER_TELEMETRY ---")[1];
+          if (telemetryStr) {
+            const telemetry = JSON.parse(telemetryStr.trim());
+            if (telemetry.recommendedKva) recKva = Number(telemetry.recommendedKva);
+          }
+        } catch (e) {}
+      }
+
+      // Automatically convert Lead into an Opportunity upon Survey Approval!
+      let dealId: string | null = null;
+      try {
+        const { convertLeadToOpportunity } = require("./leadJourneyWorkflowEngine");
+        const convResult = await convertLeadToOpportunity(
+          lead.id,
+          {
+            dealName: `${lead.company || lead.firstName || "Site"} - ${recKva} kVA Prime Rental`,
+            accountName: lead.company || `${lead.firstName || ""} ${lead.lastName || ""}`.trim() || "Industrial Client",
+            estimatedValue: 45000 * 6,
+            requirement: `${recKva} kVA Prime Generator Rental Package`,
+          },
+          reviewerId
+        );
+        if (convResult?.deal?.id) {
+          dealId = convResult.deal.id;
+        }
+      } catch (convErr) {
+        console.warn("[reviewInspection] Auto-convert lead to opportunity warning:", convErr);
+      }
+
+      // Notify lead owner (Sales Rep) with direct 1-click action to CPQ with pre-linked Opportunity
+      const cpqUrl = dealId
+        ? `/rental-cpq/builder?dealId=${dealId}&leadId=${lead.id}&kVA=${recKva}`
+        : `/rental-cpq/builder?leadId=${lead.id}&kVA=${recKva}`;
+
       if (lead.assignedToId) {
         try {
           await createNotification(
             lead.assignedToId,
             "site_inspection",
-            "Site Inspection Approved",
-            `Site Inspection for lead ${lead.company || lead.firstName} has been approved.`,
-            `/leads/${lead.id}`
+            "⚡ Survey Approved: Ready for CPQ",
+            `Site inspection for ${lead.company || lead.firstName} (${recKva} kVA) is approved. Opportunity automatically created and ready for quoting.`,
+            cpqUrl
           );
         } catch (notifErr) {
           console.warn("[reviewInspection] Notification warn:", notifErr);
         }
+      }
+
+      // Also create an executive notification for the reviewing manager
+      if (reviewerId && reviewerId !== lead.assignedToId) {
+        try {
+          await createNotification(
+            reviewerId,
+            "site_inspection",
+            "Site Survey Approved",
+            `Survey SI-${inspection.inspectionNumber || inspection.id} for ${lead.company || lead.firstName} approved. Opportunity created & sales notified to quote.`,
+            cpqUrl
+          );
+        } catch (e) {}
       }
 
       // Attempt auto-advancing lead now that gate is satisfied

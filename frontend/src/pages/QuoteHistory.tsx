@@ -121,71 +121,136 @@ export default function QuoteHistory() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-background h-[calc(100vh-64px)] relative">
+    <div className="flex-1 overflow-y-auto h-[calc(100vh-64px)] relative text-slate-900 animate-fade-in">
       <div className="w-full px-6 md:px-8 py-6 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Standard Quotes</h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Review commercial quotation proposals, document revisions, and signed contract values.
+            </p>
+          </div>
+          <Link
+            to="/quotes/new"
+            className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-xs rounded-xl shadow-md shadow-red-600/20 active:scale-95 transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create New Quote</span>
+          </Link>
+        </div>
         
-        {/* Dashboard Stats Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-          <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <span className="text-[12px] font-semibold tracking-wider text-outline uppercase">Total Quotations</span>
-              <div className="text-primary bg-primary-container/10 p-1.5 rounded-lg"><Filter className="w-5 h-5" /></div>
+        {/* Dashboard Stats Bento Grid (Pinterest Web 2.0 Elevated Cards with Circular Telemetry Rings) */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white p-5 rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between text-slate-900 group">
+            <div className="flex justify-between items-start">
+              <div className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-700 shadow-2xs group-hover:scale-105 transition-transform">
+                <Filter className="w-5 h-5 text-slate-600" />
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 shadow-2xs">
+                <div className="relative w-4 h-4 flex items-center justify-center">
+                  <svg className="w-4 h-4 -rotate-90 transform" viewBox="0 0 36 36">
+                    <path className="text-slate-200" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path className="text-indigo-500" strokeDasharray="75, 100" strokeWidth="4" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-black text-indigo-700 font-mono">List</span>
+              </div>
             </div>
-            <div className="text-4xl font-bold text-on-surface">{quotes?.length || 0}</div>
-            <div className="text-sm font-medium text-primary flex items-center gap-1">
-              <TrendingUp className="w-4 h-4" />
-              Active list count
+            <div className="mt-3.5 space-y-1">
+              <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Total Quotations</span>
+              <div className="text-2xl lg:text-3xl font-black text-slate-800 font-mono">{quotes?.length || 0}</div>
+            </div>
+            <div className="mt-3 pt-2.5 border-t border-slate-100 text-xs font-semibold text-slate-500 flex items-center gap-1">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Active proposals list count</span>
             </div>
           </div>
           
-          <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <span className="text-[12px] font-semibold tracking-wider text-outline uppercase">Total Value</span>
-              <div className="text-secondary bg-secondary-container/10 p-1.5 rounded-lg"><TrendingUp className="w-5 h-5" /></div>
+          <div className="bg-white p-5 rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between text-slate-900 group">
+            <div className="flex justify-between items-start">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-2xs group-hover:scale-105 transition-transform">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 shadow-2xs">
+                <div className="relative w-4 h-4 flex items-center justify-center">
+                  <svg className="w-4 h-4 -rotate-90 transform" viewBox="0 0 36 36">
+                    <path className="text-slate-200" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path className="text-emerald-500" strokeDasharray="85, 100" strokeWidth="4" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-black text-emerald-700 font-mono">Value</span>
+              </div>
             </div>
-            <div className="text-4xl font-bold text-on-surface">
-              {formatCurrencyCompact(quotes?.reduce((acc: number, q: any) => acc + Number(q.totalAmount || 0), 0) || 0)}
+            <div className="mt-3.5 space-y-1">
+              <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Total Value</span>
+              <div className="text-2xl lg:text-3xl font-black text-slate-800 font-mono">
+                {formatCurrencyCompact(quotes?.reduce((acc: number, q: any) => acc + Number(q.totalAmount || 0), 0) || 0)}
+              </div>
             </div>
-            <div className="text-sm font-medium text-secondary flex items-center gap-1">
-              <TrendingUp className="w-4 h-4" />
+            <div className="mt-3 pt-2.5 border-t border-slate-100 text-xs font-semibold text-emerald-600 flex items-center gap-1">
               Combined value of filtered quotes
             </div>
           </div>
           
-          <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <span className="text-[12px] font-semibold tracking-wider text-outline uppercase">Pending Approvals</span>
-              <div className="text-tertiary bg-tertiary-container/10 p-1.5 rounded-lg"><Filter className="w-5 h-5" /></div>
+          <div className="bg-white p-5 rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between text-slate-900 group">
+            <div className="flex justify-between items-start">
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shadow-2xs group-hover:scale-105 transition-transform">
+                <Timer className="w-5 h-5" />
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 shadow-2xs">
+                <div className="relative w-4 h-4 flex items-center justify-center">
+                  <svg className="w-4 h-4 -rotate-90 transform" viewBox="0 0 36 36">
+                    <path className="text-slate-200" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path className="text-amber-500" strokeDasharray="40, 100" strokeWidth="4" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-black text-amber-700 font-mono">Action</span>
+              </div>
             </div>
-            <div className="text-4xl font-bold text-on-surface">
-              {quotes?.filter((q: any) => q.status === "Pending Approval" || q.status === "Pending").length || 0}
+            <div className="mt-3.5 space-y-1">
+              <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Pending Approvals</span>
+              <div className="text-2xl lg:text-3xl font-black text-slate-800 font-mono">
+                {quotes?.filter((q: any) => q.status === "Pending Approval" || q.status === "Pending").length || 0}
+              </div>
             </div>
-            <div className="text-sm font-medium text-tertiary flex items-center gap-1">
-              <Timer className="w-4 h-4" />
-              Requires action
+            <div className="mt-3 pt-2.5 border-t border-slate-100 text-xs font-semibold text-amber-600 flex items-center gap-1">
+              Requires commercial action
             </div>
           </div>
           
-          <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <span className="text-[12px] font-semibold tracking-wider text-outline uppercase">Accepted (Won)</span>
-              <div className="text-on-primary-container bg-primary-container p-1.5 rounded-lg"><Filter className="w-5 h-5" /></div>
+          <div className="bg-white p-5 rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between text-slate-900 group">
+            <div className="flex justify-between items-start">
+              <div className="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-[#DC2626] shadow-2xs group-hover:scale-105 transition-transform">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 shadow-2xs">
+                <div className="relative w-4 h-4 flex items-center justify-center">
+                  <svg className="w-4 h-4 -rotate-90 transform" viewBox="0 0 36 36">
+                    <path className="text-slate-200" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path className="text-red-500" strokeDasharray="65, 100" strokeWidth="4" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-black text-red-700 font-mono">Won</span>
+              </div>
             </div>
-            <div className="text-4xl font-bold text-on-surface">
-              {quotes?.filter((q: any) => q.status === "Accepted").length || 0}
+            <div className="mt-3.5 space-y-1">
+              <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Accepted (Won)</span>
+              <div className="text-2xl lg:text-3xl font-black text-slate-800 font-mono">
+                {quotes?.filter((q: any) => q.status === "Accepted").length || 0}
+              </div>
             </div>
-            <div className="text-sm font-medium text-primary flex items-center gap-1">
-              <TrendingUp className="w-4 h-4" />
+            <div className="mt-3 pt-2.5 border-t border-slate-100 text-xs font-semibold text-red-600 flex items-center gap-1">
               DocuSigned quotes
             </div>
           </div>
         </div>
 
-        {/* Filters Section */}
-        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-4 mb-6 flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2 pr-4 border-r border-outline-variant">
-            <Filter className="w-5 h-5 text-outline" />
-            <span className="text-[12px] font-semibold tracking-wider text-on-surface uppercase">Filter By</span>
+        {/* Filters Section (Elevated White Panel) */}
+        <div className="bg-white rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] border border-white p-4 mb-6 flex flex-wrap items-center gap-4 text-slate-900">
+          <div className="flex items-center gap-2 pr-4 border-r border-slate-300">
+            <Filter className="w-4 h-4 text-slate-500" />
+            <span className="text-xs font-bold tracking-wider text-slate-700 uppercase">Filter By</span>
           </div>
           
           <div className="flex flex-wrap gap-2 items-center flex-1">
@@ -194,14 +259,13 @@ export default function QuoteHistory() {
               placeholder="Search Ref / Client..."
               value={search}
               onChange={(e) => handleSearchChange(e.target.value)}
-
-              className="bg-surface border border-outline-variant rounded-lg py-1.5 px-3 text-sm focus:ring-1 focus:ring-primary outline-none w-48"
+              className="bg-white border border-slate-200 rounded-lg py-1.5 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#45142B] w-48 font-medium shadow-2xs"
             />
             
             <select 
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="bg-surface border border-outline-variant rounded-lg py-1.5 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+              className="bg-white border border-slate-200 rounded-lg py-1.5 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#45142B] font-medium shadow-2xs"
             >
               <option>All Statuses</option>
               <option>Draft</option>
@@ -215,18 +279,18 @@ export default function QuoteHistory() {
             <select 
               value={valueBand}
               onChange={(e) => setValueBand(e.target.value)}
-              className="bg-surface border border-outline-variant rounded-lg py-1.5 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+              className="bg-white border border-slate-200 rounded-lg py-1.5 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#45142B] font-medium shadow-2xs"
             >
               <option value="">All Value Bands</option>
-              <option value="low">Low (≤ $10k)</option>
-              <option value="medium">Medium ($10k - $50k)</option>
-              <option value="high">High (&gt; $50k)</option>
+              <option value="low">Low (≤ 10k SAR)</option>
+              <option value="medium">Medium (10k - 50k SAR)</option>
+              <option value="high">High (&gt; 50k SAR)</option>
             </select>
 
             <select 
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="bg-surface border border-outline-variant rounded-lg py-1.5 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+              className="bg-white border border-slate-200 rounded-lg py-1.5 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#45142B] font-medium shadow-2xs"
             >
               <option value="">All Categories</option>
               <option value="Standard Tier">Standard Tier</option>
@@ -237,84 +301,84 @@ export default function QuoteHistory() {
 
             <button 
               onClick={() => setShowDates(!showDates)}
-              className={`bg-surface border border-outline-variant rounded-lg py-1.5 px-3 text-sm flex items-center gap-2 hover:bg-surface-container-low transition-colors ${showDates ? 'bg-primary/15 text-primary border-primary/20' : ''}`}
+              className={`bg-white border border-slate-200 rounded-lg py-1.5 px-3 text-xs font-semibold flex items-center gap-1.5 hover:bg-slate-50 transition-colors shadow-2xs ${showDates ? 'bg-red-50 text-[#DC2626] border-red-200' : 'text-slate-700'}`}
             >
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-3.5 h-3.5" />
               <span>Date Range</span>
             </button>
 
             {showDates && (
-              <div className="flex items-center gap-1 bg-surface border border-outline-variant rounded-lg px-2 py-1 animate-fade-in">
-                <span className="text-xs text-outline">From</span>
+              <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1 animate-fade-in text-xs shadow-2xs">
+                <span className="text-[10px] text-slate-400">From</span>
                 <input 
                   type="date"
                   value={startDate}
                   onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
-                  className="bg-transparent text-sm outline-none"
+                  className="bg-transparent text-xs outline-none font-mono"
                 />
-                <span className="text-xs text-outline">To</span>
+                <span className="text-[10px] text-slate-400">To</span>
                 <input 
                   type="date"
                   value={endDate}
                   onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
-                  className="bg-transparent text-sm outline-none"
+                  className="bg-transparent text-xs outline-none font-mono"
                 />
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => refetch()}
-              className="bg-surface border border-outline-variant text-on-surface px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-surface-container-low transition-all"
+              className="bg-white border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all shadow-2xs cursor-pointer"
             >
               Apply Filters
             </button>
             <button 
               onClick={handleExport}
-              className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 text-sm font-medium"
+              className="bg-white border border-slate-200 text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-2xs flex items-center gap-1 cursor-pointer"
             >
-              <Download className="w-4 h-4" /> Export CSV
+              <Download className="w-3.5 h-3.5" /> Export CSV
             </button>
-            <div className="flex border border-outline-variant rounded-xl overflow-hidden p-0.5 bg-surface-container">
+            <div className="flex border border-slate-300 rounded-xl overflow-hidden p-0.5 bg-slate-200/80">
               <button 
                 onClick={() => setIsSimpleView(true)}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${isSimpleView ? 'bg-primary text-white shadow-sm' : 'text-on-surface hover:bg-surface-variant'}`}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${isSimpleView ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 Simple
               </button>
               <button 
                 onClick={() => setIsSimpleView(false)}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${!isSimpleView ? 'bg-primary text-white shadow-sm' : 'text-on-surface hover:bg-surface-variant'}`}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${!isSimpleView ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 Full
               </button>
             </div>
-            <button 
-              onClick={() => window.location.href = '/quotes/new'}
-              className="bg-primary text-on-primary px-6 py-1.5 rounded-lg text-sm font-semibold hover:opacity-90 active:scale-95 transition-all flex items-center gap-2"
+            <Link 
+              to="/quotes/new"
+              className="bg-[#DC2626] hover:bg-[#B91C1C] text-white px-4 py-1.5 rounded-xl text-xs font-bold hover:opacity-90 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> New Quote
-            </button>
+              <Plus className="w-3.5 h-3.5" /> New Quote
+            </Link>
           </div>
         </div>
 
-        {/* Quotations Table */}
-        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden mb-8">
+        {/* Quotations Table (Elevated White Panel) */}
+        <div className="bg-white rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] border border-white overflow-hidden mb-8 text-slate-900">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-surface-container-low border-b border-outline-variant">
-                  <th className="px-6 py-4 text-[12px] font-bold text-outline uppercase tracking-wider">Ref ID</th>
-                  <th className="px-6 py-4 text-[12px] font-bold text-outline uppercase tracking-wider">Customer / Lead</th>
-                  <th className="px-6 py-4 text-[12px] font-bold text-outline uppercase tracking-wider">Value</th>
-                  {!isSimpleView && <th className="px-6 py-4 text-[12px] font-bold text-outline uppercase tracking-wider">Stage</th>}
-                  <th className="px-6 py-4 text-[12px] font-bold text-outline uppercase tracking-wider">Status</th>
-                  {!isSimpleView && <th className="px-6 py-4 text-[12px] font-bold text-outline uppercase tracking-wider">Expires In</th>}
-                  <th className="px-6 py-4 text-[12px] font-bold text-outline uppercase tracking-wider text-right">Actions</th>
+                <tr className="bg-slate-200/80 backdrop-blur-sm border-b border-slate-300">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-700 uppercase tracking-wider font-mono">Ref ID</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-700 uppercase tracking-wider font-mono">Customer / Lead</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-700 uppercase tracking-wider font-mono">Value</th>
+                  {!isSimpleView && <th className="px-6 py-4 text-[11px] font-bold text-slate-700 uppercase tracking-wider font-mono">Stage</th>}
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-700 uppercase tracking-wider font-mono">Status</th>
+                  {!isSimpleView && <th className="px-6 py-4 text-[11px] font-bold text-slate-700 uppercase tracking-wider font-mono">Expires In</th>}
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-700 uppercase tracking-wider font-mono text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-variant">
+              <tbody className="divide-y divide-slate-200/80">
                 {isLoading ? (
                   <tr>
                     <td colSpan={isSimpleView ? 5 : 7} className="px-6 py-8 text-center text-on-surface-variant animate-pulse">Loading quote history...</td>

@@ -63,7 +63,7 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         isNexus: false,
         appName: "ENERGIA CRM",
         tagline: "Heavy Industrial Power & Fleet",
-        logoUrl: "/energia-logo.png",
+        logoUrl: "/energia-logo-cropped.png",
         primaryColor: "#ED1A53",
         badgeText: "EN",
         badgeGradient: "bg-gradient-to-r from-[#ED1A53] to-[#B00F38] shadow-[#ED1A53]/30",

@@ -252,17 +252,17 @@ export function CommissionSplitAndTiersCard() {
   const closerSplitNum = 100 - splitNum;
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 sm:p-8 shadow-sm space-y-8">
+    <div className="bg-white border border-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] space-y-8 text-slate-900">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant/60 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
+            <div className="w-10 h-10 rounded-xl bg-white/80 border border-slate-200 flex items-center justify-center text-[#45142B] shadow-2xs">
               <Percent className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-on-surface">Opportunity Split & Closer Tier Configuration</h3>
-              <p className="text-xs text-on-surface-variant">
+              <h3 className="text-xl font-black text-slate-900">Opportunity Split & Closer Tier Configuration</h3>
+              <p className="text-xs text-slate-600 font-medium">
                 Configure two-tier commercial assignments between Qualifying SDRs and Closing AEs, default commission splits, and closing tiers.
               </p>
             </div>
@@ -272,17 +272,17 @@ export function CommissionSplitAndTiersCard() {
           <button
             onClick={handleResetDefaults}
             type="button"
-            className="px-3.5 py-2 bg-surface hover:bg-surface-container-high border border-outline-variant rounded-xl text-xs font-semibold text-on-surface-variant flex items-center gap-1.5 transition-all active:scale-95"
+            className="px-3.5 py-2 bg-white/90 hover:bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-all active:scale-95 shadow-2xs cursor-pointer"
             title="Reset split to 20/80 and standard senior AE tiers"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
             Reset Defaults
           </button>
           <button
             onClick={handleSaveAll}
             disabled={saveSplitMutation.isPending || saveTiersMutation.isPending}
             type="button"
-            className="px-5 py-2 bg-primary hover:bg-primary/90 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50"
+            className="px-5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             <Save className="w-4 h-4" />
             {saveSplitMutation.isPending || saveTiersMutation.isPending ? "Saving..." : "Save Configuration"}

@@ -18,109 +18,109 @@ export const CANONICAL_PIPELINE_STAGES: PipelineStageInfo[] = [
     name: "Discovery",
     order: 1,
     probability: 10,
-    color: "bg-blue-50 text-blue-700 border-blue-200",
-    badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
-    headerBg: "bg-blue-50/80",
-    headerText: "text-blue-900",
-    headerBorder: "border-blue-200"
+    color: "bg-[#F8F4F8] text-[#4D2D56] border-[#E1D4E5] font-semibold",
+    badgeColor: "bg-[#F8F4F8] text-[#4D2D56] border-[#E1D4E5] font-semibold",
+    headerBg: "bg-[#F8F4F8]",
+    headerText: "text-[#4D2D56]",
+    headerBorder: "border-[#E1D4E5]"
   },
   {
     name: "Requirements",
     order: 2,
     probability: 20,
-    color: "bg-cyan-50 text-cyan-700 border-cyan-200",
-    badgeColor: "bg-cyan-50 text-cyan-700 border-cyan-200",
-    headerBg: "bg-cyan-50/80",
-    headerText: "text-cyan-900",
-    headerBorder: "border-cyan-200"
+    color: "bg-[#FAF4F1] text-[#6B3322] border-[#E6D4CC] font-semibold",
+    badgeColor: "bg-[#FAF4F1] text-[#6B3322] border-[#E6D4CC] font-semibold",
+    headerBg: "bg-[#FAF4F1]",
+    headerText: "text-[#6B3322]",
+    headerBorder: "border-[#E6D4CC]"
   },
   {
     name: "Solution/Scope",
     order: 3,
     probability: 40,
-    color: "bg-indigo-50 text-indigo-700 border-indigo-200",
-    badgeColor: "bg-indigo-50 text-indigo-700 border-indigo-200",
-    headerBg: "bg-indigo-50/80",
-    headerText: "text-indigo-900",
-    headerBorder: "border-indigo-200"
+    color: "bg-[#FAF5EE] text-[#69421E] border-[#E5D7C6] font-semibold",
+    badgeColor: "bg-[#FAF5EE] text-[#69421E] border-[#E5D7C6] font-semibold",
+    headerBg: "bg-[#FAF5EE]",
+    headerText: "text-[#69421E]",
+    headerBorder: "border-[#E5D7C6]"
   },
   {
     name: "Quote Preparation",
     order: 4,
     probability: 60,
-    color: "bg-amber-50 text-amber-700 border-amber-200",
-    badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
-    headerBg: "bg-amber-50/90",
-    headerText: "text-amber-950",
-    headerBorder: "border-amber-200"
+    color: "bg-[#FAF3F5] text-[#662335] border-[#E6D0D7] font-semibold",
+    badgeColor: "bg-[#FAF3F5] text-[#662335] border-[#E6D0D7] font-semibold",
+    headerBg: "bg-[#FAF3F5]",
+    headerText: "text-[#662335]",
+    headerBorder: "border-[#E6D0D7]"
   },
   {
     name: "Quote Sent",
     order: 5,
     probability: 70,
-    color: "bg-orange-50 text-orange-700 border-orange-200",
-    badgeColor: "bg-orange-50 text-orange-700 border-orange-200",
-    headerBg: "bg-orange-50/90",
-    headerText: "text-orange-950",
-    headerBorder: "border-orange-200"
+    color: "bg-[#FAF2F4] text-[#701A32] border-[#E6CBD3] font-semibold",
+    badgeColor: "bg-[#FAF2F4] text-[#701A32] border-[#E6CBD3] font-semibold",
+    headerBg: "bg-[#FAF2F4]",
+    headerText: "text-[#701A32]",
+    headerBorder: "border-[#E6CBD3]"
   },
   {
     name: "Negotiation",
     order: 6,
     probability: 80,
-    color: "bg-purple-50 text-purple-700 border-purple-200",
-    badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
-    headerBg: "bg-purple-50/90",
-    headerText: "text-purple-950",
-    headerBorder: "border-purple-200"
+    color: "bg-[#F7F2F6] text-[#541B44] border-[#E1CFDE] font-semibold",
+    badgeColor: "bg-[#F7F2F6] text-[#541B44] border-[#E1CFDE] font-semibold",
+    headerBg: "bg-[#F7F2F6]",
+    headerText: "text-[#541B44]",
+    headerBorder: "border-[#E1CFDE]"
   },
   {
     name: "Agreed",
     order: 7,
     probability: 90,
-    color: "bg-teal-50 text-teal-700 border-teal-200",
-    badgeColor: "bg-teal-50 text-teal-700 border-teal-200",
-    headerBg: "bg-teal-50/90",
-    headerText: "text-teal-950",
-    headerBorder: "border-teal-200"
+    color: "bg-[#FAF6F1] text-[#5E4320] border-[#E4D9C7] font-semibold",
+    badgeColor: "bg-[#FAF6F1] text-[#5E4320] border-[#E4D9C7] font-semibold",
+    headerBg: "bg-[#FAF6F1]",
+    headerText: "text-[#5E4320]",
+    headerBorder: "border-[#E4D9C7]"
   },
   {
     name: "Won",
     order: 8,
     probability: 100,
-    color: "bg-emerald-100 text-emerald-800 border-emerald-300 font-bold",
-    badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-300 font-bold",
-    headerBg: "bg-emerald-50/90",
-    headerText: "text-emerald-950",
-    headerBorder: "border-emerald-200"
+    color: "bg-[#F3F7F5] text-[#184531] border-[#CEDFD6] font-bold",
+    badgeColor: "bg-[#F3F7F5] text-[#184531] border-[#CEDFD6] font-bold",
+    headerBg: "bg-[#F3F7F5]",
+    headerText: "text-[#184531]",
+    headerBorder: "border-[#CEDFD6]"
   },
   {
     name: "Lost",
     order: 9,
     probability: 0,
-    color: "bg-slate-100 text-slate-600 border-slate-200",
-    badgeColor: "bg-slate-100 text-slate-600 border-slate-200",
-    headerBg: "bg-slate-100/90",
-    headerText: "text-slate-900",
-    headerBorder: "border-slate-300"
+    color: "bg-[#F5F6F7] text-[#47515D] border-[#DBDFE4]",
+    badgeColor: "bg-[#F5F6F7] text-[#47515D] border-[#DBDFE4]",
+    headerBg: "bg-[#F5F6F7]",
+    headerText: "text-[#47515D]",
+    headerBorder: "border-[#DBDFE4]"
   }
 ];
 
 export const STAGE_COLOR_MAP: Record<string, { bg: string; text: string; border: string }> = {
-  "Discovery": { bg: "bg-blue-50/80", text: "text-blue-900", border: "border-blue-200" },
-  "Requirements": { bg: "bg-cyan-50/80", text: "text-cyan-900", border: "border-cyan-200" },
-  "Solution/Scope": { bg: "bg-indigo-50/80", text: "text-indigo-900", border: "border-indigo-200" },
-  "Quote Preparation": { bg: "bg-amber-50/90", text: "text-amber-950", border: "border-amber-200" },
-  "Quote Sent": { bg: "bg-orange-50/90", text: "text-orange-950", border: "border-orange-200" },
-  "Negotiation": { bg: "bg-purple-50/90", text: "text-purple-950", border: "border-purple-200" },
-  "Agreed": { bg: "bg-teal-50/90", text: "text-teal-950", border: "border-teal-200" },
-  "Won": { bg: "bg-emerald-50/90", text: "text-emerald-950", border: "border-emerald-200" },
-  "Lost": { bg: "bg-slate-100/90", text: "text-slate-900", border: "border-slate-300" },
+  "Discovery": { bg: "bg-[#F8F4F8]", text: "text-[#4D2D56]", border: "border-[#E1D4E5]" },
+  "Requirements": { bg: "bg-[#FAF4F1]", text: "text-[#6B3322]", border: "border-[#E6D4CC]" },
+  "Solution/Scope": { bg: "bg-[#FAF5EE]", text: "text-[#69421E]", border: "border-[#E5D7C6]" },
+  "Quote Preparation": { bg: "bg-[#FAF3F5]", text: "text-[#662335]", border: "border-[#E6D0D7]" },
+  "Quote Sent": { bg: "bg-[#FAF2F4]", text: "text-[#701A32]", border: "border-[#E6CBD3]" },
+  "Negotiation": { bg: "bg-[#F7F2F6]", text: "text-[#541B44]", border: "border-[#E1CFDE]" },
+  "Agreed": { bg: "bg-[#FAF6F1]", text: "text-[#5E4320]", border: "border-[#E4D9C7]" },
+  "Won": { bg: "bg-[#F3F7F5]", text: "text-[#184531]", border: "border-[#CEDFD6]" },
+  "Lost": { bg: "bg-[#F5F6F7]", text: "text-[#47515D]", border: "border-[#DBDFE4]" },
   // Backward compatibility mappings
-  "Proposal": { bg: "bg-amber-50/90", text: "text-amber-950", border: "border-amber-200" },
-  "Needs Analysis": { bg: "bg-cyan-50/80", text: "text-cyan-900", border: "border-cyan-200" },
-  "Closed Won": { bg: "bg-emerald-50/90", text: "text-emerald-950", border: "border-emerald-200" },
-  "Closed Lost": { bg: "bg-slate-100/90", text: "text-slate-900", border: "border-slate-300" }
+  "Proposal": { bg: "bg-[#FAF3F5]", text: "text-[#662335]", border: "border-[#E6D0D7]" },
+  "Needs Analysis": { bg: "bg-[#FAF4F1]", text: "text-[#6B3322]", border: "border-[#E6D4CC]" },
+  "Closed Won": { bg: "bg-[#F3F7F5]", text: "text-[#184531]", border: "border-[#CEDFD6]" },
+  "Closed Lost": { bg: "bg-[#F5F6F7]", text: "text-[#47515D]", border: "border-[#DBDFE4]" }
 };
 
 export function normalizeStageName(rawStage: string | undefined | null): string {
@@ -143,15 +143,15 @@ export function getStageHeaderColor(stageName: string, isClosed: boolean = false
   return (
     STAGE_COLOR_MAP[normalized] ||
     (isClosed
-      ? { bg: "bg-slate-100/90", text: "text-slate-900", border: "border-slate-300" }
-      : { bg: "bg-blue-50/80", text: "text-blue-900", border: "border-blue-200" })
+      ? { bg: "bg-[#F5F6F7]", text: "text-[#47515D]", border: "border-[#DBDFE4]" }
+      : { bg: "bg-[#F8F4F8]", text: "text-[#4D2D56]", border: "border-[#E1D4E5]" })
   );
 }
 
 export function getStageBadgeClass(stageName: string): string {
   const normalized = normalizeStageName(stageName);
   const found = CANONICAL_PIPELINE_STAGES.find((s) => s.name.toLowerCase() === normalized.toLowerCase());
-  return found?.badgeColor || "bg-slate-100 text-slate-700 border-slate-200";
+  return found?.badgeColor || "bg-[#F8F4F8] text-[#4D2D56] border-[#E1D4E5]";
 }
 
 export function usePipelineStages() {
@@ -169,11 +169,11 @@ export function usePipelineStages() {
             name: s.name,
             order: s.order || 0,
             probability: s.probability || matched?.probability || 0,
-            color: matched?.color || "bg-slate-100 text-slate-700 border-slate-200",
-            badgeColor: matched?.badgeColor || "bg-slate-100 text-slate-700 border-slate-200",
-            headerBg: matched?.headerBg || "bg-blue-50/80",
-            headerText: matched?.headerText || "text-blue-900",
-            headerBorder: matched?.headerBorder || "border-blue-200"
+            color: matched?.color || "bg-[#F8F4F8] text-[#4D2D56] border-[#E1D4E5]",
+            badgeColor: matched?.badgeColor || "bg-[#F8F4F8] text-[#4D2D56] border-[#E1D4E5]",
+            headerBg: matched?.headerBg || "bg-[#F8F4F8]",
+            headerText: matched?.headerText || "text-[#4D2D56]",
+            headerBorder: matched?.headerBorder || "border-[#E1D4E5]"
           };
         });
       }

@@ -54,18 +54,18 @@ const PIPELINE_STAGES = [
 ];
 
 const STAGE_BADGES: Record<string, string> = {
-  Discovery: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800",
-  Requirements: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/50 dark:text-cyan-300 dark:border-cyan-800",
-  "Solution/Scope": "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800",
-  "Quote Preparation": "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800",
-  "Quote Sent": "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-800",
-  Negotiation: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800",
-  Agreed: "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800",
-  Won: "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700",
-  Lost: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800",
+  Discovery: "bg-[#F8F4F8] text-[#4D2D56] border-[#E1D4E5] dark:bg-[#2A1733] dark:text-[#E2CBE8] dark:border-[#4B2F5C]",
+  Requirements: "bg-[#FAF4F1] text-[#6B3322] border-[#E6D4CC] dark:bg-[#331C13] dark:text-[#E8C2B3] dark:border-[#5C3224]",
+  "Solution/Scope": "bg-[#FAF5EE] text-[#69421E] border-[#E5D7C6] dark:bg-[#332210] dark:text-[#E8D1B5] dark:border-[#5C3C1E]",
+  "Quote Preparation": "bg-[#FAF3F5] text-[#662335] border-[#E6D0D7] dark:bg-[#33131D] dark:text-[#E8B5C4] dark:border-[#5C2334]",
+  "Quote Sent": "bg-[#FAF2F4] text-[#701A32] border-[#E6CBD3] dark:bg-[#330F1A] dark:text-[#E8AABF] dark:border-[#5C1A2E]",
+  Negotiation: "bg-[#F7F2F6] text-[#541B44] border-[#E1CFDE] dark:bg-[#2B0E23] dark:text-[#E2ACCB] dark:border-[#4E1A3F]",
+  Agreed: "bg-[#FAF6F1] text-[#5E4320] border-[#E4D9C7] dark:bg-[#302111] dark:text-[#E5CEA8] dark:border-[#523A1F]",
+  Won: "bg-[#F3F7F5] text-[#184531] border-[#CEDFD6] dark:bg-[#0E281D] dark:text-[#A7D4BF] dark:border-[#1E4D37]",
+  Lost: "bg-[#F5F6F7] text-[#47515D] border-[#DBDFE4] dark:bg-[#1E242B] dark:text-[#BAC3CC] dark:border-[#38424E]",
   // Backward compatibility
-  Proposal: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800",
-  Meeting: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/50 dark:text-cyan-300 dark:border-cyan-800"
+  Proposal: "bg-[#FAF3F5] text-[#662335] border-[#E6D0D7]",
+  Meeting: "bg-[#FAF4F1] text-[#6B3322] border-[#E6D4CC]"
 };
 
 const QUOTE_STATUS_BADGES: Record<string, string> = {

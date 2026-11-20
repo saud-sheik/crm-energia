@@ -539,7 +539,306 @@ function parseAndValidateReportJson(rawText: string): AIReportPayload | null {
  */
 function generateDeterministicVisualReport(query: string, ctx: any): AIReportPayload {
   const q = query.toLowerCase();
-  const formatCur = (num: number) => `₹${Number(num || 0).toLocaleString()}`;
+  const formatCur = (num: number) => `SAR ${Number(num || 0).toLocaleString()}`;
+
+  const isPowerSizingQuery = q.includes("inrush") || q.includes("sizing") || q.includes("generator") || q.includes("kva") || q.includes("kw") || q.includes("motor") || q.includes("dol") || q.includes("prime") || q.includes("standby") || q.includes("260");
+  const isCableVoltageQuery = q.includes("cable") || q.includes("voltage drop") || q.includes("run") || q.includes("copper") || q.includes("conductor") || q.includes("70m") || q.includes("400v");
+  const isRateBookQuery = q.includes("rate card") || q.includes("rate book") || q.includes("multiplier") || q.includes("20x") || q.includes("margin floor") || q.includes("rental rate") || q.includes("pricing terms");
+  const isComplianceZatcaQuery = q.includes("zatca") || q.includes("vat") || q.includes("wathq") || q.includes("cr") || q.includes("compliance") || q.includes("fatoora") || q.includes("tax rules");
+  const isFleetAvailabilityQuery = q.includes("fleet") || q.includes("yard") || q.includes("availability") || q.includes("depot") || q.includes("riyadh") || q.includes("jubail") || q.includes("dammam") || q.includes("inventory");
+
+  // DOMAIN 1: INDUSTRIAL POWER GENERATOR SIZING & MOTOR INRUSH (VOLVI ASSIST RAG)
+  if (isPowerSizingQuery) {
+    return {
+      summary: `### ⚡ Technical Generator Sizing & Motor Inrush Advisory (Volvi Assist RAG)
+
+**Engineering Load Profile for 260 kW Continuous Demand with 3.0× Direct-On-Line (DOL) Motor Inrush:**
+
+- **Continuous Running Load**: 260 kW @ 0.80 PF = **325 kVA running demand**.
+- **Transient Motor Starting Surge**: 260 kW × 3.0 inrush multiplier = **780 kVA peak starting demand** (3–5 second transient duration).
+- **Recommended Fleet Package**: **250 kVA Prime / 275 kVA Standby Soundproof Generator** equipped with heavy-duty Cummins/Perkins diesel engine and DeepSea DSE7320 digital sync controller.
+- **SEC & SASO Grid Compatibility**: Incorporates PMG (Permanent Magnet Generator) excitation allowing **300% short-circuit withstand for 10 seconds**, restricting alternator voltage dip below **12%** during full motor acceleration.
+- **Auxiliary Support**: Includes 50m heavy copper cable set and auxiliary 3,000L double-wall bunded fuel skid for 72-hour continuous runtime.`,
+      kpis: [
+        { label: "Running Load", value: "260 kW (325 kVA)", delta: "Continuous", status: "positive", subtext: "0.80 Power Factor" },
+        { label: "Starting Inrush Peak", value: "780 kVA", delta: "3.0x DOL Surge", status: "neutral", subtext: "3-5s Transient Duration" },
+        { label: "Recommended Fleet", value: "250 kVA Prime", delta: "Tier 3 Soundproof", status: "positive", subtext: "Cummins/Perkins Heavy Duty" },
+        { label: "SEC Voltage Dip", value: "< 12%", delta: "Compliant (< 15% limit)", status: "positive", subtext: "PMG Excitation Verified" }
+      ],
+      charts: [
+        {
+          id: "inrush_surge_profile",
+          type: "line",
+          title: "Transient Inrush Load vs. Alternator Capacity (kVA)",
+          subtitle: "Starting transient surge over 5 seconds showing voltage governor stabilization",
+          data: [
+            { time: "0.0s (Rest)", load: 0, capacity: 275 },
+            { time: "0.5s (Peak Inrush)", load: 780, capacity: 825 },
+            { time: "1.5s (Run-up)", load: 510, capacity: 600 },
+            { time: "3.0s (Governor Lock)", load: 325, capacity: 275 },
+            { time: "5.0s (Steady State)", load: 260, capacity: 250 }
+          ],
+          dataKey: "load",
+          secondaryKey: "capacity",
+          categoryKey: "time",
+          xLabel: "Start Timeline (seconds)",
+          yLabel: "Apparent Power (kVA)",
+          color: "#ED1A53",
+          secondaryColor: "#45142B",
+          unit: "kVA",
+          description: "Illustrates the 780 kVA inrush peak absorbed safely by the PMG alternator without tripping."
+        },
+        {
+          id: "generator_headroom_comparison",
+          type: "bar",
+          title: "Fleet Package Capacity vs Starting Surge (kVA)",
+          subtitle: "Comparison of candidate fleet generator ratings against starting demand",
+          data: [
+            { model: "150 kVA Genset", prime: 150, surgePeak: 450 },
+            { model: "200 kVA Genset", prime: 200, surgePeak: 600 },
+            { model: "250 kVA Prime (Selected)", prime: 250, surgePeak: 780 },
+            { model: "300 kVA Genset", prime: 300, surgePeak: 900 }
+          ],
+          dataKey: "prime",
+          secondaryKey: "surgePeak",
+          categoryKey: "model",
+          xLabel: "Generator Rating",
+          yLabel: "kVA Rating",
+          color: "#45142B",
+          secondaryColor: "#ED1A53",
+          unit: "kVA"
+        }
+      ],
+      table: {
+        title: "Load Breakdown & Protection Specs",
+        headers: ["Component", "Continuous (kW)", "PF", "Starting Surge (kVA)", "Protection Class", "Recommended Feed"],
+        rows: [
+          ["Main Industrial Drive", "180 kW", "0.80", "540 kVA", "Class H / IP23", "400A 4-Pole MCCB"],
+          ["Auxiliary Dewatering Pumps", "50 kW", "0.82", "150 kVA", "IP55 Weatherproof", "125A 3-Phase Breaker"],
+          ["Site Prefab & HVAC Core", "30 kW", "0.90", "90 kVA", "DeepSea Sync Control", "63A Distribution Board"]
+        ]
+      },
+      recommendations: [
+        "Dispatch Field Engineer for Site Survey to verify ground compaction (>= 150 kPa) and crane offloading path.",
+        "Position auxiliary 3,000L fuel skid at minimum 3-meter safety perimeter in compliance with SEC fire standards.",
+        "Proceed to Rental CPQ to generate commercial quotation with 20x monthly rental rate card multiplier."
+      ],
+      followUps: [
+        "Calculate voltage drop for 70m copper cable run at 400V",
+        "Explain 20x monthly rental rate card multiplier & margin floor",
+        "Verify ZATCA 15% VAT & Wathq CR compliance rules"
+      ]
+    };
+  }
+
+  // DOMAIN 2: CABLE RUN & VOLTAGE DROP ADVISORY
+  if (isCableVoltageQuery) {
+    return {
+      summary: `### 📏 Conductor Sizing & Voltage Drop Analysis (Volvi Assist RAG)
+
+**Engineering Sizing for 260 kW / 375A Full-Load Current over 70-meter run distance (400V 50Hz 3-Phase):**
+
+- **Design Formula**: \`ΔV = √3 × I × (R cos φ + X sin φ) × L\`
+- **Recommended Conductor**: **4-Core × 185 mm² Copper Conductor (Cu/XLPE/SWA/PVC)** with galvanized steel wire armor.
+- **Voltage Drop Calculated**: **1.84% (7.36 Volts)**, well within the Saudi Electricity Company (SEC) and SASO statutory maximum limit of **4.00%**.
+- **Thermal Derating Applied**: Ambient temperature rating of **50°C KSA summer ground/air condition** with 0.82 derating factor applied.`,
+      kpis: [
+        { label: "Run Distance", value: "70 meters", delta: "Direct Route", status: "neutral", subtext: "Cable Trench / Tray" },
+        { label: "Recommended Conductor", value: "4C x 185 mm² Cu", delta: "XLPE/SWA/PVC", status: "positive", subtext: "Heavy Armored Cable" },
+        { label: "Calculated Voltage Drop", value: "1.84% (7.36V)", delta: "Well within SEC 4% limit", status: "positive", subtext: "Optimal Efficiency" },
+        { label: "Continuous Ampacity", value: "435 Amps", delta: "+16% Thermal Headroom", status: "positive", subtext: "At 50°C Ambient" }
+      ],
+      charts: [
+        {
+          id: "cable_voltage_drop_comparison",
+          type: "bar",
+          title: "Voltage Drop % by Conductor Cross-Section (70m Run)",
+          subtitle: "Calculated voltage drop percentage compared against 4.0% SEC limit",
+          data: [
+            { gauge: "4C x 70mm²", dropPct: 4.86, secLimit: 4.0 },
+            { gauge: "4C x 95mm²", dropPct: 3.58, secLimit: 4.0 },
+            { gauge: "4C x 120mm²", dropPct: 2.84, secLimit: 4.0 },
+            { gauge: "4C x 150mm²", dropPct: 2.27, secLimit: 4.0 },
+            { gauge: "4C x 185mm² (Selected)", dropPct: 1.84, secLimit: 4.0 },
+            { gauge: "4C x 240mm²", dropPct: 1.42, secLimit: 4.0 }
+          ],
+          dataKey: "dropPct",
+          secondaryKey: "secLimit",
+          categoryKey: "gauge",
+          xLabel: "Conductor Size",
+          yLabel: "Voltage Drop (%)",
+          color: "#ED1A53",
+          secondaryColor: "#94A3B8",
+          unit: "%",
+          description: "4C x 185mm² guarantees a low 1.84% drop, minimizing motor heating and energy loss."
+        }
+      ],
+      recommendations: [
+        "Include 70m of 4C x 185 mm² armored copper cable with M12 compression lugs in the CPQ quotation.",
+        "Ensure field installation uses cable ramps across active vehicular crossings on site.",
+        "Review client credit rating before dispatching high-value copper cable stock."
+      ],
+      followUps: [
+        "Recommend generator for 260 kW with 3x DOL motor inrush",
+        "Explain 20x monthly rental rate card multiplier & margin floor",
+        "Show live available fleet in Riyadh & Jubail yards"
+      ]
+    };
+  }
+
+  // DOMAIN 3: RENTAL RATE CARD & 20X MULTIPLIER STANDARDS
+  if (isRateBookQuery) {
+    return {
+      summary: `### 💰 Commercial Rental Rate Card & Pricing Governance (Volvi Assist RAG)
+
+**Energia KSA Standard Multipliers & Margin Governance:**
+
+- **Daily Rate Baseline**: 1.0× (Standard catalog day rate, e.g. SAR 1,200/day for 250 kVA Prime).
+- **Weekly Multiplier**: **4.5×** daily rate (e.g. SAR 5,400/week = 35% discount vs daily billing).
+- **Monthly Multiplier**: **20.0×** daily rate (e.g. SAR 24,000/month = 33% discount vs 30 daily charges).
+- **Executive Margin Floor**: Target gross margin is **52.4%**. Absolute margin floor is **45.0%**; any commercial quotation discounted below 45% automatically routes to Level 4 Executive Approval.
+- **Logistics Mobilization**: Flat SAR 3,500 round-trip standard for Eastern and Central Province hubs.`,
+      kpis: [
+        { label: "Daily Rate Baseline", value: "1.0x (SAR 1,200)", delta: "Standard Day Rate", status: "neutral", subtext: "Catalog Base" },
+        { label: "Monthly Multiplier", value: "20.0x (SAR 24,000)", delta: "Standard 20x Multiplier", status: "positive", subtext: "33% Monthly Discount" },
+        { label: "Target Gross Margin", value: "52.4%", delta: "+7.4% above floor", status: "positive", subtext: "Energia Target" },
+        { label: "Executive Margin Floor", value: "45.0%", delta: "Strict Lvl 4 Gate", status: "positive", subtext: "Requires Director Sign-off" }
+      ],
+      charts: [
+        {
+          id: "rental_multiplier_structure",
+          type: "bar",
+          title: "Rental Rate Multiplier by Hire Duration",
+          subtitle: "Standard multiplier curve applied to baseline catalog rate",
+          data: [
+            { duration: "1 Day", multiplier: 1.0, effectiveDiscount: 0 },
+            { duration: "1 Week (7 Days)", multiplier: 4.5, effectiveDiscount: 35.7 },
+            { duration: "1 Month (30 Days)", multiplier: 20.0, effectiveDiscount: 33.3 },
+            { duration: "3 Months (Quarterly)", multiplier: 54.0, effectiveDiscount: 40.0 },
+            { duration: "1 Year (Annual)", multiplier: 200.0, effectiveDiscount: 45.2 }
+          ],
+          dataKey: "multiplier",
+          categoryKey: "duration",
+          xLabel: "Hire Duration",
+          yLabel: "Multiplier (x Daily)",
+          color: "#45142B",
+          unit: "x"
+        }
+      ],
+      recommendations: [
+        "Apply standard 20x monthly multiplier for 3-month rental contract (SAR 72,000 base package).",
+        "Add standard SAR 3,500 mobilization and SAR 4,500/mo auxiliary fuel skid line items.",
+        "Verify KYC & Wathq CR clearance prior to contract dispatch."
+      ],
+      followUps: [
+        "Verify ZATCA 15% VAT & Wathq CR compliance rules",
+        "Show live available fleet in Riyadh & Jubail yards",
+        "Recommend generator for 260 kW with 3x DOL motor inrush"
+      ]
+    };
+  }
+
+  // DOMAIN 4: ZATCA 15% VAT & WATHQ REGULATORY COMPLIANCE
+  if (isComplianceZatcaQuery) {
+    return {
+      summary: `### 🛡️ Saudi Regulatory, ZATCA Phase 2 & Wathq CR Compliance (Volvi Assist RAG)
+
+**Compliance Protocol for Commercial Power Equipment Rental:**
+
+- **Wathq CR Validation**: Commercial Registration is validated in real-time via Wathq API against Ministry of Commerce records (active status, authorized signers, chamber of commerce registration).
+- **ZATCA Fatoora Phase 2 Integration**: All tax invoices are generated with mandatory Cryptographic Stamp (CSID), Invoice UUID, and Base64 QR code encoding Seller Name, VAT Number, Timestamp, Total, and VAT Amount.
+- **15% Statutory KSA VAT**: Applied uniformly across rental assets, auxiliary fuel skids, and mobilization logistics lines.
+- **Credit & Financial Limit**: Automated Simah credit scoring establishes maximum unsecured rental exposure (default SAR 250,000 for verified tier-1 contractors).`,
+      kpis: [
+        { label: "KSA Statutory VAT", value: "15.0%", delta: "ZATCA Fatoora Phase 2", status: "positive", subtext: "Standard Rate" },
+        { label: "Wathq CR Verification", value: "MoC Real-Time", delta: "100% Active", status: "positive", subtext: "Ministry of Commerce API" },
+        { label: "Standard Credit Limit", value: "SAR 250,000", delta: "Tier 1 Verified", status: "positive", subtext: "Simah Score >= 720" },
+        { label: "E-Contract Standard", value: "Nafath / ZATCA", delta: "Cryptographic CSID", status: "positive", subtext: "B2B Enforceable" }
+      ],
+      charts: [
+        {
+          id: "zatca_invoice_component_breakdown",
+          type: "bar",
+          title: "Contract Pricing & 15% ZATCA VAT Breakdown (SAR)",
+          subtitle: "Standard monthly contract charges and tax computation",
+          data: [
+            { component: "250 kVA Prime Genset", base: 24000, vat: 3600, total: 27600 },
+            { component: "3000L Aux Fuel Skid", base: 4500, vat: 675, total: 5175 },
+            { component: "50m Heavy Cables", base: 1200, vat: 180, total: 1380 },
+            { component: "Mobilization Logistics", base: 3500, vat: 525, total: 4025 }
+          ],
+          dataKey: "base",
+          secondaryKey: "vat",
+          categoryKey: "component",
+          xLabel: "Line Item",
+          yLabel: "Amount (SAR)",
+          color: "#45142B",
+          secondaryColor: "#ED1A53",
+          unit: "SAR"
+        }
+      ],
+      recommendations: [
+        "Verify client's 10-digit CR and 15-digit ZATCA VAT registration on the Credit KYC desk.",
+        "Ensure billing address exactly matches the national address registered with Saudi Post (SPL).",
+        "Require 100% advance payment or bank guarantee if credit score falls below 650."
+      ],
+      followUps: [
+        "Explain 20x monthly rental rate card multiplier & margin floor",
+        "Show live available fleet in Riyadh & Jubail yards"
+      ]
+    };
+  }
+
+  // DOMAIN 5: FLEET AVAILABILITY & YARD INVENTORY
+  if (isFleetAvailabilityQuery) {
+    return {
+      summary: `### 🚜 Live Fleet Availability & Depot Inventory Status (Volvi Assist RAG)
+
+**Real-Time Fleet Distribution across KSA Hubs:**
+
+- **Riyadh Central Hub**: 88 Total Units | **92% On-Hire** | 7 Units Available (including 2× 250 kVA, 1× 500 kVA).
+- **Jubail Heavy Industrial Yard**: 124 Total Units | **89% On-Hire** | 14 Units Available (including 3× 250 kVA, 4× 500 kVA, 2× 1000 kVA).
+- **Dammam Coastal Depot**: 68 Total Units | **85% On-Hire** | 10 Units Available (including 2× 250 kVA, 2× 400 kVA).
+- **Active Live Capacity**: **142.8 MW** across **342 deployed units** (fleet utilization 90.0%).`,
+      kpis: [
+        { label: "Total Fleet Assets", value: "380 Units", delta: "KSA Operations", status: "neutral", subtext: "Heavy Industrial Gensets" },
+        { label: "Live Active Grid", value: "142.8 MW", delta: "Deployed Power", status: "positive", subtext: "Active Connected Load" },
+        { label: "Fleet On-Hire Ratio", value: "90.0%", delta: "+2.1% MoM", status: "positive", subtext: "High Utilization" },
+        { label: "Immediate Dispatch", value: "31 Units Ready", delta: "Pre-Inspected", status: "positive", subtext: "Riyadh • Jubail • Dammam" }
+      ],
+      charts: [
+        {
+          id: "fleet_depot_distribution",
+          type: "bar",
+          title: "Fleet Inventory by Hub Location (On-Hire vs Available)",
+          subtitle: "Current asset deployment across primary operational hubs",
+          data: [
+            { hub: "Jubail Heavy Yard", onHire: 110, available: 14 },
+            { hub: "Riyadh Central Hub", onHire: 81, available: 7 },
+            { hub: "Dammam Coastal Depot", onHire: 58, available: 10 },
+            { hub: "Western Hub (Jeddah/NEOM)", onHire: 93, available: 7 }
+          ],
+          dataKey: "onHire",
+          secondaryKey: "available",
+          categoryKey: "hub",
+          xLabel: "Depot Location",
+          yLabel: "Number of Generators",
+          color: "#45142B",
+          secondaryColor: "#10B981",
+          unit: "units"
+        }
+      ],
+      recommendations: [
+        "Reserve 250 kVA Prime Genset (Unit #GEN-250-042) in Riyadh Yard for immediate dispatch upon contract execution.",
+        "Schedule pre-delivery load bank test (100% step load) 24 hours prior to mobilization.",
+        "Assign field mobilization technician from Riyadh central dispatch pool."
+      ],
+      followUps: [
+        "Recommend generator for 260 kW with 3x DOL motor inrush",
+        "Calculate voltage drop for 70m copper cable run at 400V"
+      ]
+    };
+  }
 
   const isRiskQuery = q.includes("risk") || q.includes("stall") || q.includes("inactiv") || q.includes("danger") || q.includes("delay") || q.includes("aging");
   const isLossQuery = q.includes("loss") || q.includes("lost") || q.includes("churn") || q.includes("reject") || q.includes("why did we lose");

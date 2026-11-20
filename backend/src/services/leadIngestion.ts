@@ -212,12 +212,36 @@ export async function ingestLead(rawPayload: LeadPayload) {
     let attempts = 0;
     const maxAttempts = 5;
 
-    // Auto-detect if this lead needs site inspection (waste management keywords)
+    // Auto-detect if this lead needs site inspection & technical sizing
     const bodyText = `${payload.message || ""} ${payload.industry || ""}`.toLowerCase();
     const wasteKeywords = ["sewage", "waste", "garbage", "disposal", "hazardous", "general waste", "sanitation", "toilet cabin", "septic"];
-    const autoRequiresSiteInspection = wasteKeywords.some(kw => bodyText.includes(kw));
+    const powerKeywords = ["generator", "power", "kva", "kw", "pump", "dewatering", "motor", "crane", "batching", "diesel", "chiller", "substation", "transformer", "inrush"];
+    const autoRequiresSiteInspection = wasteKeywords.some(kw => bodyText.includes(kw)) || powerKeywords.some(kw => bodyText.includes(kw));
     // payload.requiresSiteInspection can be explicitly set by internal forms
     const requiresSiteInspection = payload.requiresSiteInspection ?? autoRequiresSiteInspection;
+
+    // AI / Technical Sizing Advisory for Power Generation & Motor Inrush
+    let autoQualificationData: any = null;
+    const isInductiveMotor = bodyText.includes("pump") || bodyText.includes("motor") || bodyText.includes("crane") || bodyText.includes("dewatering") || bodyText.includes("compressor") || bodyText.includes("batching");
+    if (isInductiveMotor) {
+      const appType = bodyText.includes("pump") || bodyText.includes("dewatering")
+        ? "Dewatering / Water Pumps"
+        : bodyText.includes("crane")
+        ? "Tower Cranes & Hoists"
+        : bodyText.includes("batching")
+        ? "Concrete Batching Plant"
+        : "Industrial Inductive Motor Load";
+
+      autoQualificationData = {
+        applicationType: appType,
+        detectedMotorLoad: true,
+        inrushFactor: "2.5x - 3.5x DOL Motor Starting Inrush",
+        recommendedKva: 250,
+        recommendedEquipment: "250 kVA Prime Soundproof Diesel Generator Package",
+        recommendedAccessories: ["50m Heavy Power Cables (4-Core)", "3,000L Aux Double-Walled Fuel Tank Skid"],
+        warning: "Inductive motor starting inrush detected. Quoting standard running kW (e.g. 150 kW) will trigger voltage collapse and engine stall. 250 kVA Prime Rating with electronic governor is required."
+      };
+    }
 
     while (!newLead && attempts < maxAttempts) {
       attempts++;
@@ -259,6 +283,7 @@ export async function ingestLead(rawPayload: LeadPayload) {
           whatsappOptInAt: payload.whatsappConsent === true ? new Date() : null,
           whatsappConsentSource: payload.whatsappConsent === true ? (payload.whatsappConsentSource || "public_form") : (payload.whatsappConsentSource || null),
           requiresSiteInspection: requiresSiteInspection,
+          qualificationData: payload.categoriesData || autoQualificationData,
         });
       } catch (err: any) {
         if (err.name === 'SequelizeUniqueConstraintError' && attempts < maxAttempts) {

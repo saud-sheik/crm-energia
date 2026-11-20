@@ -177,23 +177,23 @@ export function MasterDataNav() {
     <div className="space-y-6 mb-6">
       {/* Settings Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 bg-primary/10 rounded-xl">
-          <Settings className="w-6 h-6 text-primary" />
+        <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm">
+          <Settings className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-on-surface">Settings</h2>
-          <p className="text-xs text-on-surface-variant">Manage workspace master data and AI quotation templates.</p>
+          <h2 className="text-2xl font-black text-white tracking-tight">Master Data Settings</h2>
+          <p className="text-xs text-slate-300 font-medium">Manage workspace master data and AI quotation templates.</p>
         </div>
       </div>
 
       {/* Main Tabs */}
-      <div className="flex items-center gap-6 border-b border-border px-1">
+      <div className="flex items-center gap-6 border-b border-white/20 px-1">
         <Link 
           to="/master-data/requirements"
-          className={`pb-3 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${
+          className={`pb-3 text-sm font-black border-b-2 transition-colors flex items-center gap-2 ${
             !isTemplateStudio 
-              ? "border-primary text-primary" 
-              : "border-transparent text-muted-foreground hover:text-foreground"
+              ? "border-[#ED1A53] text-white" 
+              : "border-transparent text-slate-300 hover:text-white"
           }`}
         >
           <Database className="w-4 h-4" />
@@ -201,10 +201,10 @@ export function MasterDataNav() {
         </Link>
         <Link 
           to="/master-data/quote-templates"
-          className={`pb-3 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${
+          className={`pb-3 text-sm font-black border-b-2 transition-colors flex items-center gap-2 ${
             isTemplateStudio 
-              ? "border-primary text-primary" 
-              : "border-transparent text-muted-foreground hover:text-foreground"
+              ? "border-[#ED1A53] text-white" 
+              : "border-transparent text-slate-300 hover:text-white"
           }`}
         >
           <LayoutTemplate className="w-4 h-4" />
@@ -214,17 +214,17 @@ export function MasterDataNav() {
 
       {/* Sub Tabs for Master Data */}
       {!isTemplateStudio && (
-        <div className="flex items-center gap-1 overflow-x-auto pb-2 border-b border-border no-scrollbar pt-2">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-white/10 no-scrollbar pt-2">
           {compactTabs.map((tab) => {
             const isActive = location.pathname === tab.path;
             return (
               <Link
                 key={tab.name}
                 to={tab.path}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                   isActive
-                    ? "bg-primary text-white shadow-2xs"
-                    : "bg-surface hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
+                    ? "bg-[#DC2626] text-white shadow-md font-extrabold"
+                    : "bg-slate-100/80 hover:bg-white text-slate-800 border border-white/40 backdrop-blur-md shadow-2xs"
                 }`}
               >
                 {tab.name}

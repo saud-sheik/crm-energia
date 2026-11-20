@@ -13,14 +13,18 @@ export default function PublicQuoteRequest() {
     phone: "",
     company: "",
     message: "",
-    source: sourceParam
+    source: sourceParam,
+    applicationType: "Dewatering & Submersible Pumps",
+    siteLocation: "Red Sea / Yanbu Coastal",
+    motorLoad: "",
+    hireDuration: "3 Months"
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -30,13 +34,29 @@ export default function PublicQuoteRequest() {
     setError("");
 
     try {
-      // Calling the local API. If deployed, this assumes standard relative path proxying or CORS.
+      const compiledMessage = [
+        formData.message,
+        `Application: ${formData.applicationType}`,
+        `Site Location: ${formData.siteLocation}`,
+        formData.motorLoad ? `Motor / Equipment Load: ${formData.motorLoad}` : null,
+        `Hire Duration: ${formData.hireDuration}`
+      ].filter(Boolean).join(" • ");
+
       const response = await fetch("/api/v1/public/leads", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          company: formData.company,
+          message: compiledMessage,
+          source: formData.source || "Website Form",
+          industry: formData.applicationType
+        })
       });
 
       if (!response.ok) {
@@ -155,16 +175,102 @@ export default function PublicQuoteRequest() {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="company" className="block text-sm font-semibold text-on-surface">Company Name</label>
+              <label htmlFor="company" className="block text-sm font-semibold text-on-surface">Company / Contractor Name *</label>
               <input
                 type="text"
                 id="company"
                 name="company"
+                required
                 value={formData.company}
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-xl border border-outline bg-surface text-on-surface focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none"
-                placeholder="Acme Corp"
+                placeholder="e.g. Red Sea Coastal Works Subcontractor"
               />
+            </div>
+
+            {/* Smart Technical Sizing Section */}
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#ED1A53]">Power Engineering &amp; Sizing Specs</span>
+                <span className="text-[10px] text-slate-500 font-mono">Ensures Zero Motor Inrush Blackout</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label htmlFor="applicationType" className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Primary Application *
+                  </label>
+                  <select
+                    id="applicationType"
+                    name="applicationType"
+                    value={formData.applicationType}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2.5 rounded-xl border border-outline bg-white dark:bg-slate-800 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  >
+                    <option value="Dewatering & Submersible Pumps">Dewatering &amp; Submersible Pumps (High Inrush)</option>
+                    <option value="Tower Cranes & Hoists">Tower Cranes &amp; Hoists (Regenerative / High Surge)</option>
+                    <option value="Concrete Batching Plant">Concrete Batching Plant (Continuous Heavy Load)</option>
+                    <option value="Camp, Offices & HVAC Power">Camp, Site Offices &amp; HVAC Climate Control</option>
+                    <option value="Oilfield & Gas Plant Power">Oilfield &amp; Gas Plant Exploration</option>
+                    <option value="Emergency Standby / General Power">Emergency Standby / General Construction Power</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="siteLocation" className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Site Location / Hub *
+                  </label>
+                  <select
+                    id="siteLocation"
+                    name="siteLocation"
+                    value={formData.siteLocation}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2.5 rounded-xl border border-outline bg-white dark:bg-slate-800 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  >
+                    <option value="Red Sea / Yanbu Coastal">Red Sea / Yanbu Coastal Hub</option>
+                    <option value="NEOM / Tabuk Region">NEOM / Tabuk Region</option>
+                    <option value="Riyadh & Central Region">Riyadh &amp; Central Hub</option>
+                    <option value="Jubail / Dammam Eastern Hub">Jubail / Dammam Eastern Hub</option>
+                    <option value="Aramco Khurais / Oilfields">Aramco Khurais / Remote Concession</option>
+                    <option value="Other KSA Site">Other KSA Job Site</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label htmlFor="motorLoad" className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Estimated Load / Equipment Spec
+                  </label>
+                  <input
+                    type="text"
+                    id="motorLoad"
+                    name="motorLoad"
+                    value={formData.motorLoad}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2.5 rounded-xl border border-outline bg-white dark:bg-slate-800 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    placeholder="e.g. Three 45 kW pump motors (135 kW running)"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="hireDuration" className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Required Hire Duration *
+                  </label>
+                  <select
+                    id="hireDuration"
+                    name="hireDuration"
+                    value={formData.hireDuration}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2.5 rounded-xl border border-outline bg-white dark:bg-slate-800 text-xs text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  >
+                    <option value="1 Month">1 Month</option>
+                    <option value="3 Months">3 Months</option>
+                    <option value="6 Months">6 Months</option>
+                    <option value="12+ Months Long-term">12+ Months Long-Term Contract</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-1.5">

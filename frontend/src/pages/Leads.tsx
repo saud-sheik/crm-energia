@@ -437,7 +437,7 @@ export default function Leads() {
                         </div>
                       ) : (
                         <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                          {l.budgetRange || (l.leadScore ? `₹${(l.leadScore * 10000).toLocaleString()}` : "—")}
+                          {l.budgetRange || (l.leadScore ? `SAR ${(l.leadScore * 10000).toLocaleString()}` : "—")}
                         </span>
                       )}
                     </td>

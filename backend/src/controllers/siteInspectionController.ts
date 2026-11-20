@@ -372,10 +372,15 @@ export const READ_ONLY_INSPECTION_MESSAGE =
   "Access denied: only the assigned site inspector can modify this inspection. Your access is read-only.";
 
 export function canWriteInspection(user: any, inspection: any): boolean {
-  if (!user || user.role !== "site_manager") {
-    return false;
+  if (!user) return false;
+  // Admins, Directors, and Ops Managers have managerial override permissions
+  if (["admin", "director", "ops_manager"].includes(user.role)) {
+    return true;
   }
-  return !inspection.assignedToId || inspection.assignedToId === user.id;
+  if (user.role === "site_manager") {
+    return !inspection.assignedToId || inspection.assignedToId === user.id;
+  }
+  return false;
 }
 
 // Helper to verify user permissions and inspection editability for attachment modifications

@@ -19,6 +19,64 @@ import {
   Volume2
 } from "lucide-react";
 
+const DEFAULT_LEAD_SOURCES = [
+  { id: "src-1", name: "Website" },
+  { id: "src-2", name: "WhatsApp" },
+  { id: "src-3", name: "Email" },
+  { id: "src-4", name: "Instagram" },
+  { id: "src-5", name: "LinkedIn" },
+  { id: "src-6", name: "Facebook / Meta" },
+  { id: "src-7", name: "Direct Phone Call" },
+  { id: "src-8", name: "Referral / Word of Mouth" },
+  { id: "src-9", name: "Manual Entry" },
+];
+
+const DEFAULT_DELIVERABLE_PACKAGES = [
+  {
+    id: "req-250kva",
+    name: "250 kVA Prime Soundproof Package",
+    lineItems: [
+      { id: "li-1", name: "250 kVA Soundproof Diesel Generator", defaultQuantity: 1, unit: "unit", description: "Prime rated generator" },
+      { id: "li-2", name: "4x 1C 120mm² Heavy Copper Power Cables (50m)", defaultQuantity: 1, unit: "set", description: "Flexible cables" },
+      { id: "li-3", name: "3,000L External Double-Walled Fuel Skid", defaultQuantity: 1, unit: "unit", description: "Aux fuel tank" },
+      { id: "li-4", name: "400A Auto Transfer Switch (ATS) & Protection Panel", defaultQuantity: 1, unit: "unit", description: "Protection panel" }
+    ]
+  },
+  {
+    id: "req-500kva",
+    name: "500 kVA Heavy Industrial Power Package",
+    lineItems: [
+      { id: "li-5", name: "500 kVA Prime Soundproof Generator", defaultQuantity: 1, unit: "unit", description: "Heavy industrial generator" },
+      { id: "li-6", name: "4x 1C 240mm² Power Cables (100m)", defaultQuantity: 1, unit: "set", description: "High capacity cables" },
+      { id: "li-7", name: "5,000L Auxiliary Bulk Fuel Tank", defaultQuantity: 1, unit: "unit", description: "Bunded tank" }
+    ]
+  },
+  {
+    id: "req-150bess",
+    name: "150 kVA / 300 kWh Hybrid Battery Storage (BESS)",
+    lineItems: [
+      { id: "li-8", name: "150 kVA / 300 kWh Lithium-Ion BESS System", defaultQuantity: 1, unit: "unit", description: "Clean hybrid battery" },
+      { id: "li-9", name: "Hybrid SCADA Energy Management Gateway", defaultQuantity: 1, unit: "license", description: "Real-time telemetry" }
+    ]
+  },
+  {
+    id: "req-dewatering",
+    name: "Site Dewatering & Pumping Power Package",
+    lineItems: [
+      { id: "li-10", name: "200 kVA Prime Dewatering Power Generator", defaultQuantity: 1, unit: "unit", description: "Engineered for continuous pumps" },
+      { id: "li-11", name: "90 kW Soft Starter Panel (2.5x Inrush Cap)", defaultQuantity: 1, unit: "unit", description: "Reduces starting surge" }
+    ]
+  },
+  {
+    id: "req-turnkey",
+    name: "Turnkey Mobilization & 24/7 Operator Package",
+    lineItems: [
+      { id: "li-12", name: "Lowbed Transport & Mobilization Rig", defaultQuantity: 1, unit: "trip", description: "Site transport" },
+      { id: "li-13", name: "24/7 Dedicated On-Site Generator Operator", defaultQuantity: 1, unit: "month", description: "Dedicated operator" }
+    ]
+  }
+];
+
 export default function LeadCreate() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -31,7 +89,7 @@ export default function LeadCreate() {
   const [clientId, setClientId] = useState(clientIdParam || "");
   const [salespersonId, setSalespersonId] = useState(user?.id || "");
   const [leadType, setLeadType] = useState("General");
-  const [source, setSource] = useState("Manual");
+  const [source, setSource] = useState("Website");
   const [expectedValue, setExpectedValue] = useState("");
   const [notes, setNotes] = useState("");
 
@@ -197,17 +255,23 @@ export default function LeadCreate() {
       if (!res.ok) throw new Error(await res.text());
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["leads"] });
-      navigate("/leads");
+      if (data?.id) {
+        navigate(`/leads/${data.id}`);
+      } else {
+        navigate("/leads");
+      }
     },
     onError: (err: any) => {
       alert(err.message);
     }
   });
 
+  const availablePackages = (requirements && requirements.length > 0) ? requirements : DEFAULT_DELIVERABLE_PACKAGES;
+
   const handleAddServiceCategory = (requirementId: string) => {
-    const req = requirements?.find(r => r.id === requirementId);
+    const req = availablePackages.find(r => r.id === requirementId);
     if (!req) return;
 
     if (selectedGroups.some(g => g.requirementId === requirementId)) {
@@ -932,11 +996,11 @@ export default function LeadCreate() {
             <select 
               value={source} 
               onChange={e => setSource(e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-900 font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none shadow-sm cursor-pointer"
+              className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-xs text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none shadow-sm cursor-pointer"
             >
-              {leadSources?.map(s => (
-                <option key={s.id} value={s.name}>
-                  {s.name.charAt(0).toUpperCase() + s.name.slice(1)}
+              {((leadSources && leadSources.length > 0) ? leadSources : DEFAULT_LEAD_SOURCES).map(s => (
+                <option key={s.id || s.name} value={s.name}>
+                  {s.name}
                 </option>
               ))}
             </select>
@@ -983,7 +1047,7 @@ export default function LeadCreate() {
               className="bg-slate-50 border border-slate-300 hover:border-slate-400 text-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold focus:ring-2 focus:ring-blue-500/20 focus:outline-none cursor-pointer shadow-sm"
             >
               <option value="">+ Add Deliverable Package</option>
-              {requirements?.map(r => (
+              {availablePackages.map(r => (
                 <option key={r.id} value={r.id}>{r.name}</option>
               ))}
             </select>

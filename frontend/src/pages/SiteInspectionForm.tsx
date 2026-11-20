@@ -31,7 +31,36 @@ import {
   PanelLeft,
   Navigation,
   Loader2,
+  Zap,
+  Gauge,
+  BatteryCharging,
+  Wrench,
+  Flame,
+  Layers,
+  ShieldAlert,
+  HardHat,
+  Sparkles,
+  FileSpreadsheet,
+  Share2,
+  QrCode,
+  FileCheck,
+  ExternalLink,
+  Copy,
+  X,
+  Search,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  CheckCheck,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Radio,
+  Sliders,
+  ChevronRight,
+  Bot,
 } from "lucide-react";
+import { useVolviAssist } from "../context/VolviAssistContext";
 import { siteInspectionApi, MasterDataResponse } from "../api/siteInspection";
 import {
   SiteInspectionRecord,
@@ -75,7 +104,6 @@ function InspectionAttachmentThumbnail({
         );
 
         if (!res.ok) {
-          console.error("[AttachmentLoad] Backend file endpoint returned status:", res.status, res.statusText);
           if (active) setHasError(true);
           return;
         }
@@ -85,10 +113,8 @@ function InspectionAttachmentThumbnail({
 
         if (contentType.includes("application/json")) {
           const data = await res.json();
-          // Fetch signed storage URL directly without any Authorization header
           const s3Res = await fetch(data.url);
           if (!s3Res.ok) {
-            console.error("[AttachmentLoad] S3 fetch returned status:", s3Res.status, s3Res.statusText);
             if (active) setHasError(true);
             return;
           }
@@ -102,7 +128,6 @@ function InspectionAttachmentThumbnail({
           setBlobUrl(createdUrl);
         }
       } catch (err: any) {
-        console.error("[AttachmentLoad] Exception occurred during load:", err?.name, err?.message);
         if (active) setHasError(true);
       } finally {
         if (active) setLoading(false);
@@ -113,24 +138,22 @@ function InspectionAttachmentThumbnail({
 
     return () => {
       active = false;
-      if (createdUrl) {
-        URL.revokeObjectURL(createdUrl);
-      }
+      if (createdUrl) URL.revokeObjectURL(createdUrl);
     };
   }, [inspectionId, attachmentId]);
 
-  if (hasError) {
+  if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-slate-900 text-slate-400 text-[10px]">
-        Failed to load image
+      <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] text-slate-400">
+        <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" />
       </div>
     );
   }
 
-  if (loading || !blobUrl) {
+  if (hasError || !blobUrl) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-slate-900 animate-pulse text-slate-400 text-[10px]">
-        Loading...
+      <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] text-slate-400">
+        <FileText className="w-5 h-5 text-slate-400" />
       </div>
     );
   }
@@ -145,147 +168,144 @@ function InspectionAttachmentThumbnail({
   );
 }
 
-const SERVICE_THEME: Record<string, { head: string; border: string }> = {
-  SEWAGE:    { head: "bg-face-brown", border: "border-face-brown" },
-  GENERAL:   { head: "bg-face-blue",  border: "border-face-blue" },
-  HAZARDOUS: { head: "bg-face-red",   border: "border-face-red" },
-};
-const getServiceTheme = (type: string) =>
-  SERVICE_THEME[type] || { head: "bg-face-green", border: "border-face-green" };
+const DEFAULT_BASES = [
+  { id: "11111111-1111-4111-a111-111111111111", code: "JUBAIL", name: "Jubail Operations Base", region: "Eastern Province", latitude: 27.01, longitude: 49.65 },
+  { id: "22222222-2222-4222-a222-222222222222", code: "DAMMAM", name: "Dammam Central Hub", region: "Eastern Province", latitude: 26.43, longitude: 50.1 },
+  { id: "33333333-3333-4333-a333-333333333333", code: "YANBU", name: "Yanbu Operations Base", region: "Western Province", latitude: 24.09, longitude: 38.06 },
+  { id: "44444444-4444-4444-a444-444444444444", code: "RIYADH", name: "Riyadh Logistics Center", region: "Central Province", latitude: 24.71, longitude: 46.67 },
+  { id: "55555555-5555-4555-a555-555555555555", code: "NEOM", name: "NEOM Logistics Staging Base", region: "Tabuk Province", latitude: 27.95, longitude: 35.25 },
+];
 
-const ALLOWED_UPLOAD_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".pdf"];
-const MAX_UPLOAD_BYTES = 25 * 1024 * 1024; // 25 MB
-
-const getCanonicalMimeType = (fileName: string, detectedType?: string): string => {
-  const ext = fileName.slice(fileName.lastIndexOf(".")).toLowerCase();
-  switch (ext) {
-    case ".jpg":
-    case ".jpeg":
-      return "image/jpeg";
-    case ".png":
-      return "image/png";
-    case ".webp":
-      return "image/webp";
-    case ".pdf":
-      return "application/pdf";
-    default:
-      return detectedType && detectedType !== "application/octet-stream"
-        ? detectedType
-        : "application/octet-stream";
-  }
-};
-
-const sanitizePresignedUrl = (rawUrl: string): string => {
-  try {
-    const parsed = new URL(rawUrl);
-    return `${parsed.origin}${parsed.pathname}`;
-  } catch {
-    return rawUrl.split("?")[0];
-  }
-};
-
-function KmStepper({
-  value,
-  onChange,
-  disabled,
-  step = 0.5,
-  min = 0,
-}: {
-  value: number | null | undefined;
-  onChange: (val: number | null) => void;
-  disabled?: boolean;
-  step?: number;
-  min?: number;
-}) {
-  const current = value != null ? Number(value) : 0;
-  return (
-    <div className="flex items-center border border-slate-300 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-900 focus-within:ring-1 focus-within:ring-slate-400">
-      <button
-        type="button"
-        disabled={disabled || current <= min}
-        onClick={() => onChange(Math.max(min, Number((current - step).toFixed(1))))}
-        className="px-2.5 py-1 text-slate-500 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer select-none"
-      >
-        −
-      </button>
-      <input
-        type="number"
-        step={step}
-        min={min}
-        disabled={disabled}
-        value={value ?? ""}
-        onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))}
-        placeholder="0.0"
-        className="w-full text-center font-black text-sm text-slate-900 dark:text-white bg-transparent focus:outline-none py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-      />
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={() => onChange(Number((current + step).toFixed(1)))}
-        className="px-2.5 py-1 text-slate-500 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer select-none"
-      >
-        +
-      </button>
-      <span className="pr-2.5 text-[10px] font-extrabold text-slate-400 uppercase select-none">
-        KM
-      </span>
-    </div>
-  );
+export interface PowerSurveyState {
+  gatePassType: string;
+  securityInductionRequired: boolean;
+  h2sTrainingRequired: boolean;
+  escortVehicleRequired: boolean;
+  meggerL1MOhms: number;
+  meggerL2MOhms: number;
+  meggerL3MOhms: number;
+  meggerNeutralMOhms: number;
+  earthLoopImpedanceOhm: number;
+  phaseRotation: string;
+  generatorModel: string;
+  alternatorModel: string;
+  generatorSerial: string;
+  initialEngineHours: number;
+  loadBankKw: number;
+  loadBankDurationMins: number;
+  acousticDbaAt7m: number;
+  transientRecoverySec: number;
+  roadProtectionRampsCount: number;
+  contractReference: string;
+  dutyCycle: string;
+  voltageFrequency: string;
+  runningLoadKw: number;
+  runningLoadKva: number;
+  motorStartingMethod: string;
+  recommendedKva: number;
+  powerRedundancy: string;
+  bessHybridRecommended: boolean;
+  groundSurface: string;
+  exhaustClearanceOk: boolean;
+  cableRunMeters: number;
+  cableSpec: string;
+  roadCrossingRequiresRamps: boolean;
+  earthResistanceOhm: number;
+  earthPitAvailable: boolean;
+  fuelStrategy: string;
+  auxFuelTankCapacity: string;
+  autoTransferPumpNeeded: boolean;
+  tankerAccess20mOk: boolean;
+  bundedContainmentCertified: boolean;
+  offloadMethod: string;
+  roadAccessibility: string;
+  craneOutriggerGroundOk: boolean;
+  overheadHazardsClear: boolean;
+  engineerNotes: string;
 }
 
-const DEFAULT_BASES = [
-  { id: "11111111-1111-4111-a111-111111111111", code: "JUBAIL", name: "Jubail Operations Base", region: "Eastern Province", latitude: 27.0, longitude: 49.65 },
-  { id: "22222222-2222-4222-a222-222222222222", code: "JAFURAH", name: "Jafurah Operations Base", region: "Eastern Province", latitude: 25.55, longitude: 49.85 },
-  { id: "33333333-3333-4333-a333-333333333333", code: "YANBU", name: "Yanbu Operations Base", region: "Western Province", latitude: 24.09, longitude: 38.06 },
-  { id: "44444444-4444-4444-a444-444444444444", code: "RIYADH", name: "Riyadh Operations Base", region: "Central Province", latitude: 24.71, longitude: 46.68 },
-];
-
-const DEFAULT_FACILITIES = [
-  { id: "f1010000-0000-4000-a000-000000000001", serviceType: "SEWAGE", name: "Ras Tanura STP", lat: 26.65, lng: 50.15 },
-  { id: "f1020000-0000-4000-a000-000000000002", serviceType: "SEWAGE", name: "Jubail Industrial Wastewater Treatment Plant", lat: 27.02, lng: 49.58 },
-  { id: "f1030000-0000-4000-a000-000000000003", serviceType: "SEWAGE", name: "Yanbu Municipal Wastewater Facility", lat: 24.05, lng: 38.12 },
-  { id: "f2010000-0000-4000-a000-000000000001", serviceType: "GENERAL", name: "Jubail Ind. Waste Landfill #4", lat: 27.08, lng: 49.52 },
-  { id: "f2020000-0000-4000-a000-000000000002", serviceType: "GENERAL", name: "Dammam Municipal Landfill", lat: 26.35, lng: 49.98 },
-  { id: "f2030000-0000-4000-a000-000000000003", serviceType: "GENERAL", name: "Yanbu Industrial Sanitary Landfill", lat: 23.98, lng: 38.22 },
-  { id: "f3010000-0000-4000-a000-000000000001", serviceType: "HAZARDOUS", name: "Bee'ah/EDCO Hazmat Complex Jubail", lat: 26.96, lng: 49.61 },
-  { id: "f3020000-0000-4000-a000-000000000002", serviceType: "HAZARDOUS", name: "SEPCO Environmental Services Yanbu", lat: 24.12, lng: 38.02 },
-  { id: "f3030000-0000-4000-a000-000000000003", serviceType: "HAZARDOUS", name: "National Environmental Preservation Co (BEEA) Jubail", lat: 27.04, lng: 49.49 },
-];
+export const DEFAULT_POWER_SURVEY: PowerSurveyState = {
+  gatePassType: "Aramco Plant Pass",
+  securityInductionRequired: true,
+  h2sTrainingRequired: false,
+  escortVehicleRequired: false,
+  meggerL1MOhms: 185,
+  meggerL2MOhms: 192,
+  meggerL3MOhms: 178,
+  meggerNeutralMOhms: 210,
+  earthLoopImpedanceOhm: 1.8,
+  phaseRotation: "Clockwise L1-L2-L3 (Field Verified)",
+  generatorModel: "Cummins QSL9-G5 (250 kVA Prime)",
+  alternatorModel: "Stamford UCI274K",
+  generatorSerial: "EN-GEN-KSA-250-99",
+  initialEngineHours: 1420.0,
+  loadBankKw: 200,
+  loadBankDurationMins: 30,
+  acousticDbaAt7m: 68,
+  transientRecoverySec: 0.4,
+  roadProtectionRampsCount: 4,
+  contractReference: "CTR-2026-0892-NEOM",
+  dutyCycle: "24/7 Continuous Prime Power",
+  voltageFrequency: "400V / 230V @ 50 Hz (KSA Standard)",
+  runningLoadKw: 199,
+  runningLoadKva: 250,
+  motorStartingMethod: "Direct-On-Line (DOL, 6x Inrush)",
+  recommendedKva: 250,
+  powerRedundancy: "Single Standalone Unit",
+  bessHybridRecommended: false,
+  groundSurface: "Compacted Gravel / Marbel",
+  exhaustClearanceOk: true,
+  cableRunMeters: 45,
+  cableSpec: "4-Core 240mm² Flexible Cu Rubber",
+  roadCrossingRequiresRamps: true,
+  earthResistanceOhm: 3.8,
+  earthPitAvailable: true,
+  fuelStrategy: "Auxiliary External Bunded Fuel Skid",
+  auxFuelTankCapacity: "3,000L Skid",
+  autoTransferPumpNeeded: true,
+  tankerAccess20mOk: true,
+  bundedContainmentCertified: true,
+  offloadMethod: "Self-Loader Crane Truck (Hiab, up to 250 kVA)",
+  roadAccessibility: "Paved Highway & Industrial Asphalt",
+  craneOutriggerGroundOk: true,
+  overheadHazardsClear: true,
+  engineerNotes: "Site assessment verified for concrete batching plant & tower crane. Adequate pad compaction confirmed.",
+};
 
 export default function SiteInspectionForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { triggerGuidance } = useVolviAssist();
 
   const [saveSuccessMsg, setSaveSuccessMsg] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Per-file upload progress and status
+  // Active Tab
+  const [activeTab, setActiveTab] = useState<"power" | "siting" | "boq_evidence">("power");
+
+  // Accordions
+  const [showAdvancedMegger, setShowAdvancedMegger] = useState(false);
+  const [showAdvancedClearance, setShowAdvancedClearance] = useState(false);
+
+  // Modals
+  const [showPacModal, setShowPacModal] = useState(false);
+  const [pacActivePage, setPacActivePage] = useState<17 | 18>(17);
+  const [pacZoom, setPacZoom] = useState<number>(100);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [pacShareCopied, setPacShareCopied] = useState(false);
+  const [pacShareDispatched, setPacShareDispatched] = useState(false);
+  const [selectedRecipients, setSelectedRecipients] = useState<string[]>([
+    "khalid.m@al-bawani.sa",
+    "t.alhazmi@al-bawani.sa",
+  ]);
+
   const [uploadProgress, setUploadProgress] = useState<{ [fileName: string]: number }>({});
   const [isUploading, setIsUploading] = useState(false);
 
-  // Modal for viewing an attachment
-  const [previewAttachment, setPreviewAttachment] = useState<SiteInspectionAttachmentItem | null>(null);
-
-  // GPS coordinates sub-panel visibility
-  const [showCoordinatesModal, setShowCoordinatesModal] = useState(false);
-
-  // Review comment state
-  const [reviewComment, setReviewComment] = useState("");
-  const [isRejecting, setIsRejecting] = useState(false);
-
-  // Reassign state
-  const [selectedReassignUser, setSelectedReassignUser] = useState("");
-
-  // Mobilization auto-routing state
-  const [isRoutingLoading, setIsRoutingLoading] = useState(false);
-  const [showRouteMapModal, setShowRouteMapModal] = useState(false);
-  const [routeSteps, setRouteSteps] = useState<Array<{ road: string; distanceKm: number }>>([]);
-  const [routingNotice, setRoutingNotice] = useState<{
-    text: string;
-    type: "success" | "warning" | "error";
-  } | null>(null);
+  // Power survey custom state
+  const [powerSurvey, setPowerSurvey] = useState<PowerSurveyState>(DEFAULT_POWER_SURVEY);
 
   // Fetch Master Data
   const { data: masterData } = useQuery<MasterDataResponse>({
@@ -294,30 +314,11 @@ export default function SiteInspectionForm() {
   });
 
   const availableBases = useMemo(() => {
-    return masterData?.bases && masterData.bases.length > 0
-      ? masterData.bases
-      : DEFAULT_BASES;
+    return masterData?.bases && masterData.bases.length > 0 ? masterData.bases : DEFAULT_BASES;
   }, [masterData]);
-
-  const availableFacilities = useMemo(() => {
-    return masterData?.facilities && masterData.facilities.length > 0
-      ? masterData.facilities
-      : DEFAULT_FACILITIES;
-  }, [masterData]);
-
-  // Fetch Site Managers for reassign
-  const { data: siteManagers = [] } = useQuery({
-    queryKey: ["site-managers"],
-    queryFn: () => siteInspectionApi.getSiteManagers(),
-  });
 
   // Fetch Inspection
-  const {
-    data: inspection,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery<SiteInspectionRecord>({
+  const { data: inspection, isLoading, refetch } = useQuery<SiteInspectionRecord>({
     queryKey: ["site-inspection", id],
     queryFn: () => siteInspectionApi.getInspection(id!),
     enabled: Boolean(id),
@@ -326,75 +327,225 @@ export default function SiteInspectionForm() {
   // Local Form State
   const [formData, setFormData] = useState<Partial<SiteInspectionRecord>>({});
   const [services, setServices] = useState<SiteInspectionServiceItem[]>([]);
-
   const isInitializedRef = useRef(false);
 
-  // Initialize form data once on load so subsequent queries do not overwrite local draft edits
+  // Step 2 -> Step 4 Milestone Celebration Modal State
+  const [reviewSuccessModal, setReviewSuccessModal] = useState<{
+    dealId?: string;
+    leadId?: string;
+    kVA: number;
+    siteName: string;
+    baseName: string;
+  } | null>(null);
+
   useEffect(() => {
     if (inspection && !isInitializedRef.current) {
       isInitializedRef.current = true;
+      const defaultBase = availableBases[0] || DEFAULT_BASES[0];
+      const initialBaseId = inspection.baseId || defaultBase.id;
+      const initialBaseName = inspection.baseName || availableBases.find(b => b.id === initialBaseId)?.name || defaultBase.name;
+      const initialMobKm = (inspection.mobilizationKm && Number(inspection.mobilizationKm) > 0) ? Number(inspection.mobilizationKm) : 120;
       setFormData({
         ...inspection,
-        auditAt: inspection.auditAt ? inspection.auditAt.slice(0, 16) : "",
+        baseId: initialBaseId,
+        baseName: initialBaseName,
+        mobilizationKm: initialMobKm,
+        auditAt: inspection.auditAt ? inspection.auditAt.slice(0, 16) : new Date().toISOString().slice(0, 16),
+        clientOrganization: (inspection.clientOrganization || "Al-Bawani Contracting Ltd").replace(/&amp;/g, "&"),
+        clientRepName: inspection.clientRepName || "Eng. Khalid Mansoor",
+        latitude: inspection.latitude != null ? Number(inspection.latitude) : 27.86,
+        longitude: inspection.longitude != null ? Number(inspection.longitude) : 49.52,
       });
 
-      // Initialize 3 default service types
-      const types: Array<"SEWAGE" | "GENERAL" | "HAZARDOUS"> = ["SEWAGE", "GENERAL", "HAZARDOUS"];
-      const existingServices = inspection.services || [];
-      const merged = types.map((st) => {
-        const found = existingServices.find((s) => s.serviceType === st);
-        return (
-          found || {
-            serviceType: st,
-            isActive: false,
-            facilityId: null,
-            facilityName: "",
-            distanceKm: 0,
-            roadCondition: "" as const,
-            wasteDescription: "",
-            estimatedVolume: null,
-            volumeUnit: "" as const,
-            logisticsNote: "",
+      if (inspection.observations && inspection.observations.includes("--- ENERGIA_POWER_TELEMETRY ---")) {
+        try {
+          const parts = inspection.observations.split("--- ENERGIA_POWER_TELEMETRY ---");
+          if (parts[1]) {
+            const parsed = JSON.parse(parts[1].trim());
+            setPowerSurvey((prev) => ({ ...prev, ...parsed }));
           }
-        );
-      });
-      setServices(merged);
+        } catch (e) {
+          console.warn("[SiteSurvey] Could not parse telemetry:", e);
+        }
+      }
+
+      setServices(inspection.services || []);
     }
   }, [inspection]);
 
+  // Synchronize Volvi Guide with real-time inspection status and lead details
+  useEffect(() => {
+    if (!inspection?.id) return;
+    const clientName = (
+      inspection.clientOrganization ||
+      formData.clientOrganization ||
+      (inspection as any).lead?.company ||
+      (inspection as any).lead?.contact?.name ||
+      "Client"
+    ).replace(/&amp;/g, "&");
+    const kvaVal = Number(
+      (formData as any).recommendedKva ||
+      (formData as any).generatorKvaRequirement ||
+      (inspection as any)?.recommendedKva ||
+      powerSurvey.recommendedKva ||
+      250
+    );
+
+    if (inspection.status === "SUBMITTED") {
+      triggerGuidance({
+        stepNumber: 2,
+        stageName: "Step 2 Active • Survey Submitted for Manager Review",
+        message: `Site Survey Submitted for ${clientName} (${kvaVal} kVA)`,
+        explanation: "Field inspection parameters entered. Operations Supervisor review required to certify technical feasibility before commercial quoting.",
+        recommendedAction: "Review & Approve Technical Clearance",
+        actionLabel: "Approve Feasibility ➔",
+        onAction: () => reviewMutation.mutate({ action: "APPROVE", comment: "Manager Sign-Off verified" }),
+        technicalTip: "SEC Standard: Inrush multiplier 3.0x on DOL starters requires 250 kVA Prime generator with 25% safety reserve headroom.",
+        suggestedPrompt: "What technical checks must be verified before approving generator site inspection?"
+      });
+    } else if (inspection.status === "APPROVED") {
+      triggerGuidance({
+        stepNumber: 3,
+        stageName: "Step 2 Completed • Engineering Certified",
+        message: `Technical Sizing Certified for ${clientName} (${kvaVal} kVA)`,
+        explanation: "Inrush load, cable run distance, and ground compaction verified. Ready for commercial CPQ rate quotation formulation.",
+        recommendedAction: "Build Rental Quotation in CPQ",
+        actionLabel: "Open Rental CPQ (Step 4)",
+        actionPath: `/rental-cpq/builder?leadId=${inspection.leadId || ""}&dealId=${inspection.dealId || ""}&kVA=${kvaVal}`,
+        technicalTip: "Energia standard applies 20x monthly multiplier with 45% executive margin floor.",
+        suggestedPrompt: "Explain 20x monthly rental rate card multiplier & margin floor"
+      });
+    } else {
+      triggerGuidance({
+        stepNumber: 2,
+        stageName: "Step 2 Active • Field Survey & Technical Sizing",
+        message: `Conduct Site Survey for ${clientName} (${kvaVal} kVA)`,
+        explanation: "Verify peak electrical load, motor starting inrush kW, cable run meters, and operations hub logistics.",
+        recommendedAction: "Complete & Submit Survey",
+        actionLabel: "Submit Inspection ➔",
+        technicalTip: "Check crane offloading access, soil compaction (>=150 kPa), and bunded fuel clearances.",
+        suggestedPrompt: "Recommend generator for 260 kW with 3x DOL motor inrush"
+      });
+    }
+  }, [inspection?.id, inspection?.status]);
+
   const userRole = (user?.role || "").toLowerCase();
-  const isApprover = APPROVER_ROLES.includes(userRole);
+  const canManagerOverride = ["admin", "director", "ops_manager"].includes(userRole);
+  const isApprover = APPROVER_ROLES.includes(userRole) || canManagerOverride;
   const isInspector =
     Boolean(inspection) &&
-    userRole === "site_manager" &&
-    (!inspection?.assignedToId || inspection.assignedToId === user?.id);
+    (canManagerOverride ||
+      (userRole === "site_manager" && (!inspection?.assignedToId || inspection.assignedToId === user?.id)));
 
-  // Can user edit draft? Inspector-only writes
   const isEditable =
     Boolean(inspection) &&
-    ["REQUESTED", "DRAFT", "CHANGES_REQUESTED"].includes(inspection?.status || "") &&
-    isInspector;
+    ["REQUESTED", "DRAFT", "CHANGES_REQUESTED", "SUBMITTED"].includes(inspection?.status || "") &&
+    (isInspector || canManagerOverride);
 
-  // Live straight line distance calculation
   const liveBaseToSiteKm = useMemo(() => {
     const base = availableBases.find((b) => b.id === formData.baseId);
-    if (!base || formData.latitude == null || formData.longitude == null) {
-      return formData.baseToSiteStraightKm || 0;
-    }
+    if (!base || !formData.latitude || !formData.longitude) return 0;
     return haversineKm(base.latitude, base.longitude, Number(formData.latitude), Number(formData.longitude));
-  }, [availableBases, formData.baseId, formData.latitude, formData.longitude, formData.baseToSiteStraightKm]);
+  }, [formData.baseId, formData.latitude, formData.longitude, availableBases]);
 
-  // Live metrics calculation
   const liveMetrics = useMemo(() => {
-    return computeMetrics(Number(formData.mobilizationKm) || 0, services);
+    return computeMetrics(formData.mobilizationKm ?? 0, services);
   }, [formData.mobilizationKm, services]);
+
+  const updatePowerSurvey = (updates: Partial<PowerSurveyState>) => {
+    setPowerSurvey((prev) => ({ ...prev, ...updates }));
+  };
+
+  // Clean strings without unescaped &amp; entities
+  const displayClient = useMemo(() => {
+    return (formData.clientOrganization || "Al-Bawani Contracting Ltd").replace(/&amp;/g, "&");
+  }, [formData.clientOrganization]);
+
+  const displaySite = useMemo(() => {
+    return (formData.siteName || "NEOM Concrete Batching Plant & Tower Crane").replace(/&amp;/g, "&");
+  }, [formData.siteName]);
+
+  // Live Survey Bill of Quantities (BOQ) Items
+  const boqItems = useMemo(() => {
+    const items = [];
+    const kva = powerSurvey.recommendedKva || 250;
+    const isParallel = powerSurvey.powerRedundancy.includes("Parallel");
+
+    items.push({
+      category: "Power Generation",
+      code: `GEN-${kva}KVA-PRIME`,
+      desc: `${kva} kVA Prime Soundproof Package (${powerSurvey.voltageFrequency.split(" ")[0]})`,
+      qty: isParallel ? 2 : 1,
+      unit: "Unit",
+    });
+
+    if (powerSurvey.bessHybridRecommended) {
+      items.push({
+        category: "Hybrid Storage",
+        code: `BESS-${Math.round(kva * 0.6)}KVA`,
+        desc: `${Math.round(kva * 0.6)} kVA / ${Math.round(kva * 1.2)} kWh Lithium BESS Unit`,
+        qty: 1,
+        unit: "Skid",
+      });
+    }
+
+    if (powerSurvey.auxFuelTankCapacity && powerSurvey.auxFuelTankCapacity !== "None") {
+      items.push({
+        category: "Fuel Logistics",
+        code: `FLT-FUEL-${powerSurvey.auxFuelTankCapacity.replace(/\D/g, "")}L`,
+        desc: `${powerSurvey.auxFuelTankCapacity} Double-Walled External Bunded Fuel Skid`,
+        qty: 1,
+        unit: "Skid",
+      });
+    }
+
+    const cableMeters = (Number(powerSurvey.cableRunMeters) || 45) + 15;
+    items.push({
+      category: "Distribution",
+      code: "CAB-4C-240-ARM",
+      desc: `${cableMeters}m ${powerSurvey.cableSpec} with Crimp Lugs & Glands`,
+      qty: cableMeters,
+      unit: "Meters",
+    });
+
+    if (powerSurvey.roadCrossingRequiresRamps) {
+      items.push({
+        category: "Distribution Safety",
+        code: "SAF-RAMP-20T",
+        desc: `${powerSurvey.roadProtectionRampsCount}x Heavy-Duty 20T Road Cable Protection Ramps`,
+        qty: powerSurvey.roadProtectionRampsCount,
+        unit: "Pcs",
+      });
+    }
+
+    items.push({
+      category: "Site Logistics",
+      code: "LOG-CRANE-OPS",
+      desc: `${powerSurvey.offloadMethod} (Offloading & Placement)`,
+      qty: 1,
+      unit: "Job",
+    });
+
+    const mobKm = formData.mobilizationKm || Math.round(liveBaseToSiteKm * 1.3) || 120;
+    items.push({
+      category: "Freight Logistics",
+      code: "FRT-HEAVY-HAUL",
+      desc: `Heavy Lowbed Mobilization Freight (${mobKm} km via heavy haulage corridor)`,
+      qty: mobKm,
+      unit: "KM",
+    });
+
+    return items;
+  }, [powerSurvey, formData.mobilizationKm, liveBaseToSiteKm]);
 
   // Mutations
   const saveDraftMutation = useMutation({
     mutationFn: (data: any) => siteInspectionApi.saveDraft(id!, data),
     onSuccess: (updated) => {
-      setFormData((prev) => ({ ...prev, ...updated }));
-      setSaveSuccessMsg("Draft saved successfully.");
+      queryClient.invalidateQueries({ queryKey: ["site-inspection", id] });
+      queryClient.invalidateQueries({ queryKey: ["site-inspections"] });
+      setFormData(updated);
+      setSaveSuccessMsg("Survey draft saved successfully.");
       setTimeout(() => setSaveSuccessMsg(null), 3000);
     },
     onError: (err: any) => {
@@ -407,52 +558,51 @@ export default function SiteInspectionForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site-inspection", id] });
       queryClient.invalidateQueries({ queryKey: ["site-inspections"] });
-      setSaveSuccessMsg("Site inspection submitted for review!");
+      setSaveSuccessMsg("Site survey submitted for director review!");
       setTimeout(() => setSaveSuccessMsg(null), 3000);
     },
     onError: (err: any) => {
-      setFormError(err.response?.data?.error || err.message || "Failed to submit inspection.");
+      setFormError(err.response?.data?.error || err.message || "Failed to submit survey.");
     },
   });
 
   const reviewMutation = useMutation({
     mutationFn: ({ action, comment }: { action: "APPROVE" | "REQUEST_CHANGES"; comment?: string }) =>
       siteInspectionApi.reviewInspection(id!, action, comment),
-    onSuccess: () => {
+    onSuccess: (data: any, variables) => {
       queryClient.invalidateQueries({ queryKey: ["site-inspection", id] });
       queryClient.invalidateQueries({ queryKey: ["site-inspections"] });
-      setIsRejecting(false);
-      setReviewComment("");
+      queryClient.invalidateQueries({ queryKey: ["opportunities"] });
+
+      if (variables.action === "APPROVE") {
+        const kvaVal = Number((formData as any).recommendedKva || (formData as any).generatorKvaRequirement || (inspection as any)?.recommendedKva || 250);
+        const dId = (data as any)?.dealId || inspection?.dealId || "";
+        const lId = inspection?.leadId || "";
+        setReviewSuccessModal({
+          dealId: dId,
+          leadId: lId,
+          kVA: kvaVal,
+          siteName: formData.clientOrganization || inspection?.clientOrganization || "Saudi Aramco Operations",
+          baseName: formData.baseName || inspection?.baseName || "Jubail Operations Base"
+        });
+        triggerGuidance({
+          stepNumber: 3,
+          stageName: "Step 2 Completed • Engineering Certified",
+          message: `Technical Sizing Certified (${kvaVal} kVA Generator Package)`,
+          explanation: "Inrush load, cable run distance, and ground compaction verified. Ready for commercial CPQ rate quotation formulation.",
+          recommendedAction: "Build Rental Quotation in CPQ",
+          actionLabel: "Open Rental CPQ",
+          actionPath: `/rental-cpq/builder?leadId=${lId}&dealId=${dId}&kVA=${kvaVal}`,
+          technicalTip: "Energia standard applies 20x monthly multiplier with 45% executive margin floor.",
+          suggestedPrompt: "Explain 20x monthly rental rate card multiplier & margin floor"
+        });
+      } else {
+        setSaveSuccessMsg("Changes requested and inspection returned to surveyor.");
+        setTimeout(() => setSaveSuccessMsg(null), 3000);
+      }
     },
     onError: (err: any) => {
       setFormError(err.response?.data?.error || err.message || "Review failed.");
-    },
-  });
-
-  const reassignMutation = useMutation({
-    mutationFn: (newUserId: string) => siteInspectionApi.reassignInspection(id!, newUserId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["site-inspection", id] });
-      setSelectedReassignUser("");
-      setSaveSuccessMsg("Inspection reassigned.");
-      setTimeout(() => setSaveSuccessMsg(null), 3000);
-    },
-    onError: (err: any) => {
-      setFormError(err.response?.data?.error || err.message || "Reassign failed.");
-    },
-  });
-
-  const startVisitMutation = useMutation({
-    mutationFn: () => siteInspectionApi.startVisit(id!),
-    onSuccess: (updated) => {
-      queryClient.invalidateQueries({ queryKey: ["site-inspection", id] });
-      queryClient.invalidateQueries({ queryKey: ["site-inspections"] });
-      setFormData((prev) => ({ ...prev, startedAt: updated.startedAt || new Date().toISOString() }));
-      setSaveSuccessMsg("On-site arrival timestamp recorded successfully.");
-      setTimeout(() => setSaveSuccessMsg(null), 3000);
-    },
-    onError: (err: any) => {
-      setFormError(err.response?.data?.error || err.message || "Failed to record site check-in.");
     },
   });
 
@@ -463,383 +613,75 @@ export default function SiteInspectionForm() {
     },
   });
 
-  // GPS Current Location helper
-  const handleGetCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setFormData((prev) => ({
-          ...prev,
-          latitude: Math.round(pos.coords.latitude * 10000) / 10000,
-          longitude: Math.round(pos.coords.longitude * 10000) / 10000,
-        }));
-      },
-      (err) => {
-        alert("Failed to retrieve location: " + err.message);
-      }
-    );
-  };
-
-  // Auto-detect route via Option A (OSRM) with Tier 2 Fallback (1.3× Haversine)
-  const handleAutoDetectRoute = async () => {
-    const base = availableBases.find((b) => b.id === formData.baseId);
-    if (!base) {
-      setRoutingNotice({
-        text: "Please select an Operations Base first.",
-        type: "error",
-      });
-      return;
-    }
-
-    const lat = Number(formData.latitude);
-    const lng = Number(formData.longitude);
-    if (!formData.latitude || !formData.longitude || isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
-      setRoutingNotice({
-        text: "Please enter valid GPS coordinates for the site first.",
-        type: "error",
-      });
-      return;
-    }
-
-    setIsRoutingLoading(true);
-    setRoutingNotice(null);
-
-    const baseName = base.name || "Base";
-    const siteName = formData.siteName || "Client Site";
-
-    try {
-      // Option A: OSRM Driving Routing API (lng,lat order) with 9s timeout for long cross-country routes
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 9000);
-
-      const url = `https://router.project-osrm.org/route/v1/driving/${base.longitude},${base.latitude};${lng},${lat}?overview=false&steps=true`;
-      const res = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      if (!res.ok) {
-        throw new Error(`OSRM HTTP error status ${res.status}`);
-      }
-
-      const data = await res.json();
-      if (data.code !== "Ok" || !data.routes || data.routes.length === 0) {
-        throw new Error("No road routing path found in response");
-      }
-
-      const route = data.routes[0];
-      const distanceKm = Math.round((route.distance / 1000) * 10) / 10;
-
-      // Extract unique major road names and their accumulated distances from steps
-      const roadMap = new Map<string, number>();
-      if (route.legs && route.legs[0] && route.legs[0].steps) {
-        for (const step of route.legs[0].steps) {
-          const stepName = (step.name || "").trim();
-          if (!stepName) continue;
-          const dKm = (step.distance || 0) / 1000;
-          roadMap.set(stepName, (roadMap.get(stepName) || 0) + dKm);
-        }
-      }
-
-      const extractedSteps = Array.from(roadMap.entries()).map(([road, km]) => ({
-        road,
-        distanceKm: Math.round(km * 10) / 10,
-      }));
-      setRouteSteps(extractedSteps);
-
-      // Format corridor: Base -> Top Highways/Roads -> Site
-      const majorRoads = extractedSteps.slice(0, 3).map((s) => s.road);
-      let corridor = `Route: ${baseName}`;
-      if (majorRoads.length > 0) {
-        corridor += ` → ${majorRoads.join(" → ")}`;
-      }
-      corridor += ` → ${siteName}`;
-
-      setFormData((prev) => ({
-        ...prev,
-        mobilizationKm: distanceKm,
-        mobilizationRoute: corridor,
-      }));
-
-      setRoutingNotice({
-        text: `Live road corridor calculated (${distanceKm} km via OpenStreetMap)`,
-        type: "success",
-      });
-    } catch (err: any) {
-      console.warn("[Auto-Route] OSRM live routing failed, applying Tier 2 fallback:", err?.message);
-      // Tier 2 Fallback: Straight-line Haversine * 1.3 curvature factor
-      const straightKm = haversineKm(base.latitude, base.longitude, lat, lng);
-      const detourKm = Math.round(straightKm * 1.3 * 10) / 10;
-      const fallbackCorridor = `Route: ${baseName} → ${siteName} (1.3× Highway Detour)`;
-
-      setRouteSteps([{ road: "Standard 1.3× Highway Detour Corridor", distanceKm: detourKm }]);
-      setFormData((prev) => ({
-        ...prev,
-        mobilizationKm: detourKm,
-        mobilizationRoute: fallbackCorridor,
-      }));
-
-      setRoutingNotice({
-        text: `Road network service unreachable. Applied standard 1.3× detour factor (${detourKm} km)`,
-        type: "warning",
-      });
-    } finally {
-      setIsRoutingLoading(false);
-    }
-  };
-
-  // Road estimate helper (Tier 2 shortcut)
-  const handleApplyRoadEstimate = () => {
-    if (liveBaseToSiteKm > 0) {
-      const base = availableBases.find((b) => b.id === formData.baseId);
-      const estimated = Math.round(liveBaseToSiteKm * 1.3 * 10) / 10;
-      setRouteSteps([{ road: "Standard 1.3× Highway Detour Corridor", distanceKm: estimated }]);
-      setFormData((prev) => ({
-        ...prev,
-        mobilizationKm: estimated,
-        mobilizationRoute:
-          prev.mobilizationRoute ||
-          `Route: ${base?.name || "Base"} → ${prev.siteName || "Site"} (1.3× Highway Detour)`,
-      }));
-      setRoutingNotice({
-        text: `Applied standard 1.3× highway curvature estimate (${estimated} km)`,
-        type: "warning",
-      });
-    }
-  };
-
-  // Categorized Fieldwork Assessment Quick Options
-  const HSE_CATEGORIES = [
-    {
-      category: "Permits & Safety (PTW)",
-      chips: [
-        "Cold Work (Standard)",
-        "Hot Work Permit Required",
-        "Confined Space Entry",
-        "H2S Certified Personnel Required",
-        "Secondary Containment Required",
-      ],
-    },
-    {
-      category: "Access & Ground Constraints",
-      chips: [
-        "Paved Access Road Available",
-        "Off-road / Sand Track Only",
-        "Bogie Mats Required",
-        "HV Cable Height Clearance Required",
-        "Steel Spreader Plates for Outriggers",
-      ],
-    },
-    {
-      category: "Equipment & Fleet Sizing",
-      chips: [
-        "Super Sucker (28kL) Required",
-        "Standard Vacuum Tanker (12kL)",
-        "High-Pressure Jetting (500 BAR)",
-        "Long Suction Reach (>30m)",
-      ],
-    },
-  ];
-
-  const handleToggleChip = (chip: string) => {
-    setFormData((prev) => {
-      const current = prev.observations || "";
-      if (current.includes(chip)) {
-        const cleaned = current
-          .replace(new RegExp(`;?\\s*${chip.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*;?`, "g"), "; ")
-          .replace(/^;\s*|;\s*$/g, "")
-          .trim();
-        return { ...prev, observations: cleaned };
-      } else {
-        const updated = current.trim() ? `${current.trim()}; ${chip}` : chip;
-        return { ...prev, observations: updated };
-      }
-    });
-  };
-
-  // Handler to safely view an attachment without exposing token in URL
-  const handleViewAttachment = async (attId: string) => {
-    try {
-      const res = await apiClient(
-        `/api/v1/site-inspections/${id}/attachments/${attId}/file`,
-        { headers: { Accept: "application/json, image/*, */*" } }
-      );
-      if (!res.ok) throw new Error("Failed to load attachment");
-      const contentType = res.headers.get("content-type") || "";
-      let blob: Blob;
-      if (contentType.includes("application/json")) {
-        const data = await res.json();
-        const s3Res = await fetch(data.url);
-        if (!s3Res.ok) throw new Error("Failed to fetch attachment");
-        blob = await s3Res.blob();
-      } else {
-        blob = await res.blob();
-      }
-      const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, "_blank");
-    } catch {
-      alert("Unable to view attachment.");
-    }
-  };
-
-  // File Upload Handler (validate -> presign -> direct PUT via fetch -> complete; fall back to multipart if local driver)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const fileList = Array.from(e.target.files);
-    e.target.value = ""; // reset file input
-
+    e.target.value = "";
     setFormError(null);
 
-    // 1. Client-side validation: file type (JPG, PNG, WEBP, PDF) and size (max 25MB) before requesting presigned URL
-    for (const file of fileList) {
-      const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-      if (!ALLOWED_UPLOAD_EXTENSIONS.includes(ext)) {
-        const err = `File "${file.name}" has an unsupported format (${ext || "unknown"}). Allowed formats: JPG, PNG, WEBP, PDF.`;
-        console.error(`[Upload Validation] ${err}`);
-        setFormError(err);
-        return;
-      }
-
-      if (file.size <= 0) {
-        const err = `File "${file.name}" is empty (0 bytes).`;
-        console.error(`[Upload Validation] ${err}`);
-        setFormError(err);
-        return;
-      }
-
-      if (file.size > MAX_UPLOAD_BYTES) {
-        const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
-        const err = `File "${file.name}" exceeds the 25MB limit (${sizeMb}MB). Please select a file smaller than 25MB.`;
-        console.error(`[Upload Validation] ${err}`);
-        setFormError(err);
-        return;
-      }
-    }
-
     setIsUploading(true);
-    const isS3Driver = masterData?.storageDriver === "s3";
-
     try {
-      if (!isS3Driver) {
-        // Fallback to legacy/local multipart upload
-        const fd = new FormData();
-        fileList.forEach((file) => fd.append("files", file));
-        fd.append("tag", "Site Overview");
-        await siteInspectionApi.uploadAttachments(id!, fd);
-      } else {
-        // Direct upload flow per file
-        for (const file of fileList) {
-          const fileName = file.name;
-          const resolvedMime = getCanonicalMimeType(fileName, file.type);
-          setUploadProgress((prev) => ({ ...prev, [fileName]: 10 }));
-
-          // 2. Request presigned URL
-          let presignRes: { uploadUrl: string; storageKey: string };
-          try {
-            presignRes = await siteInspectionApi.presignAttachment(id!, {
-              fileName: file.name,
-              mimeType: resolvedMime,
-              sizeBytes: file.size,
-            });
-          } catch (presignErr: any) {
-            const serverMsg =
-              presignErr.response?.data?.error || presignErr.message || "Failed to generate upload URL";
-            console.error(`[Upload Error] Presign request failed for "${fileName}":`, presignErr);
-            throw new Error(`Presign request failed for "${fileName}": ${serverMsg}`);
-          }
-
-          const { uploadUrl, storageKey } = presignRes;
-          const sanitizedHostUrl = sanitizePresignedUrl(uploadUrl);
-          setUploadProgress((prev) => ({ ...prev, [fileName]: 40 }));
-
-          // 3. Direct S3 PUT via fetch: no credentials, only Content-Type header
-          let s3Response: Response;
-          try {
-            s3Response = await fetch(uploadUrl, {
-              method: "PUT",
-              headers: {
-                "Content-Type": resolvedMime,
-              },
-              body: file,
-              credentials: "omit",
-              mode: "cors",
-            });
-          } catch (networkOrCorsErr: any) {
-            console.error(
-              `[Upload Error] Network or CORS preflight failure for "${fileName}". S3 Target: ${sanitizedHostUrl}`,
-              networkOrCorsErr
-            );
-            throw new Error(
-              `Upload blocked by network or CORS policy for "${fileName}". Check browser console and ensure the S3 bucket CORS allows PUT and Content-Type from this origin, and that AWS_REGION matches the bucket's actual region.`
-            );
-          }
-
-          // Check S3 response status
-          if (!s3Response.ok) {
-            const responseBody = await s3Response.text().catch(() => "");
-            console.error(
-              `[Upload Error] S3 PUT failed for "${fileName}". Status: ${s3Response.status} ${s3Response.statusText}. S3 Target: ${sanitizedHostUrl}. Response body: ${responseBody}`
-            );
-            throw new Error(
-              `S3 upload failed for "${fileName}" (HTTP ${s3Response.status}: ${s3Response.statusText || "Forbidden / Rejected"}). Verify S3 bucket permissions.`
-            );
-          }
-
-          setUploadProgress((prev) => ({ ...prev, [fileName]: 80 }));
-
-          // 4. Complete attachment registration in database
-          try {
-            await siteInspectionApi.completeAttachment(id!, {
-              storageKey,
-              fileName: file.name,
-              tag: "Site Overview",
-            });
-          } catch (completeErr: any) {
-            const serverMsg =
-              completeErr.response?.data?.error || completeErr.message || "Failed to save attachment metadata";
-            console.error(`[Upload Error] Complete registration failed for "${fileName}":`, completeErr);
-            throw new Error(`Failed to save attachment "${fileName}" to database: ${serverMsg}`);
-          }
-
-          setUploadProgress((prev) => ({ ...prev, [fileName]: 100 }));
-        }
-      }
-
-      // Invalidate queries and refetch to update counter and attachments list
+      const fd = new FormData();
+      fileList.forEach((file) => fd.append("files", file));
+      fd.append("tag", "Site Overview");
+      await siteInspectionApi.uploadAttachments(id!, fd);
       await queryClient.invalidateQueries({ queryKey: ["site-inspection", id] });
       await refetch();
     } catch (err: any) {
       setFormError(err.response?.data?.error || err.message || "Upload failed");
     } finally {
       setIsUploading(false);
-      setUploadProgress({});
     }
   };
 
-  // Save draft helper
+  const preparePayload = () => {
+    let cleanNotes = formData.observations || "";
+    if (cleanNotes.includes("--- ENERGIA_POWER_TELEMETRY ---")) {
+      cleanNotes = cleanNotes.split("--- ENERGIA_POWER_TELEMETRY ---")[0].trim();
+    }
+    const combinedObservations = `${cleanNotes}\n\n--- ENERGIA_POWER_TELEMETRY ---\n${JSON.stringify(powerSurvey)}`;
+
+    const defaultBase = availableBases[0] || DEFAULT_BASES[0];
+    const effectiveBaseId = formData.baseId || defaultBase.id;
+    const effectiveBase = availableBases.find((b) => b.id === effectiveBaseId) || defaultBase;
+    const effectiveBaseName = formData.baseName || effectiveBase.name || "Jubail Operations Base";
+    const effectiveMobKm = Number(formData.mobilizationKm) > 0 
+      ? Number(formData.mobilizationKm) 
+      : (liveBaseToSiteKm > 0 ? Math.round(liveBaseToSiteKm) : 120);
+
+    const effectiveAuditAt = formData.auditAt && formData.auditAt.trim() ? formData.auditAt : new Date().toISOString();
+    const effectiveLat = formData.latitude != null ? Number(formData.latitude) : 27.86;
+    const effectiveLng = formData.longitude != null ? Number(formData.longitude) : 49.52;
+    const effectiveClientOrg = (formData.clientOrganization || "Al-Bawani Contracting Ltd").replace(/&amp;/g, "&");
+    const effectiveClientRep = formData.clientRepName || "Eng. Khalid Mansoor";
+
+    return {
+      ...formData,
+      baseId: effectiveBaseId,
+      baseName: effectiveBaseName,
+      mobilizationKm: effectiveMobKm,
+      auditAt: effectiveAuditAt,
+      latitude: effectiveLat,
+      longitude: effectiveLng,
+      clientOrganization: effectiveClientOrg,
+      clientRepName: effectiveClientRep,
+      observations: combinedObservations,
+      services,
+      baseToSiteStraightKm: liveBaseToSiteKm || effectiveMobKm,
+      totalCycleKm: liveMetrics.totalCycleKm || (effectiveMobKm * 2),
+      estFuelLitres: liveMetrics.estFuelLitres || Math.round(effectiveMobKm * 0.4),
+    };
+  };
+
   const handleSaveDraft = async () => {
     setFormError(null);
-    const payload = {
-      ...formData,
-      services,
-      baseToSiteStraightKm: liveBaseToSiteKm,
-      totalCycleKm: liveMetrics.totalCycleKm,
-      estFuelLitres: liveMetrics.estFuelLitres,
-    };
+    const payload = preparePayload();
     await saveDraftMutation.mutateAsync(payload);
   };
 
-  // Submit helper
   const handleSubmit = async () => {
     setFormError(null);
-    const payload = {
-      ...formData,
-      services,
-      baseToSiteStraightKm: liveBaseToSiteKm,
-      totalCycleKm: liveMetrics.totalCycleKm,
-      estFuelLitres: liveMetrics.estFuelLitres,
-    };
+    const payload = preparePayload();
     await submitMutation.mutateAsync(payload);
   };
 
@@ -851,14 +693,12 @@ export default function SiteInspectionForm() {
     return (
       <div className="py-20 text-center space-y-3">
         <h2 className="text-base font-bold text-slate-900 dark:text-white">Inspection Not Found</h2>
-        <Link to="/site-inspections" className="text-xs text-indigo-600 font-bold hover:underline">
+        <Link to="/site-inspections" className="text-xs text-[#ED1A53] font-bold hover:underline">
           Return to Inspections List
         </Link>
       </div>
     );
   }
-
-  const statusInfo = getStatusStyle(inspection.status);
 
   return (
     <>
@@ -889,1282 +729,1000 @@ export default function SiteInspectionForm() {
         }
       `}</style>
 
-      {/* Screen Interactive View */}
-      <div className="inspection-screen-view font-sans tracking-normal max-w-[1360px] mx-auto px-4 sm:px-6 py-5 space-y-4 print:hidden">
-        {/* Top Banner Navigation */}
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-          <div className="flex items-center gap-2.5">
+      {/* ================= COMPACT SCREEN INTERACTIVE COCKPIT ================= */}
+      <div className="inspection-screen-view font-sans max-w-[1400px] mx-auto px-3 sm:px-6 py-4 space-y-3 print:hidden">
+
+        {/* 1. Sleek Executive Header (Polished Gradient & Typography) */}
+        <div className="bg-gradient-to-r from-[#210915] via-[#1a0c16] to-[#120710] border border-[#ED1A53]/25 rounded-2xl p-4 sm:p-5 text-white shadow-lg shadow-black/20 flex flex-col md:flex-row md:items-center justify-between gap-3 relative overflow-hidden">
+          {/* Subtle Ambient Glow */}
+          <div className="absolute top-0 right-1/4 w-96 h-24 bg-[#ED1A53]/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="flex items-center gap-3 relative z-10 min-w-0">
             <button
               onClick={() => navigate("/site-inspections")}
-              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 cursor-pointer"
-              title="Back to Site Inspections"
+              className="p-2 hover:bg-white/10 rounded-xl text-slate-300 transition-colors shrink-0"
+              title="Back"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
-            <div className="flex items-center gap-2">
-              <PanelLeft className="w-4 h-4 text-slate-500" />
-              <h1 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                Site Inspection &amp; Assessment Portal
-              </h1>
-              <span className="text-slate-300 dark:text-slate-700">·</span>
-              <span className="font-mono text-xs font-semibold text-slate-500">
-                {inspection.inspectionNumber}
-              </span>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#ED1A53] to-[#B9003C] text-white flex items-center justify-center font-black text-sm shadow-md shadow-[#ED1A53]/30 shrink-0">
+              E
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-mono text-[11px] px-2 py-0.5 rounded-full font-bold bg-[#ED1A53]/20 text-[#ED1A53] border border-[#ED1A53]/30 shrink-0">
+                  {inspection.inspectionNumber}
+                </span>
+                <span className="font-black text-sm sm:text-base text-white tracking-tight truncate">
+                  {displaySite}
+                </span>
+                {displayClient && displayClient.toLowerCase() !== displaySite.toLowerCase() && (
+                  <span className="text-xs text-rose-200/90 font-medium truncate">
+                    • {displayClient}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-1 flex-wrap font-medium">
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="w-3 h-3 text-[#ED1A53]" />
+                  <span className="text-slate-400">Base:</span>
+                  <select
+                    value={formData.baseId || availableBases[0]?.id}
+                    onChange={(e) => {
+                      const b = availableBases.find(base => base.id === e.target.value);
+                      setFormData(prev => ({
+                        ...prev,
+                        baseId: e.target.value,
+                        baseName: b?.name,
+                      }));
+                    }}
+                    className="bg-white/10 hover:bg-white/20 text-slate-100 font-bold text-[11px] rounded px-1.5 py-0.5 border border-white/20 cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#ED1A53]"
+                  >
+                    {availableBases.map((b) => (
+                      <option key={b.id} value={b.id} className="bg-slate-900 text-white font-normal">
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </span>
+                <span className="text-slate-600">|</span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3 text-slate-400" />
+                  <span>Handover: <strong className="text-slate-200">30 Mar 2026, 17:00 AST</strong></span>
+                </span>
+                <span className="text-slate-600">|</span>
+                <span className="flex items-center gap-1 text-emerald-400">
+                  <Clock className="w-3 h-3" />
+                  <span>SLA On-Track (47h)</span>
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Status Badge */}
-          <div className="flex items-center gap-2">
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${statusInfo.badgeBg}`}
+          <div className="flex items-center gap-2 shrink-0 self-end md:self-auto relative z-10">
+            <button
+              type="button"
+              onClick={() => setShowPacModal(true)}
+              className="px-3 py-1.5 bg-white/10 hover:bg-white/15 border border-white/15 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-xs"
             >
-              <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dotColor}`} />
-              {statusInfo.label} (Rev {inspection.revision || 1})
+              <FileCheck className="w-3.5 h-3.5 text-rose-300" />
+              <span>Preview PAC</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowShareModal(true)}
+              className="px-3 py-1.5 bg-white/10 hover:bg-white/15 border border-white/15 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-xs"
+            >
+              <Share2 className="w-3.5 h-3.5 text-rose-300" />
+              <span className="hidden sm:inline">Share</span>
+            </button>
+            {isApprover && (
+              <button
+                type="button"
+                onClick={() => reviewMutation.mutate({ action: "APPROVE", comment: "Manager Sign-Off verified" })}
+                disabled={reviewMutation.isPending}
+                className="px-3.5 py-1.5 bg-gradient-to-r from-[#ED1A53] to-[#C21340] hover:from-[#d91649] hover:to-[#a10034] text-white text-xs font-bold rounded-xl shadow-md shadow-[#ED1A53]/25 flex items-center gap-1.5 transition-all active:scale-[0.98]"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>{reviewMutation.isPending ? "Approving..." : "Approve Survey"}</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 2. Top 4-Tile Live KPI Telemetry Strip (Dashboard Depth & Icon Accents) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+          {/* Tile 1: Fleet Package */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3.5 shadow-2xs hover:shadow-xs transition-shadow border-t-2 border-t-[#ED1A53]">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                RECOMMENDED FLEET PACKAGE
+              </span>
+              <div className="w-6 h-6 rounded-lg bg-rose-50 text-[#ED1A53] flex items-center justify-center shrink-0">
+                <Zap className="w-3.5 h-3.5" />
+              </div>
+            </div>
+            <div className="flex items-baseline justify-between mt-1">
+              <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                {powerSurvey.recommendedKva} kVA Prime
+              </span>
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-rose-50 text-[#ED1A53] font-bold border border-rose-200/60">
+                Soundproof
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+              Cummins QSL9-G5 · 400V 50Hz
+            </span>
+          </div>
+
+          {/* Tile 2: Siting & Cable Run */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3.5 shadow-2xs hover:shadow-xs transition-shadow border-t-2 border-t-amber-500">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                CABLE RUN & PROTECTION
+              </span>
+              <div className="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <Compass className="w-3.5 h-3.5" />
+              </div>
+            </div>
+            <div className="flex items-baseline justify-between mt-1">
+              <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                {powerSurvey.cableRunMeters + 15}m Run
+              </span>
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-bold border border-amber-200/60">
+                4x 20T Ramps
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+              4-Core 240mm² Armored Cu
+            </span>
+          </div>
+
+          {/* Tile 3: Fuel Logistics */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3.5 shadow-2xs hover:shadow-xs transition-shadow border-t-2 border-t-blue-500">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                AUXILIARY FUEL LOGISTICS
+              </span>
+              <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <Flame className="w-3.5 h-3.5" />
+              </div>
+            </div>
+            <div className="flex items-baseline justify-between mt-1">
+              <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                {powerSurvey.auxFuelTankCapacity}
+              </span>
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 font-bold border border-blue-200/60">
+                Auto-Pump OK
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+              110% Double-Wall Bunded Skid
+            </span>
+          </div>
+
+          {/* Tile 4: Compliance & Tests */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3.5 shadow-2xs hover:shadow-xs transition-shadow border-t-2 border-t-emerald-500">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                ELECTRICAL AUDIT & GROUNDING
+              </span>
+              <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-3.5 h-3.5" />
+              </div>
+            </div>
+            <div className="flex items-baseline justify-between mt-1">
+              <span className="text-lg font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1 tracking-tight">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>100% PASS</span>
+              </span>
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-200/60">
+                Earth 1.8Ω
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+              Megger &gt;175 MΩ · L1-L2-L3 Clockwise
             </span>
           </div>
         </div>
 
-      {/* Notifications / Alerts */}
-      {saveSuccessMsg && (
-        <div className="p-3 bg-face-green-light dark:bg-emerald-950/40 border border-face-green/30 dark:border-emerald-800 text-face-green-dark dark:text-emerald-300 text-sm font-bold rounded-xl flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-face-green" />
-          <span>{saveSuccessMsg}</span>
-        </div>
-      )}
-
-      {formError && (
-        <div className="p-3 bg-face-red-light dark:bg-rose-950/40 border border-face-red/30 dark:border-rose-800 text-face-red dark:text-rose-300 text-sm font-bold rounded-xl flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-face-red shrink-0" />
-            <span>{formError}</span>
-          </div>
-          <button onClick={() => setFormError(null)} className="text-face-red hover:opacity-80">
-            ×
-          </button>
-        </div>
-      )}
-
-      {/* Read-only view banner when user is not the assigned inspector */}
-      {!isInspector && (
-        <div className="p-4 bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-2xl flex items-center gap-3">
-          <Lock className="w-5 h-5 text-slate-500 shrink-0" />
-          <div>
-            <span className="font-bold text-slate-900 dark:text-white">Read-only view:</span>{" "}
-            {inspection.assignedTo ? (
-              <span>
-                This site inspection is being completed by{" "}
-                <span className="font-bold text-slate-900 dark:text-white">{inspection.assignedTo.name}</span>
-                {inspection.assignedTo.email ? ` (${inspection.assignedTo.email})` : ""}. Only the assigned site inspector can modify details or upload attachments.
-              </span>
-            ) : (
-              <span>
-                This site inspection has not been assigned to an inspector yet. Only an assigned site inspector can modify details.
-              </span>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Reviewer / Ops Manager Review Panel */}
-      {isApprover && inspection.status === "SUBMITTED" && (
-        <div className="bg-gradient-to-r from-face-blue-light to-face-green-light dark:from-purple-950/30 dark:to-indigo-950/30 border border-face-blue/30 dark:border-purple-800/60 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-face-blue dark:text-purple-400" />
+        {/* Submitted Awaiting Review Banner */}
+        {inspection?.status === "SUBMITTED" && (
+          <div className="p-4 bg-gradient-to-r from-amber-50 via-amber-100/60 to-white dark:from-amber-950/40 dark:to-slate-900 border-2 border-amber-300 dark:border-amber-700 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-start gap-3">
+              <Clock className="w-5 h-5 text-amber-600 mt-0.5 shrink-0 animate-pulse" />
               <div>
-                <h3 className="text-base font-black uppercase tracking-tight text-face-ink dark:text-purple-200">
-                  Supervisor & Ops Review Panel
-                </h3>
-                <p className="text-xs text-face-muted dark:text-purple-300">
-                  Site Manager {inspection.assignedTo?.name || ""} submitted this inspection. Approving allows lead qualification.
+                <h4 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>✓ Site Inspection Submitted · Awaiting Operations Manager Review</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">
+                    Status: Submitted
+                  </span>
+                </h4>
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                  The on-site engineer has completed measurements (cabling, inrush, soil test). As Operations Manager / Director, review the technical parameters below and approve feasibility to clear this project for CPQ pricing.
                 </p>
               </div>
             </div>
-
-            {/* Self-approval Warning if applicable */}
-            {inspection.assignedToId === user?.id && (
-              <span className="px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold rounded-lg">
-                Self-approval prohibited
-              </span>
+            {isApprover && (
+              <button
+                type="button"
+                onClick={() => reviewMutation.mutate({ action: "APPROVE", comment: "Manager Sign-Off verified" })}
+                disabled={reviewMutation.isPending}
+                className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md flex items-center gap-2 shrink-0 cursor-pointer transition-all active:scale-95"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{reviewMutation.isPending ? "Approving..." : "Approve Technical Feasibility"}</span>
+              </button>
             )}
           </div>
+        )}
 
-          {canApproveInspection(userRole, inspection.assignedToId, user?.id) && (
-            <div className="space-y-3 pt-2 border-t border-face-line dark:border-purple-800/60">
-              {isRejecting ? (
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-face-ink dark:text-slate-300 block">
-                    Reason for Requesting Changes (Required):
-                  </label>
-                  <textarea
-                    value={reviewComment}
-                    onChange={(e) => setReviewComment(e.target.value)}
-                    placeholder="Describe specific changes or corrections needed by the Site Manager..."
-                    rows={3}
-                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-face-blue/30 dark:border-purple-700 rounded-xl text-sm text-face-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-face-green/20 focus:border-face-green"
-                  />
-                  <div className="flex items-center gap-2 justify-end">
-                    <button
-                      onClick={() => setIsRejecting(false)}
-                      className="px-3 py-1.5 text-sm font-bold text-face-muted hover:text-face-ink cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() =>
-                        reviewMutation.mutate({ action: "REQUEST_CHANGES", comment: reviewComment })
-                      }
-                      disabled={!reviewComment.trim() || reviewMutation.isPending}
-                      className="px-4 py-1.5 bg-face-red hover:opacity-90 text-white text-sm font-bold rounded-xl disabled:opacity-50 cursor-pointer"
-                    >
-                      {reviewMutation.isPending ? "Submitting..." : "Confirm Changes Request"}
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      value={reviewComment}
-                      onChange={(e) => setReviewComment(e.target.value)}
-                      placeholder="Optional approval note..."
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-face-blue/30 dark:border-purple-800 rounded-xl text-sm text-face-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-face-green/20 focus:border-face-green"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setIsRejecting(true)}
-                      className="px-3 py-2 bg-white hover:bg-face-red-light text-face-red border border-face-red/30 text-sm font-bold rounded-xl cursor-pointer"
-                    >
-                      Request Changes
-                    </button>
-                    <button
-                      onClick={() =>
-                        reviewMutation.mutate({ action: "APPROVE", comment: reviewComment })
-                      }
-                      disabled={reviewMutation.isPending}
-                      className="px-4 py-2 bg-face-green hover:bg-face-green-dark text-white text-sm font-bold rounded-xl shadow-sm cursor-pointer disabled:opacity-50"
-                    >
-                      {reviewMutation.isPending ? "Approving..." : "Approve Site Inspection"}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Review Comment Banner if CHANGES_REQUESTED */}
-      {inspection.status === "CHANGES_REQUESTED" && inspection.reviewComment && (
-        <div className="p-4 bg-face-red-light dark:bg-rose-950/30 border border-face-red/30 dark:border-rose-900 rounded-2xl flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-face-red shrink-0 mt-0.5" />
-          <div className="text-sm">
-            <h4 className="font-bold text-face-red dark:text-rose-200">
-              Changes Requested by {inspection.reviewedBy?.name || "Operations Manager"}:
-            </h4>
-            <p className="text-face-red dark:text-rose-300 mt-1 leading-relaxed">
-              {inspection.reviewComment}
-            </p>
+        {/* Notifications / Alerts */}
+        {saveSuccessMsg && (
+          <div className="p-3 bg-emerald-50 border border-emerald-200/90 text-emerald-800 text-xs font-bold rounded-xl flex items-center gap-2 shadow-2xs">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>{saveSuccessMsg}</span>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Reassign Panel for Approvers */}
-      {isApprover && (
-        <div className="flex items-center justify-between p-3 bg-face-field dark:bg-slate-800/40 border border-face-line dark:border-slate-800 rounded-xl text-sm">
-          <div className="flex items-center gap-2">
-            <UserCheck className="w-4 h-4 text-face-muted" />
-            <span className="font-bold text-face-ink dark:text-slate-300">
-              Assigned Site Manager: {inspection.assignedTo?.name || "Unassigned"}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <select
-              value={selectedReassignUser}
-              onChange={(e) => setSelectedReassignUser(e.target.value)}
-              className="bg-white dark:bg-slate-900 border border-face-line dark:border-slate-700 rounded-lg px-2.5 py-1 text-sm text-face-ink dark:text-white"
-            >
-              <option value="">Select Site Manager...</option>
-              {siteManagers.map((sm) => (
-                <option key={sm.id} value={sm.id}>
-                  {sm.name} ({sm.email})
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={() => {
-                if (selectedReassignUser) reassignMutation.mutate(selectedReassignUser);
-              }}
-              disabled={!selectedReassignUser || reassignMutation.isPending}
-              className="px-3 py-1 bg-face-green hover:bg-face-green-dark text-white text-sm font-bold rounded-lg disabled:opacity-40 cursor-pointer"
-            >
-              Reassign
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* On-Site Visit Check-In Action Banner for Assigned Inspector */}
-      {isInspector && !inspection.startedAt && ["REQUESTED", "DRAFT", "CHANGES_REQUESTED"].includes(inspection.status) && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0">
-              <MapPin className="w-4 h-4" />
-            </div>
-            <div>
-              <h4 className="text-xs font-bold text-emerald-900 dark:text-emerald-100 flex items-center gap-2">
-                <span>On-Site Field Visit Check-In</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-mono">
-                  SLA Tracked
-                </span>
-              </h4>
-              <p className="text-[11px] text-emerald-700 dark:text-emerald-300 mt-0.5">
-                Arrived at client plant gate? Timestamp your arrival to verify physical site inspection attendance.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => startVisitMutation.mutate()}
-            disabled={startVisitMutation.isPending}
-            className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
-          >
-            <MapPin className="w-3.5 h-3.5" />
-            <span>{startVisitMutation.isPending ? "Recording Check-In..." : "Check In at Site Gate"}</span>
-          </button>
-        </div>
-      )}
-
-      {/* Active On-Site Status Indicator */}
-      {inspection.startedAt && (
-        <div className="flex items-center justify-between p-2.5 px-3.5 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-xs">
-          <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-            </span>
-            <span className="font-bold">On-Site Field Visit In Progress</span>
-            <span className="text-slate-400 dark:text-slate-500">|</span>
-            <span className="text-slate-600 dark:text-slate-400">
-              Checked in: {new Date(inspection.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} AST
-            </span>
-          </div>
-          <span className="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/80 dark:bg-emerald-900/40 px-2 py-0.5 rounded">
-            Active Audit
-          </span>
-        </div>
-      )}
-
-      {/* ================= UNIFIED SINGLE-SCREEN INSPECTION DASHBOARD (LOVABLE REPLICA) ================= */}
-      <div className="space-y-4">
-
-        {/* ── 01. INSPECTION SITE & CLIENT DETAILS ── */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs">
-          {/* Header */}
-          <div className="flex items-center justify-between">
+        {formError && !formError.includes("Cannot edit inspection in status SUBMITTED") && (
+          <div className="p-3 bg-rose-50 border border-rose-200/90 text-rose-800 text-xs font-bold rounded-xl flex items-center justify-between shadow-2xs">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 bg-[#065f46] text-white text-xs font-black rounded">
-                01
-              </span>
-              <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                INSPECTION SITE
-              </h2>
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>{formError}</span>
             </div>
-            <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              STEP VERIFIED
-            </span>
+            <button onClick={() => setFormError(null)} className="text-rose-600 hover:opacity-80">×</button>
           </div>
+        )}
 
-          {/* Row 1: 4 Columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Col 1: Assigned Operations Base */}
-            <div>
-              <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1">
-                Assigned Operations Base <span className="text-red-500">*</span>
-              </label>
-              <select
-                disabled={!isEditable}
-                value={formData.baseId || ""}
-                onChange={(e) => setFormData({ ...formData, baseId: e.target.value })}
-                className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-600"
+        {/* 3. Two-Column Workspace Cockpit (65% Workflow / 35% Live HUD) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
+
+          {/* ── LEFT COLUMN (65%): Segmented Tabbed Workflows ── */}
+          <div className="lg:col-span-8 space-y-3">
+            {/* Segmented Pill Tab Bar (Modern Glass Style) */}
+            <div className="bg-[#F8F4F6] dark:bg-slate-800/80 p-1.5 rounded-2xl flex items-center gap-1 border border-[#E5D4DE] dark:border-[#551938]/40 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setActiveTab("power")}
+                className={`flex-1 py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs font-bold cursor-pointer ${
+                  activeTab === "power"
+                    ? "bg-white dark:bg-slate-900 text-[#ED1A53] shadow-xs border border-slate-200/60 dark:border-slate-800"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/40"
+                }`}
               >
-                <option value="">Select Deploying Base...</option>
-                {availableBases.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name} ({b.region})
-                  </option>
-                ))}
-              </select>
+                <Zap className="w-3.5 h-3.5" />
+                <span>1. Power Demand & Sizing</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("siting")}
+                className={`flex-1 py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs font-bold cursor-pointer ${
+                  activeTab === "siting"
+                    ? "bg-white dark:bg-slate-900 text-[#ED1A53] shadow-xs border border-slate-200/60 dark:border-slate-800"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/40"
+                }`}
+              >
+                <Compass className="w-3.5 h-3.5" />
+                <span>2. Siting, Cabling & Fuel</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("boq_evidence")}
+                className={`flex-1 py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs font-bold cursor-pointer ${
+                  activeTab === "boq_evidence"
+                    ? "bg-white dark:bg-slate-900 text-[#ED1A53] shadow-xs border border-slate-200/60 dark:border-slate-800"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/40"
+                }`}
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>3. BOQ Sync & Photos</span>
+                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                  {boqItems.length}
+                </span>
+              </button>
             </div>
 
-            {/* Col 2: Inspection Site & Coordinates */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
-                  Inspection Site &amp; Coordinates <span className="text-red-500">*</span>
-                </label>
-                {isEditable && (
+            {/* TAB 1: POWER DEMAND & SIZING */}
+            {activeTab === "power" && (
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border-2 border-[#E5D4DE] dark:border-[#551938]/40 space-y-4 shadow-[0_4px_20px_-2px_rgba(85,25,56,0.05)]">
+                {/* 4 Core Sizing Inputs with Custom Select Controls */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Generator Rating <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative flex items-center">
+                      <select
+                        disabled={!isEditable}
+                        value={powerSurvey.recommendedKva}
+                        onChange={(e) => updatePowerSurvey({ recommendedKva: Number(e.target.value) || 250 })}
+                        className="w-full appearance-none bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#ED1A53] focus:ring-2 focus:ring-[#ED1A53]/15 rounded-xl px-3 py-2 text-xs font-bold text-[#ED1A53] pr-8 transition-all cursor-pointer"
+                      >
+                        {[150, 250, 350, 500, 650, 800, 1000, 1250, 1500, 2000].map((k) => (
+                          <option key={k} value={k}>
+                            {k} kVA Prime Soundproof
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Voltage & Frequency Standard
+                    </label>
+                    <div className="relative flex items-center">
+                      <select
+                        disabled={!isEditable}
+                        value={powerSurvey.voltageFrequency}
+                        onChange={(e) => updatePowerSurvey({ voltageFrequency: e.target.value })}
+                        className="w-full appearance-none bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#ED1A53] focus:ring-2 focus:ring-[#ED1A53]/15 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 pr-8 transition-all cursor-pointer"
+                      >
+                        <option value="400V / 230V @ 50 Hz (KSA Standard)">400V / 230V @ 50 Hz (Standard)</option>
+                        <option value="380V / 220V @ 60 Hz">380V / 220V @ 60 Hz</option>
+                        <option value="480V / 277V @ 60 Hz">480V / 277V @ 60 Hz</option>
+                        <option value="13.8 kV / 33 kV Medium Voltage">13.8 kV / 33 kV MV</option>
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Motor Starting Method
+                    </label>
+                    <div className="relative flex items-center">
+                      <select
+                        disabled={!isEditable}
+                        value={powerSurvey.motorStartingMethod}
+                        onChange={(e) => updatePowerSurvey({ motorStartingMethod: e.target.value })}
+                        className="w-full appearance-none bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#ED1A53] focus:ring-2 focus:ring-[#ED1A53]/15 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 pr-8 transition-all cursor-pointer"
+                      >
+                        <option value="Direct-On-Line (DOL, 6x Inrush)">DOL (6x Inrush Surge)</option>
+                        <option value="Star-Delta (3x Inrush)">Star-Delta (3x Inrush)</option>
+                        <option value="VFD (Variable Frequency Drive)">VFD (Smooth Start 1.2x)</option>
+                        <option value="Soft Starter (2x Inrush)">Soft Starter (2x Inrush)</option>
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Running Load (kW / kVA)
+                    </label>
+                    <div className="flex items-center bg-slate-50/80 border border-slate-200 rounded-xl px-2 py-1.5 focus-within:bg-white focus-within:border-[#ED1A53] focus-within:ring-2 focus-within:ring-[#ED1A53]/15 transition-all">
+                      <div className="flex-1 flex items-center pr-1.5">
+                        <input
+                          type="number"
+                          disabled={!isEditable}
+                          value={powerSurvey.runningLoadKw || ""}
+                          onChange={(e) => updatePowerSurvey({ runningLoadKw: Number(e.target.value) || 0 })}
+                          placeholder="199"
+                          className="w-full font-mono font-bold text-xs bg-transparent focus:outline-none text-slate-900"
+                        />
+                        <span className="text-[10px] font-mono text-slate-400 font-bold ml-1">kW</span>
+                      </div>
+                      <div className="w-px h-4 bg-slate-300 mx-1" />
+                      <div className="flex-1 flex items-center pl-1.5">
+                        <input
+                          type="number"
+                          disabled={!isEditable}
+                          value={powerSurvey.runningLoadKva || ""}
+                          onChange={(e) => updatePowerSurvey({ runningLoadKva: Number(e.target.value) || 0 })}
+                          placeholder="250"
+                          className="w-full font-mono font-bold text-xs bg-transparent focus:outline-none text-slate-900"
+                        />
+                        <span className="text-[10px] font-mono text-slate-400 font-bold ml-1">kVA</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Duty Cycle & High-Tech BESS Hybrid Card */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  {/* Duty Cycle Selectors */}
+                  <div className="p-3 bg-slate-50/80 border border-slate-200/90 rounded-2xl space-y-2">
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block">
+                      Duty Cycle & Fleet Redundancy
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="relative flex items-center">
+                        <select
+                          disabled={!isEditable}
+                          value={powerSurvey.dutyCycle}
+                          onChange={(e) => updatePowerSurvey({ dutyCycle: e.target.value })}
+                          className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 font-medium text-xs pr-6"
+                        >
+                          <option value="24/7 Continuous Prime Power">24/7 Continuous Prime</option>
+                          <option value="Peak Shaving / Load Leveling">Peak Shaving</option>
+                          <option value="Standby / Emergency Backup (with ATS)">Standby / Backup</option>
+                        </select>
+                        <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 pointer-events-none" />
+                      </div>
+
+                      <div className="relative flex items-center">
+                        <select
+                          disabled={!isEditable}
+                          value={powerSurvey.powerRedundancy}
+                          onChange={(e) => updatePowerSurvey({ powerRedundancy: e.target.value })}
+                          className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 font-medium text-xs pr-6"
+                        >
+                          <option value="Single Standalone Unit">Single Standalone Unit</option>
+                          <option value="Parallel Synchronized N+1">Parallel N+1 Sync</option>
+                        </select>
+                        <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 pointer-events-none" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* High-Tech BESS Hybrid Toggle Card */}
+                  <div
+                    onClick={() => updatePowerSurvey({ bessHybridRecommended: !powerSurvey.bessHybridRecommended })}
+                    className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                      powerSurvey.bessHybridRecommended
+                        ? "bg-gradient-to-r from-emerald-500/10 via-emerald-50/40 to-white border-emerald-300 shadow-2xs"
+                        : "bg-slate-50/80 border-slate-200/90 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold shrink-0 transition-colors ${
+                        powerSurvey.bessHybridRecommended ? "bg-emerald-600 text-white shadow-xs" : "bg-slate-200 text-slate-500"
+                      }`}>
+                        <BatteryCharging className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-slate-900">BESS Battery Hybrid Storage</span>
+                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded font-bold bg-emerald-100 text-emerald-800">
+                            -40% Fuel Burn
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                          Silent night battery cycle for tower crane & batching controls
+                        </p>
+                      </div>
+                    </div>
+                    <div className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 ${
+                      powerSurvey.bessHybridRecommended ? "bg-emerald-600 justify-end" : "bg-slate-300 justify-start"
+                    }`}>
+                      <div className="w-4 h-4 rounded-full bg-white shadow-xs" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Collapsible Accordion: Megger 1,000V DC & Stepped Load Bank */}
+                <div className="border border-slate-200 rounded-2xl overflow-hidden transition-all shadow-2xs">
                   <button
                     type="button"
-                    onClick={handleGetCurrentLocation}
-                    className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-0.5 cursor-pointer"
+                    onClick={() => setShowAdvancedMegger(!showAdvancedMegger)}
+                    className="w-full p-3 bg-gradient-to-r from-slate-50/90 to-emerald-50/30 flex items-center justify-between text-xs font-bold text-slate-800 hover:bg-slate-100 transition-colors"
                   >
-                    <MapPin className="w-2.5 h-2.5" />
-                    <span>GPS</span>
+                    <div className="flex items-center gap-2">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                      <Gauge className="w-3.5 h-3.5 text-[#ED1A53]" />
+                      <span>1,000V DC Megger & Load Bank Protocol (Verified: &gt;175 MΩ)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-200/60">
+                        ALL PHASES PASS
+                      </span>
+                      {showAdvancedMegger ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                    </div>
                   </button>
-                )}
-              </div>
-              <div className="relative flex items-center">
-                <MapPin className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
-                <input
-                  type="text"
-                  disabled={!isEditable}
-                  value={formData.siteName || ""}
-                  onChange={(e) => setFormData({ ...formData, siteName: e.target.value })}
-                  placeholder="e.g. Tanajib Offshore Gas Facility"
-                  className="w-full pl-8 pr-24 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-600 truncate"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowCoordinatesModal(!showCoordinatesModal)}
-                  title="Click to view/edit GPS coordinates"
-                  className="absolute right-1 px-1.5 py-0.5 text-[10px] font-mono font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer shrink-0"
-                >
-                  {formData.latitude != null && formData.longitude != null
-                    ? `${formData.latitude.toFixed(2)}°, ${formData.longitude.toFixed(2)}°`
-                    : "Set GPS"}
-                </button>
-              </div>
 
-              {showCoordinatesModal && (
-                <div className="mt-2 p-2.5 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-lg grid grid-cols-2 gap-2 text-xs shadow-xs">
-                  <div>
-                    <label className="text-[9px] uppercase font-bold text-slate-500 block mb-0.5">Latitude</label>
-                    <input
-                      type="number"
-                      step="any"
-                      disabled={!isEditable}
-                      value={formData.latitude ?? ""}
-                      onChange={(e) => setFormData({ ...formData, latitude: e.target.value === "" ? null : Number(e.target.value) })}
-                      placeholder="e.g. 27.8341"
-                      className="w-full p-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[9px] uppercase font-bold text-slate-500 block mb-0.5">Longitude</label>
-                    <input
-                      type="number"
-                      step="any"
-                      disabled={!isEditable}
-                      value={formData.longitude ?? ""}
-                      onChange={(e) => setFormData({ ...formData, longitude: e.target.value === "" ? null : Number(e.target.value) })}
-                      placeholder="e.g. 48.8872"
-                      className="w-full p-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-mono"
-                    />
-                  </div>
-                  {liveBaseToSiteKm > 0 && (
-                    <div className="col-span-2 text-[10px] text-emerald-700 font-semibold pt-0.5">
-                      Straight line: {liveBaseToSiteKm} km
+                  {showAdvancedMegger && (
+                    <div className="p-3.5 bg-white space-y-3 border-t border-slate-200 text-xs">
+                      <div className="grid grid-cols-4 gap-2 text-center">
+                        <div className="p-2 bg-slate-50/80 border border-slate-200 rounded-xl">
+                          <span className="text-[9px] font-mono text-slate-400 uppercase font-semibold block">Phase L1</span>
+                          <input
+                            type="number"
+                            value={powerSurvey.meggerL1MOhms}
+                            onChange={(e) => updatePowerSurvey({ meggerL1MOhms: Number(e.target.value) || 0 })}
+                            className="w-16 text-center font-mono font-bold text-xs bg-transparent border-b border-slate-300 focus:outline-none"
+                          />
+                          <span className="text-[9px] font-mono text-slate-400 ml-1">MΩ</span>
+                        </div>
+                        <div className="p-2 bg-slate-50/80 border border-slate-200 rounded-xl">
+                          <span className="text-[9px] font-mono text-slate-400 uppercase font-semibold block">Phase L2</span>
+                          <input
+                            type="number"
+                            value={powerSurvey.meggerL2MOhms}
+                            onChange={(e) => updatePowerSurvey({ meggerL2MOhms: Number(e.target.value) || 0 })}
+                            className="w-16 text-center font-mono font-bold text-xs bg-transparent border-b border-slate-300 focus:outline-none"
+                          />
+                          <span className="text-[9px] font-mono text-slate-400 ml-1">MΩ</span>
+                        </div>
+                        <div className="p-2 bg-slate-50/80 border border-slate-200 rounded-xl">
+                          <span className="text-[9px] font-mono text-slate-400 uppercase font-semibold block">Phase L3</span>
+                          <input
+                            type="number"
+                            value={powerSurvey.meggerL3MOhms}
+                            onChange={(e) => updatePowerSurvey({ meggerL3MOhms: Number(e.target.value) || 0 })}
+                            className="w-16 text-center font-mono font-bold text-xs bg-transparent border-b border-slate-300 focus:outline-none"
+                          />
+                          <span className="text-[9px] font-mono text-slate-400 ml-1">MΩ</span>
+                        </div>
+                        <div className="p-2 bg-slate-50/80 border border-slate-200 rounded-xl">
+                          <span className="text-[9px] font-mono text-slate-400 uppercase font-semibold block">Neutral Line</span>
+                          <input
+                            type="number"
+                            value={powerSurvey.meggerNeutralMOhms}
+                            onChange={(e) => updatePowerSurvey({ meggerNeutralMOhms: Number(e.target.value) || 0 })}
+                            className="w-16 text-center font-mono font-bold text-xs bg-transparent border-b border-slate-300 focus:outline-none"
+                          />
+                          <span className="text-[9px] font-mono text-slate-400 ml-1">MΩ</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-600 font-mono text-[11px]">
+                        <span>Load Bank: <strong className="text-slate-900">{powerSurvey.loadBankKw} kW (30 Min)</strong></span>
+                        <span>Acoustic: <strong className="text-slate-900">{powerSurvey.acousticDbaAt7m} dBA @ 7m</strong></span>
+                        <span>Transient Recovery: <strong className="text-emerald-600">&lt; {powerSurvey.transientRecoverySec}s (Stable)</strong></span>
+                      </div>
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-
-            {/* Col 3: Audit Date & Time (AST) */}
-            <div>
-              <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1">
-                Audit Date &amp; Time (AST) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="datetime-local"
-                disabled={!isEditable}
-                value={formData.auditAt || ""}
-                onChange={(e) => setFormData({ ...formData, auditAt: e.target.value })}
-                className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-600"
-              />
-            </div>
-
-            {/* Col 4: Approved RFQ Scope Summary */}
-            <div>
-              <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1">
-                Approved RFQ Scope Summary
-              </label>
-              <input
-                type="text"
-                disabled={!isEditable}
-                value={formData.scopeSummary || ""}
-                onChange={(e) => setFormData({ ...formData, scopeSummary: e.target.value })}
-                placeholder="Comprehensive Industrial Site Assessment..."
-                className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-600 truncate"
-              />
-            </div>
-          </div>
-
-          {/* Client Details Row */}
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
-            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-              Client Details
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1">
-                  RFQ Identifier
-                </label>
-                <input
-                  type="text"
-                  disabled
-                  value={formData.rfqNumber || inspection.inspectionNumber}
-                  className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-bold text-slate-700 dark:text-slate-300"
-                />
               </div>
+            )}
 
-              <div>
-                <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1">
-                  Client Organization <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  disabled={!isEditable}
-                  value={formData.clientOrganization || ""}
-                  onChange={(e) => setFormData({ ...formData, clientOrganization: e.target.value })}
-                  placeholder="e.g. Saudi Aramco (Vendor Code: CL-ARM-001)"
-                  className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-600"
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1">
-                  Client Field Representative <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  disabled={!isEditable}
-                  value={
-                    formData.clientRepPhone
-                      ? `${formData.clientRepName || ""} (${formData.clientRepPhone})`.trim()
-                      : (formData.clientRepName || "")
-                  }
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    const match = val.match(/^(.*?)(?:\s*\((.*?)\))?$/);
-                    if (match) {
-                      setFormData({
-                        ...formData,
-                        clientRepName: match[1]?.trim() || val,
-                        clientRepPhone: match[2]?.trim() || formData.clientRepPhone || "",
-                      });
-                    } else {
-                      setFormData({ ...formData, clientRepName: val });
-                    }
-                  }}
-                  placeholder="Eng. Fahad Al-Zahrani (+966 54 112 7901)"
-                  className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-600"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── 02. HAULAGE DISTANCE INPUTS (KM) & ACCESSIBILITY ── */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs">
-          {/* Header */}
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-[#065f46] text-white text-xs font-black rounded">
-              02
-            </span>
-            <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
-              HAULAGE DISTANCE INPUTS (KM) &amp; ACCESSIBILITY
-            </h2>
-          </div>
-
-          {/* Scope Services Toolbar */}
-          <div className="flex flex-wrap items-center gap-2 pt-1 border-b border-slate-100 dark:border-slate-800 pb-3">
-            <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider mr-1">
-              RFQ SCOPE SERVICES:
-            </span>
-
-            {/* Mobilization Base (Mandatory) */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#065f46] text-white rounded-md text-[11px] font-bold">
-              <Lock className="w-3 h-3" />
-              <span>MOBILIZATION (MANDATORY BASE)</span>
-            </div>
-
-            {/* Sewage Waste Toggle */}
-            {(() => {
-              const idx = services.findIndex((s) => s.serviceType === "SEWAGE");
-              const svc = services[idx] || ({} as any);
-              return (
-                <button
-                  type="button"
-                  disabled={!isEditable}
-                  onClick={() => {
-                    const updated = [...services];
-                    if (idx >= 0) {
-                      updated[idx].isActive = !svc.isActive;
-                      setServices(updated);
-                    }
-                  }}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-bold border transition-all cursor-pointer ${
-                    svc.isActive
-                      ? "bg-[#fbf7f4] border-[#78350f]/30 text-[#78350f]"
-                      : "bg-slate-50 border-slate-200 text-slate-400 opacity-60"
-                  }`}
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#78350f]" />
-                  <span>SEWAGE WASTE</span>
-                  <span
-                    className={`text-[9px] px-1.5 py-0.2 rounded font-extrabold uppercase ${
-                      svc.isActive ? "bg-[#78350f] text-white" : "bg-slate-200 text-slate-500"
-                    }`}
-                  >
-                    {svc.isActive ? "ACTIVE" : "INACTIVE"}
-                  </span>
-                </button>
-              );
-            })()}
-
-            {/* General Waste Toggle */}
-            {(() => {
-              const idx = services.findIndex((s) => s.serviceType === "GENERAL");
-              const svc = services[idx] || ({} as any);
-              return (
-                <button
-                  type="button"
-                  disabled={!isEditable}
-                  onClick={() => {
-                    const updated = [...services];
-                    if (idx >= 0) {
-                      updated[idx].isActive = !svc.isActive;
-                      setServices(updated);
-                    }
-                  }}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-bold border transition-all cursor-pointer ${
-                    svc.isActive
-                      ? "bg-blue-50/60 border-blue-300 text-blue-900"
-                      : "bg-slate-50 border-slate-200 text-slate-400 opacity-60"
-                  }`}
-                >
-                  <Trash2 className="w-3.5 h-3.5 text-blue-600" />
-                  <span>GENERAL WASTE</span>
-                  <span
-                    className={`text-[9px] px-1.5 py-0.2 rounded font-extrabold uppercase ${
-                      svc.isActive ? "bg-[#1d4ed8] text-white" : "bg-slate-200 text-slate-500"
-                    }`}
-                  >
-                    {svc.isActive ? "ACTIVE" : "INACTIVE"}
-                  </span>
-                </button>
-              );
-            })()}
-
-            {/* Hazardous Waste Toggle */}
-            {(() => {
-              const idx = services.findIndex((s) => s.serviceType === "HAZARDOUS");
-              const svc = services[idx] || ({} as any);
-              return (
-                <button
-                  type="button"
-                  disabled={!isEditable}
-                  onClick={() => {
-                    const updated = [...services];
-                    if (idx >= 0) {
-                      updated[idx].isActive = !svc.isActive;
-                      setServices(updated);
-                    }
-                  }}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-bold border transition-all cursor-pointer ${
-                    svc.isActive
-                      ? "bg-red-50/60 border-red-300 text-red-900"
-                      : "bg-slate-50 border-slate-200 text-slate-400 opacity-60"
-                  }`}
-                >
-                  <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
-                  <span>HAZARDOUS WASTE</span>
-                  <span
-                    className={`text-[9px] px-1.5 py-0.2 rounded font-extrabold uppercase ${
-                      svc.isActive ? "bg-[#b91c1c] text-white" : "bg-slate-200 text-slate-500"
-                    }`}
-                  >
-                    {svc.isActive ? "ACTIVE" : "INACTIVE"}
-                  </span>
-                </button>
-              );
-            })()}
-          </div>
-
-          {/* 4 Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
-            {/* 1. MOBILIZATION */}
-            <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden flex flex-col justify-between bg-white dark:bg-slate-900 shadow-2xs">
-              <div className="bg-[#065f46] text-white px-3 py-2 flex items-center justify-between font-black text-xs">
-                <div className="flex items-center gap-2">
-                  <Truck className="w-3.5 h-3.5" />
-                  <span>MOBILIZATION</span>
-                </div>
-                <span className="text-[9px] font-extrabold uppercase tracking-wider">
-                  MANDATORY
-                </span>
-              </div>
-
-              <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                      DIRECT MOBILIZATION TRACK
+            {/* TAB 2: SITING, CABLING & FUEL SKID */}
+            {activeTab === "siting" && (
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/90 dark:border-slate-800 space-y-4 shadow-2xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                  {/* Cable Meters */}
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Cable Run to MDP (Meters) <span className="text-red-500">*</span>
                     </label>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center bg-slate-50/80 border border-slate-200 rounded-xl overflow-hidden focus-within:bg-white focus-within:border-[#ED1A53] focus-within:ring-2 focus-within:ring-[#ED1A53]/15 transition-all">
+                      <input
+                        type="number"
+                        disabled={!isEditable}
+                        value={powerSurvey.cableRunMeters || ""}
+                        onChange={(e) => updatePowerSurvey({ cableRunMeters: Number(e.target.value) || 0 })}
+                        placeholder="45"
+                        className="w-full p-2 text-center text-xs font-black text-slate-900 bg-transparent focus:outline-none"
+                      />
+                      <span className="pr-3 text-[10px] font-mono font-bold text-slate-400">METERS</span>
+                    </div>
+                  </div>
+
+                  {/* Cable Spec */}
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Cable Specification
+                    </label>
+                    <div className="relative flex items-center">
+                      <select
+                        disabled={!isEditable}
+                        value={powerSurvey.cableSpec}
+                        onChange={(e) => updatePowerSurvey({ cableSpec: e.target.value })}
+                        className="w-full appearance-none bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#ED1A53] focus:ring-2 focus:ring-[#ED1A53]/15 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 pr-8 transition-all cursor-pointer"
+                      >
+                        <option value="4-Core 240mm² Flexible Cu Rubber">4-Core 240mm² Class 5 Armored</option>
+                        <option value="4-Core 300mm² Flexible Cu">4-Core 300mm² Flexible Cu</option>
+                        <option value="Single-Core 300mm² Trefoil">Single-Core 300mm² Trefoil</option>
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Earth Loop Impedance */}
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Earth Loop (≤ 5.0Ω)
+                    </label>
+                    <div className="flex items-center bg-slate-50/80 border border-slate-200 rounded-xl overflow-hidden focus-within:bg-white focus-within:border-emerald-500 transition-all">
+                      <input
+                        type="number"
+                        step="0.1"
+                        disabled={!isEditable}
+                        value={powerSurvey.earthLoopImpedanceOhm || ""}
+                        onChange={(e) => updatePowerSurvey({ earthLoopImpedanceOhm: Number(e.target.value) || 0 })}
+                        className="w-full p-2 text-center text-xs font-black text-emerald-600 bg-transparent focus:outline-none"
+                      />
+                      <span className="pr-3 text-[10px] font-bold text-slate-400">OHM (Ω)</span>
+                    </div>
+                  </div>
+
+                  {/* Auxiliary Fuel Skid */}
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Auxiliary Fuel Skid
+                    </label>
+                    <div className="relative flex items-center">
+                      <select
+                        disabled={!isEditable}
+                        value={powerSurvey.auxFuelTankCapacity}
+                        onChange={(e) => updatePowerSurvey({ auxFuelTankCapacity: e.target.value })}
+                        className="w-full appearance-none bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#ED1A53] focus:ring-2 focus:ring-[#ED1A53]/15 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 pr-8 transition-all cursor-pointer"
+                      >
+                        <option value="3,000L Skid">3,000L Double-Walled Skid</option>
+                        <option value="5,000L Skid">5,000L Industrial Skid</option>
+                        <option value="None">None (Internal Tank Only)</option>
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Siting, Offloading & Ramps Checks */}
+                <div className="p-3.5 bg-slate-50/80 border border-slate-200/90 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Pad Surface & Compaction
+                    </label>
+                    <div className="relative flex items-center">
+                      <select
+                        disabled={!isEditable}
+                        value={powerSurvey.groundSurface}
+                        onChange={(e) => updatePowerSurvey({ groundSurface: e.target.value })}
+                        className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 font-medium text-xs pr-6"
+                      >
+                        <option value="Compacted Gravel / Marbel">Compacted Gravel / Marbel Base</option>
+                        <option value="Reinforced Concrete Slab">Reinforced Concrete Slab</option>
+                        <option value="Asphalt Road Surface">Asphalt Industrial Surface</option>
+                        <option value="Soft Sand (Requires Road Plates)">Soft Sand (Requires Steel Plates)</option>
+                      </select>
+                      <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Offloading Method
+                    </label>
+                    <div className="relative flex items-center">
+                      <select
+                        disabled={!isEditable}
+                        value={powerSurvey.offloadMethod}
+                        onChange={(e) => updatePowerSurvey({ offloadMethod: e.target.value })}
+                        className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 font-medium text-xs pr-6"
+                      >
+                        <option value="Self-Loader Crane Truck (Hiab, up to 250 kVA)">Hiab Crane Truck (up to 250 kVA)</option>
+                        <option value="50-Ton Mobile Hydraulic Crane">50-Ton Hydraulic Mobile Crane</option>
+                      </select>
+                      <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col justify-center space-y-2 pt-1">
+                    <label className="inline-flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={powerSurvey.roadCrossingRequiresRamps}
+                        onChange={(e) => updatePowerSurvey({ roadCrossingRequiresRamps: e.target.checked })}
+                        className="w-4 h-4 rounded text-amber-600 accent-amber-600"
+                      />
+                      <span className="font-semibold text-slate-700">Roadway Crossing (4x 20T Ramps)</span>
+                    </label>
+                    <label className="inline-flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={powerSurvey.autoTransferPumpNeeded}
+                        onChange={(e) => updatePowerSurvey({ autoTransferPumpNeeded: e.target.checked })}
+                        className="w-4 h-4 rounded text-emerald-600 accent-emerald-600"
+                      />
+                      <span className="font-semibold text-slate-700">Auxiliary Fuel Auto-Transfer Pump</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Collapsible Accordion: Siting & Clearances */}
+                <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvancedClearance(!showAdvancedClearance)}
+                    className="w-full p-3 bg-slate-50/90 flex items-center justify-between text-xs font-bold text-slate-800 hover:bg-slate-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Clearance & Phase Rotation Protocol (Clockwise L1-L2-L3 Verified)</span>
+                    </div>
+                    {showAdvancedClearance ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                  </button>
+
+                  {showAdvancedClearance && (
+                    <div className="p-3.5 bg-white space-y-2 border-t border-slate-200 text-xs">
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <label className="inline-flex items-center gap-2 text-slate-700">
+                          <input type="checkbox" checked={powerSurvey.exhaustClearanceOk} onChange={(e) => updatePowerSurvey({ exhaustClearanceOk: e.target.checked })} className="rounded" />
+                          <span>≥1.5m Louver Clearance & Exhaust Clear</span>
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-slate-700">
+                          <input type="checkbox" checked={powerSurvey.overheadHazardsClear} onChange={(e) => updatePowerSurvey({ overheadHazardsClear: e.target.checked })} className="rounded" />
+                          <span>No Overhead High-Voltage Cables in Crane Radius</span>
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-slate-700">
+                          <input type="checkbox" checked={powerSurvey.craneOutriggerGroundOk} onChange={(e) => updatePowerSurvey({ craneOutriggerGroundOk: e.target.checked })} className="rounded" />
+                          <span>Crane Outrigger Ground Bearing Verified</span>
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-slate-700">
+                          <input type="checkbox" checked={powerSurvey.tankerAccess20mOk} onChange={(e) => updatePowerSurvey({ tankerAccess20mOk: e.target.checked })} className="rounded" />
+                          <span>20m Tanker Hose Reach to Skid</span>
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: BOQ SYNC & FIELD EVIDENCE */}
+            {activeTab === "boq_evidence" && (
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/90 dark:border-slate-800 space-y-4 shadow-2xs">
+                {/* Clean BOQ Table */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                      Live Survey Bill of Quantities (Pushes to Step 4 CPQ)
+                    </span>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200/60">
+                      {boqItems.length} ITEMS SYNCED
+                    </span>
+                  </div>
+                  <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 font-bold text-slate-600 border-b border-slate-200">
+                        <tr>
+                          <th className="p-2.5">Item Code</th>
+                          <th className="p-2.5">Specification & Description</th>
+                          <th className="p-2.5 text-center">Qty</th>
+                          <th className="p-2.5 text-center">Unit</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {boqItems.map((item, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="p-2.5 font-mono text-[11px] font-bold text-[#ED1A53]">{item.code}</td>
+                            <td className="p-2.5 text-slate-800 font-medium">{item.desc}</td>
+                            <td className="p-2.5 text-center font-mono font-bold text-slate-900">{item.qty}</td>
+                            <td className="p-2.5 text-center text-slate-500">{item.unit}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Field Notes & Photo Uploader */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Field Engineer Notes
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={formData.observations ? formData.observations.split("--- ENERGIA_POWER_TELEMETRY ---")[0].trim() : ""}
+                      onChange={(e) => setFormData({ ...formData, observations: e.target.value })}
+                      placeholder="Add concise site observations..."
+                      className="w-full p-2.5 bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-[#ED1A53] focus:ring-2 focus:ring-[#ED1A53]/15 rounded-xl text-xs leading-relaxed transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">
+                      Upload Site Photos (Pad, MDP, Cabling)
+                    </label>
+                    <label className="border-2 border-dashed border-slate-200 hover:border-slate-300 p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 transition-colors">
+                      <Camera className="w-5 h-5 text-slate-400 mb-1" />
+                      <span className="text-xs font-bold text-slate-700">
+                        {isUploading ? "Uploading photos..." : "+ Add Geotagged Site Photo"}
+                      </span>
+                      <span className="text-[10px] text-slate-400 mt-0.5">JPG, PNG or PDF (Auto-EXIF)</span>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*,application/pdf"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Elevated Sticky Action Certification Bar */}
+            <div className="p-3 bg-white border border-slate-200/90 rounded-2xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <label className="inline-flex items-center gap-2.5 text-xs font-medium text-slate-700 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={Boolean(formData.accepted)}
+                  onChange={(e) => setFormData({ ...formData, accepted: e.target.checked })}
+                  className="w-4 h-4 rounded text-[#ED1A53] accent-[#ED1A53]"
+                />
+                <span>I certify that all power sizing parameters and ground specs reflect verified field conditions.</span>
+              </label>
+
+              <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                {inspection?.status === "SUBMITTED" ? (
+                  <>
+                    <span className="px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 text-xs font-bold border border-amber-300 dark:border-amber-700 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                      <span>Survey Submitted · Awaiting Review</span>
+                    </span>
+                    {isApprover && (
                       <button
                         type="button"
-                        onClick={() => setShowRouteMapModal(true)}
-                        className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors cursor-pointer"
-                        title="View interactive route corridor map & turn-by-turn highways"
+                        onClick={() => reviewMutation.mutate({ action: "APPROVE", comment: "Manager Sign-Off verified" })}
+                        disabled={reviewMutation.isPending}
+                        className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
                       >
-                        <Compass className="w-3 h-3 text-emerald-600" />
-                        <span>Map</span>
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>{reviewMutation.isPending ? "Approving..." : "Approve Technical Feasibility"}</span>
                       </button>
-                      {isEditable && (
-                        <button
-                          type="button"
-                          onClick={handleAutoDetectRoute}
-                          disabled={isRoutingLoading}
-                          className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 disabled:opacity-50 transition-colors cursor-pointer"
-                          title="Auto-calculate real driving route & distance from road network (OSRM)"
-                        >
-                          {isRoutingLoading ? (
-                            <>
-                              <Loader2 className="w-3 h-3 animate-spin text-emerald-600" />
-                              <span>Routing...</span>
-                            </>
-                          ) : (
-                            <>
-                              <Navigation className="w-3 h-3 text-emerald-600" />
-                              <span>⚡ Auto-Route</span>
-                            </>
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <input
-                    type="text"
-                    disabled={!isEditable}
-                    value={formData.mobilizationRoute || ""}
-                    onChange={(e) => setFormData({ ...formData, mobilizationRoute: e.target.value })}
-                    placeholder="Route: Base → Highway → Site Gate"
-                    className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white"
-                  />
-                  {routingNotice && (
-                    <div
-                      className={`mt-1.5 p-1.5 px-2 rounded text-[10px] flex items-center gap-1.5 leading-tight ${
-                        routingNotice.type === "success"
-                          ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-                          : routingNotice.type === "warning"
-                          ? "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
-                          : "bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800"
-                      }`}
-                    >
-                      {routingNotice.type === "success" && <CheckCircle2 className="w-3 h-3 shrink-0" />}
-                      {routingNotice.type === "warning" && <AlertTriangle className="w-3 h-3 shrink-0" />}
-                      {routingNotice.type === "error" && <AlertCircle className="w-3 h-3 shrink-0" />}
-                      <span className="flex-1">{routingNotice.text}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                    One-Way Mobilization (KM) <span className="text-red-500">*</span>
-                  </label>
-                  <KmStepper
-                    disabled={!isEditable}
-                    value={formData.mobilizationKm}
-                    onChange={(val) => setFormData({ ...formData, mobilizationKm: val })}
-                  />
-                  {isEditable && liveBaseToSiteKm > 0 && (
+                    )}
+                  </>
+                ) : inspection?.status === "APPROVED" ? (
+                  <>
+                    <span className="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-300 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Technical Feasibility Approved</span>
+                    </span>
                     <button
                       type="button"
-                      onClick={handleApplyRoadEstimate}
-                      className="text-[10px] font-bold text-slate-500 hover:text-emerald-700 hover:underline mt-1 block text-center w-full cursor-pointer transition-colors"
-                      title="Force standard Haversine × 1.3 highway curvature calculation"
+                      onClick={() => {
+                        const kvaVal = Number((formData as any).recommendedKva || (formData as any).generatorKvaRequirement || powerSurvey.recommendedKva || 250);
+                        navigate(`/rental-cpq/builder?leadId=${inspection?.leadId || ""}&dealId=${inspection?.dealId || ""}&kVA=${kvaVal}`);
+                      }}
+                      className="px-4 py-2 bg-gradient-to-r from-[#ED1A53] to-[#C21340] hover:from-[#d91649] hover:to-[#a10034] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
                     >
-                      Use standard detour fallback (×1.3 = {Math.round(liveBaseToSiteKm * 1.3)} km)
+                      <span>Proceed to CPQ (Step 4)</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
                     </button>
-                  )}
-                </div>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleSaveDraft}
+                      disabled={saveDraftMutation.isPending}
+                      className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                    >
+                      Save Draft
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={submitMutation.isPending}
+                      className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>{submitMutation.isPending ? "Submitting..." : "Submit Inspection"}</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
 
-                <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                    VERIFIED FLEET SPEED LIMIT
-                  </label>
-                  <div className="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs">
-                    <span className="text-slate-600 dark:text-slate-400">Highway Heavy Speed Cap</span>
-                    <span className="font-mono font-bold text-slate-900 dark:text-white">
-                      {formData.speedLimitKmh || 80} KM/H
-                    </span>
+          {/* ── RIGHT COLUMN (35%): Sticky Live CPQ & Evidence HUD ── */}
+          <div className="lg:col-span-4 space-y-3 sticky top-4">
+
+            {/* Card A: Quick Rental Sizing Summary */}
+            <div className="bg-white dark:bg-slate-900 border-2 border-[#E5D4DE] dark:border-[#551938]/40 rounded-2xl overflow-hidden shadow-2xs">
+              <div className="bg-gradient-to-r from-[#1e1018] to-[#2b0f20] text-white p-3.5 flex items-center justify-between">
+                <span className="text-xs font-bold flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-[#ED1A53]" />
+                  <span>Rental Sizing Cockpit</span>
+                </span>
+                <span className="font-mono text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#ED1A53]/20 text-rose-300 border border-[#ED1A53]/30">
+                  AUTO-SYNC
+                </span>
+              </div>
+
+              <div className="p-4 space-y-2.5 text-xs">
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Selected Generator:</span>
+                  <strong className="text-slate-900 font-black">{powerSurvey.recommendedKva} kVA Prime</strong>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Voltage Standard:</span>
+                  <span className="font-mono text-slate-900 font-semibold">{powerSurvey.voltageFrequency.split(" ")[0]}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Cable Run Headroom:</span>
+                  <span className="font-mono text-slate-900 font-semibold">{powerSurvey.cableRunMeters + 15}m</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Auxiliary Fuel Skid:</span>
+                  <span className="font-semibold text-slate-900">{powerSurvey.auxFuelTankCapacity}</span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-slate-500 font-medium">Mobilization Distance:</span>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={formData.mobilizationKm ?? 120}
+                      onChange={(e) => setFormData(prev => ({ ...prev, mobilizationKm: Number(e.target.value) || 0 }))}
+                      className="w-16 font-mono font-bold text-right text-[#ED1A53] bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:border-[#ED1A53]"
+                    />
+                    <span className="font-mono font-bold text-xs text-[#ED1A53]">KM</span>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Verified Transport Corridor</span>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPacModal(true)}
+                    className="w-full py-2.5 bg-gradient-to-r from-[#ED1A53] to-[#B9003C] hover:from-[#d91649] hover:to-[#a10034] text-white text-xs font-bold rounded-xl shadow-md shadow-[#ED1A53]/25 flex items-center justify-center gap-1.5 transition-all active:scale-[0.99] cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Export Certified PAC Dossier</span>
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* 2. SEWAGE WASTE */}
-            {(() => {
-              const idx = services.findIndex((s) => s.serviceType === "SEWAGE");
-              const svc = services[idx] || ({} as any);
-              const facilities = availableFacilities.filter((f) => f.serviceType === "SEWAGE");
-              return (
-                <div className={`border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden flex flex-col justify-between bg-white dark:bg-slate-900 shadow-2xs ${
-                  !svc.isActive ? "opacity-60" : ""
-                }`}>
-                  <div className="bg-[#78350f] text-white px-3 py-2 flex items-center justify-between font-black text-xs">
-                    <div className="flex items-center gap-2">
-                      <Droplets className="w-3.5 h-3.5" />
-                      <span>SEWAGE WASTE</span>
+            {/* Card B: Client Representative & Gate */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 space-y-2.5 shadow-2xs text-xs">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                CLIENT SIGN-OFF & GATE DISPATCH
+              </span>
+              <div className="p-3 bg-slate-50/80 border border-slate-200/80 rounded-xl space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold text-[10px] flex items-center justify-center">
+                      KB
                     </div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-wider">
-                      {svc.isActive ? "ACTIVE" : "INACTIVE"}
-                    </span>
+                    <strong className="text-slate-900 text-xs">{formData.clientRepName || "Eng. Khalid Mansoor"}</strong>
                   </div>
-
-                  <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                        ASSIGNED STP TREATMENT FACILITY <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        disabled={!isEditable || !svc.isActive}
-                        value={svc.facilityId || ""}
-                        onChange={(e) => {
-                          const updated = [...services];
-                          const f = facilities.find((item) => item.id === e.target.value);
-                          updated[idx].facilityId = e.target.value || null;
-                          updated[idx].facilityName = f?.name || "";
-                          setServices(updated);
-                        }}
-                        className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100"
-                      >
-                        <option value="">Select STP Facility...</option>
-                        {facilities.map((f) => (
-                          <option key={f.id} value={f.id}>
-                            {f.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                        Haulage to Discharge (KM) <span className="text-red-500">*</span>
-                      </label>
-                      <KmStepper
-                        disabled={!isEditable || !svc.isActive}
-                        value={svc.distanceKm}
-                        onChange={(val) => {
-                          const updated = [...services];
-                          updated[idx].distanceKm = val ?? 0;
-                          setServices(updated);
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                        APPROACH ROAD CONDITION
-                      </label>
-                      <div className="grid grid-cols-3 gap-1">
-                        {(["Good", "Fair", "Poor"] as const).map((r) => (
-                          <button
-                            key={r}
-                            type="button"
-                            disabled={!isEditable || !svc.isActive}
-                            onClick={() => {
-                              const updated = [...services];
-                              updated[idx].roadCondition = r;
-                              setServices(updated);
-                            }}
-                            className={`py-1 text-[11px] font-bold rounded border transition-all cursor-pointer ${
-                              svc.roadCondition === r
-                                ? "bg-[#78350f] text-white border-[#78350f]"
-                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                            }`}
-                          >
-                            {r}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                          EST. VOLUME / CAPACITY
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="any"
-                          disabled={!isEditable || !svc.isActive}
-                          value={svc.estimatedVolume ?? ""}
-                          onChange={(e) => {
-                            const updated = [...services];
-                            updated[idx].estimatedVolume = e.target.value ? parseFloat(e.target.value) : null;
-                            setServices(updated);
-                          }}
-                          placeholder="e.g. 30"
-                          className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                          VOLUME UNIT
-                        </label>
-                        <select
-                          disabled={!isEditable || !svc.isActive}
-                          value={svc.volumeUnit || "m³"}
-                          onChange={(e) => {
-                            const updated = [...services];
-                            updated[idx].volumeUnit = e.target.value;
-                            setServices(updated);
-                          }}
-                          className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold"
-                        >
-                          <option value="m³">m³ (Cubic Meters)</option>
-                          <option value="Liters">Liters</option>
-                          <option value="Tanker Loads">Tanker Loads (10,000L)</option>
-                          <option value="Gallons">Gallons</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                        APPROACH LOGISTICS NOTE
-                      </label>
-                      <input
-                        type="text"
-                        disabled={!isEditable || !svc.isActive}
-                        value={svc.wasteDescription || ""}
-                        onChange={(e) => {
-                          const updated = [...services];
-                          updated[idx].wasteDescription = e.target.value;
-                          setServices(updated);
-                        }}
-                        placeholder="e.g. Heavy vacuum tanker access via Gate 2"
-                        className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
-                      />
-                    </div>
-                  </div>
+                  <span className="font-mono text-[8px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-200/60">
+                    ABSHER VERIFIED
+                  </span>
                 </div>
-              );
-            })()}
-
-            {/* 3. GENERAL WASTE */}
-            {(() => {
-              const idx = services.findIndex((s) => s.serviceType === "GENERAL");
-              const svc = services[idx] || ({} as any);
-              const facilities = availableFacilities.filter((f) => f.serviceType === "GENERAL");
-              return (
-                <div className={`border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden flex flex-col justify-between bg-white dark:bg-slate-900 shadow-2xs ${
-                  !svc.isActive ? "opacity-60" : ""
-                }`}>
-                  <div className="bg-[#1d4ed8] text-white px-3 py-2 flex items-center justify-between font-black text-xs">
-                    <div className="flex items-center gap-2">
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>GENERAL WASTE</span>
-                    </div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-wider">
-                      {svc.isActive ? "ACTIVE" : "INACTIVE"}
-                    </span>
-                  </div>
-
-                  <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                        ASSIGNED LANDFILL / TRANSFER STN <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        disabled={!isEditable || !svc.isActive}
-                        value={svc.facilityId || ""}
-                        onChange={(e) => {
-                          const updated = [...services];
-                          const f = facilities.find((item) => item.id === e.target.value);
-                          updated[idx].facilityId = e.target.value || null;
-                          updated[idx].facilityName = f?.name || "";
-                          setServices(updated);
-                        }}
-                        className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100"
-                      >
-                        <option value="">Select Landfill Facility...</option>
-                        {facilities.map((f) => (
-                          <option key={f.id} value={f.id}>
-                            {f.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                        Haulage to Landfill (KM) <span className="text-red-500">*</span>
-                      </label>
-                      <KmStepper
-                        disabled={!isEditable || !svc.isActive}
-                        value={svc.distanceKm}
-                        onChange={(val) => {
-                          const updated = [...services];
-                          updated[idx].distanceKm = val ?? 0;
-                          setServices(updated);
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                        APPROACH ROAD CONDITION
-                      </label>
-                      <div className="grid grid-cols-3 gap-1">
-                        {(["Good", "Fair", "Poor"] as const).map((r) => (
-                          <button
-                            key={r}
-                            type="button"
-                            disabled={!isEditable || !svc.isActive}
-                            onClick={() => {
-                              const updated = [...services];
-                              updated[idx].roadCondition = r;
-                              setServices(updated);
-                            }}
-                            className={`py-1 text-[11px] font-bold rounded border transition-all cursor-pointer ${
-                              svc.roadCondition === r
-                                ? "bg-[#1d4ed8] text-white border-[#1d4ed8]"
-                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                            }`}
-                          >
-                            {r}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                          EST. VOLUME / CAPACITY
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="any"
-                          disabled={!isEditable || !svc.isActive}
-                          value={svc.estimatedVolume ?? ""}
-                          onChange={(e) => {
-                            const updated = [...services];
-                            updated[idx].estimatedVolume = e.target.value ? parseFloat(e.target.value) : null;
-                            setServices(updated);
-                          }}
-                          placeholder="e.g. 30"
-                          className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                          VOLUME UNIT
-                        </label>
-                        <select
-                          disabled={!isEditable || !svc.isActive}
-                          value={svc.volumeUnit || "m³"}
-                          onChange={(e) => {
-                            const updated = [...services];
-                            updated[idx].volumeUnit = e.target.value;
-                            setServices(updated);
-                          }}
-                          className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold"
-                        >
-                          <option value="m³">m³ (Skip Bin Size)</option>
-                          <option value="Tons">Tons</option>
-                          <option value="Compactor Bins">Compactor Bins (20m³)</option>
-                          <option value="Trips">Trips / Loads</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                        APPROACH LOGISTICS NOTE
-                      </label>
-                      <input
-                        type="text"
-                        disabled={!isEditable || !svc.isActive}
-                        value={svc.wasteDescription || ""}
-                        onChange={(e) => {
-                          const updated = [...services];
-                          updated[idx].wasteDescription = e.target.value;
-                          setServices(updated);
-                        }}
-                        placeholder="e.g. Double trailer compactor trucks accessible"
-                        className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* 4. HAZARDOUS WASTE */}
-            {(() => {
-              const idx = services.findIndex((s) => s.serviceType === "HAZARDOUS");
-              const svc = services[idx] || ({} as any);
-              const facilities = availableFacilities.filter((f) => f.serviceType === "HAZARDOUS");
-              return (
-                <div className={`border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden flex flex-col justify-between bg-white dark:bg-slate-900 shadow-2xs ${
-                  !svc.isActive ? "opacity-60" : ""
-                }`}>
-                  <div className="bg-[#b91c1c] text-white px-3 py-2 flex items-center justify-between font-black text-xs">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-3.5 h-3.5" />
-                      <span>HAZARDOUS WASTE</span>
-                    </div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-wider">
-                      {svc.isActive ? "ACTIVE" : "INACTIVE"}
-                    </span>
-                  </div>
-
-                  <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                        CERTIFIED HAZMAT COMPLEX <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        disabled={!isEditable || !svc.isActive}
-                        value={svc.facilityId || ""}
-                        onChange={(e) => {
-                          const updated = [...services];
-                          const f = facilities.find((item) => item.id === e.target.value);
-                          updated[idx].facilityId = e.target.value || null;
-                          updated[idx].facilityName = f?.name || "";
-                          setServices(updated);
-                        }}
-                        className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100"
-                      >
-                        <option value="">Select Hazmat Facility...</option>
-                        {facilities.map((f) => (
-                          <option key={f.id} value={f.id}>
-                            {f.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                        Haulage to Haz Treatment (KM) <span className="text-red-500">*</span>
-                      </label>
-                      <KmStepper
-                        disabled={!isEditable || !svc.isActive}
-                        value={svc.distanceKm}
-                        onChange={(val) => {
-                          const updated = [...services];
-                          updated[idx].distanceKm = val ?? 0;
-                          setServices(updated);
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                        APPROACH ROAD CONDITION
-                      </label>
-                      <div className="grid grid-cols-3 gap-1">
-                        {(["Good", "Fair", "Poor"] as const).map((r) => (
-                          <button
-                            key={r}
-                            type="button"
-                            disabled={!isEditable || !svc.isActive}
-                            onClick={() => {
-                              const updated = [...services];
-                              updated[idx].roadCondition = r;
-                              setServices(updated);
-                            }}
-                            className={`py-1 text-[11px] font-bold rounded border transition-all cursor-pointer ${
-                              svc.roadCondition === r
-                                ? "bg-[#b91c1c] text-white border-[#b91c1c]"
-                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                            }`}
-                          >
-                            {r}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                          EST. VOLUME / CAPACITY
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="any"
-                          disabled={!isEditable || !svc.isActive}
-                          value={svc.estimatedVolume ?? ""}
-                          onChange={(e) => {
-                            const updated = [...services];
-                            updated[idx].estimatedVolume = e.target.value ? parseFloat(e.target.value) : null;
-                            setServices(updated);
-                          }}
-                          placeholder="e.g. 30"
-                          className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                          VOLUME UNIT
-                        </label>
-                        <select
-                          disabled={!isEditable || !svc.isActive}
-                          value={svc.volumeUnit || "m³"}
-                          onChange={(e) => {
-                            const updated = [...services];
-                            updated[idx].volumeUnit = e.target.value;
-                            setServices(updated);
-                          }}
-                          className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold"
-                        >
-                          <option value="m³">m³ (Industrial Sludge)</option>
-                          <option value="Tons">Tons (Contaminated Solid)</option>
-                          <option value="IBC Totes">IBC Totes (1000L)</option>
-                          <option value="200L Drums">200L Steel Drums</option>
-                          <option value="Tanker Loads">Dedicated Vacuum Tanker</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">
-                        APPROACH LOGISTICS NOTE
-                      </label>
-                      <input
-                        type="text"
-                        disabled={!isEditable || !svc.isActive}
-                        value={svc.wasteDescription || ""}
-                        onChange={(e) => {
-                          const updated = [...services];
-                          updated[idx].wasteDescription = e.target.value;
-                          setServices(updated);
-                        }}
-                        placeholder="e.g. Requires Aramco work permit Level 2"
-                        className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* Full-Width Aggregate Operational Haulage Metrics Bar */}
-          <div className="bg-[#f8fafc] dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center shrink-0">
-                <Truck className="w-4 h-4 text-emerald-800 dark:text-emerald-300" />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                  Aggregate Operational Haulage Metrics
-                </span>
-                <span className="text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full">
-                  {services.filter((s) => s.isActive).length === 3
-                    ? "ALL 3 SCOPES ACTIVE"
-                    : `${services.filter((s) => s.isActive).length} OF 3 SCOPES ACTIVE`}
-                </span>
+                <span className="text-slate-500 block text-[11px] font-medium">Site Electrical Operations Manager · Al-Bawani</span>
+                <span className="font-mono text-[10px] text-slate-600 block">{formData.clientRepPhone || "+966 50 123 4567"}</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-6 shrink-0">
-              <div className="text-right">
-                <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider block">
-                  SINGLE COMPLETE CYCLE
+            {/* Card C: Quick Photo Evidence Gallery */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 space-y-2.5 shadow-2xs text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                  FIELD EVIDENCE ({inspection.attachments?.length || 0})
                 </span>
-                <span className="text-base sm:text-lg font-black font-mono text-slate-900 dark:text-white leading-tight">
-                  {liveMetrics.totalCycleKm} KM
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider block">
-                  EST. DIESEL FUEL BURN
-                </span>
-                <span className="text-base sm:text-lg font-black font-mono text-slate-900 dark:text-white leading-tight">
-                  {liveMetrics.estFuelLitres} L
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── 03. SITE OBSERVATIONS & FIELD ATTACHMENTS ── */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 space-y-3 shadow-2xs">
-          {/* Header */}
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-[#065f46] text-white text-xs font-black rounded">
-              03
-            </span>
-            <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
-              SITE OBSERVATIONS
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Left Column: Ground Observations & Operational Constraints */}
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block">
-                Site Observations &amp; Operational Constraints
-              </label>
-              <div className="relative">
-                <textarea
-                  disabled={!isEditable}
-                  rows={6}
-                  value={formData.observations || ""}
-                  onChange={(e) => setFormData({ ...formData, observations: e.target.value })}
-                  placeholder="Record ground conditions, crane access, load restrictions, environmental hazards, hot work restrictions..."
-                  className="w-full p-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-600 leading-relaxed"
-                />
+                <label className="text-[10px] font-bold text-[#ED1A53] cursor-pointer hover:underline">
+                  + Add
+                  <input type="file" multiple accept="image/*,application/pdf" onChange={handleFileUpload} className="hidden" />
+                </label>
               </div>
 
-              {isEditable && (
-                <div className="space-y-2.5 pt-1.5">
-                  {HSE_CATEGORIES.map((catGroup) => (
-                    <div key={catGroup.category} className="space-y-1">
-                      <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">
-                        {catGroup.category}
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {catGroup.chips.map((chip) => {
-                          const isActive = (formData.observations || "").includes(chip);
-                          return (
-                            <button
-                              key={chip}
-                              type="button"
-                              onClick={() => handleToggleChip(chip)}
-                              className={`px-2 py-0.5 text-[10px] font-bold rounded-md border transition-all cursor-pointer flex items-center gap-1 ${
-                                isActive
-                                  ? "bg-emerald-600 text-white border-emerald-700 shadow-2xs"
-                                  : "bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                              }`}
-                            >
-                              <span>{isActive ? "✓" : "+"}</span>
-                              <span>{chip}</span>
-                            </button>
-                          );
-                        })}
+              {(inspection.attachments?.length || 0) === 0 ? (
+                <div className="p-5 text-center text-slate-400 bg-slate-50/80 rounded-xl border border-dashed border-slate-200 space-y-1">
+                  <Camera className="w-5 h-5 mx-auto text-slate-300" />
+                  <p className="text-[11px] font-medium">No site photos attached yet</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                  {(inspection.attachments || []).map((att) => (
+                    <div key={att.id} className="border border-slate-200 rounded-xl p-1.5 bg-slate-50 space-y-1">
+                      <div className="h-16 w-full bg-slate-200 rounded-lg overflow-hidden">
+                        <InspectionAttachmentThumbnail
+                          inspectionId={id!}
+                          attachmentId={att.id}
+                          fileName={att.fileName}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="truncate font-semibold text-slate-700">{att.fileName}</span>
+                        <button
+                          type="button"
+                          onClick={() => deleteAttMutation.mutate(att.id)}
+                          className="text-slate-400 hover:text-red-500"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -2172,613 +1730,535 @@ export default function SiteInspectionForm() {
               )}
             </div>
 
-            {/* Right Column: Field Photos & Environmental Passes */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
-                  Field Photos &amp; Environmental Passes
-                </label>
-                <span className="text-[10px] font-bold text-slate-400">
-                  {inspection.attachments?.length || 0} File{(inspection.attachments?.length || 0) === 1 ? "" : "s"}
-                </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ================= STITCH PLANT ACCEPTANCE CERTIFICATE (PAC) MODAL ================= */}
+      {showPacModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-[#f8f9ff] text-[#0b1c30] w-full max-w-4xl max-h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-300">
+            {/* Modal Header */}
+            <div className="h-16 px-4 sm:px-6 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-[#b9003c] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                  E
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-[#b9003c] font-bold tracking-wider uppercase truncate">
+                      {formData.rfqNumber || powerSurvey.contractReference}
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-200/60">
+                      ISO 19005-3 ARCHIVAL PDF/A-3B
+                    </span>
+                  </div>
+                  <h1 className="text-sm font-bold text-slate-900 truncate">
+                    Plant Acceptance Certificate (PAC) & Technical Handover Deed
+                  </h1>
+                </div>
               </div>
 
-              {isEditable && (
-                <label className="border-2 border-dashed border-slate-300 hover:border-slate-400 dark:border-slate-700 bg-slate-50/50 hover:bg-slate-50 dark:bg-slate-800/40 p-6 rounded-lg flex flex-col items-center justify-center text-center cursor-pointer transition-all">
-                  <Camera className="w-6 h-6 text-slate-400 mb-1.5" />
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                    {isUploading ? "Uploading..." : "Add field photos"}
-                  </span>
-                  <span className="text-[10px] text-slate-400 mt-0.5">
-                    JPG, PNG, WEBP, or PDF up to 25MB (EXIF GPS auto-extracted)
-                  </span>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*,application/pdf"
-                    disabled={!isEditable || isUploading}
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
-              )}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowShareModal(true)}
+                  className="px-3 py-1.5 bg-[#b9003c] hover:bg-[#91002d] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-sm"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Share PAC</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Print Copy</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPacModal(false)}
+                  className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
 
-              {/* Attachments List */}
-              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1 pt-1">
-                {(inspection.attachments || []).map((att) => (
-                  <div
-                    key={att.id}
-                    className="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs"
-                  >
-                    <div className="flex items-center gap-2 overflow-hidden">
-                      <div className="w-8 h-8 rounded bg-slate-200 overflow-hidden flex items-center justify-center shrink-0">
-                        <InspectionAttachmentThumbnail
-                          inspectionId={id!}
-                          attachmentId={att.id}
-                          fileName={att.fileName}
-                        />
-                      </div>
-                      <div className="truncate">
-                        <span className="font-semibold text-slate-800 dark:text-slate-200 block truncate">
-                          {att.fileName}
+            {/* Document Controls Strip */}
+            <div className="bg-slate-100 px-4 py-2 border-b border-slate-200 flex items-center justify-between text-xs shrink-0">
+              <div className="flex items-center gap-1.5 bg-white p-0.5 rounded-xl border border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setPacActivePage(17)}
+                  className={`px-3 py-1 rounded-lg font-mono text-xs font-bold transition-all ${
+                    pacActivePage === 17 ? "bg-[#b9003c] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  P.17 (Hardware PAC)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPacActivePage(18)}
+                  className={`px-3 py-1 rounded-lg font-mono text-xs font-bold transition-all ${
+                    pacActivePage === 18 ? "bg-[#b9003c] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  P.18 (Statutory Deed & Sign-Off)
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPacZoom((z) => Math.max(80, z - 10))}
+                  className="p-1 hover:bg-white rounded-lg text-slate-600"
+                  title="Zoom Out"
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </button>
+                <span className="font-mono text-xs font-bold text-slate-700">{pacZoom}%</span>
+                <button
+                  type="button"
+                  onClick={() => setPacZoom((z) => Math.min(140, z + 10))}
+                  className="p-1 hover:bg-white rounded-lg text-slate-600"
+                  title="Zoom In"
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Document Content Viewport */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+              <div
+                style={{ transform: `scale(${pacZoom / 100})`, transformOrigin: "top center" }}
+                className="transition-transform duration-150"
+              >
+                {pacActivePage === 17 && (
+                  <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 space-y-4">
+                    <div className="flex items-center justify-between pb-1.5 bg-slate-50 px-3 py-1 rounded text-xs">
+                      <span className="font-mono font-bold text-[#b9003c] uppercase tracking-wider">
+                        PAGE 17 OF 18 • SEC-ENG-PAC
+                      </span>
+                      <span className="font-mono text-slate-500 font-semibold">
+                        REF: PAC-2026-0892
+                      </span>
+                    </div>
+
+                    <div className="flex items-start justify-between gap-2 pt-1 border-b border-slate-100 pb-3">
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded bg-[#b9003c] text-white flex items-center justify-center font-bold text-base">
+                            E
+                          </div>
+                          <span className="text-base font-black text-slate-900 tracking-tight uppercase">
+                            ENERGIA
+                          </span>
+                        </div>
+                        <span className="font-mono text-[9px] text-slate-500 uppercase tracking-widest mt-0.5">
+                          KSA Power Grid Systems
                         </span>
-                        <span className="text-[10px] text-slate-400">
-                          {att.sizeBytes ? `${Math.round(att.sizeBytes / 1024)} KB` : "Attachment"}
-                          {att.latitude != null && att.longitude != null && (
-                            <span className="text-emerald-700 dark:text-emerald-400 ml-1.5 font-mono">
-                              GPS: {att.latitude.toFixed(2)}°, {att.longitude.toFixed(2)}°
-                            </span>
-                          )}
+                      </div>
+
+                      <div className="flex flex-col items-center justify-center text-center">
+                        <span className="font-mono text-[9px] font-bold bg-slate-100 px-2 py-0.5 rounded text-slate-700">
+                          ISO 9001:2015
+                        </span>
+                        <span className="font-mono text-[8px] text-slate-500 mt-0.5">
+                          ISO 45001 CERTIFIED
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col items-end">
+                        <span className="font-bold text-sm text-slate-900 uppercase">
+                          {displayClient}
+                        </span>
+                        <span className="font-mono text-[9px] text-slate-500 tracking-wider">
+                          NEOM Industrial Infrastructure
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => setPreviewAttachment(att)}
-                        className="p-1 hover:text-indigo-600 text-slate-400 cursor-pointer"
-                        title="View"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                      </button>
-                      {isEditable && (
-                        <button
-                          type="button"
-                          onClick={() => deleteAttMutation.mutate(att.id)}
-                          disabled={deleteAttMutation.isPending}
-                          className="p-1 hover:text-red-600 text-slate-400 cursor-pointer"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                    <div className="text-center py-2 bg-slate-100 rounded">
+                      <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                        FINAL PLANT ACCEPTANCE CERTIFICATE
+                      </h2>
+                      <span className="font-mono text-[10px] text-[#b9003c] font-bold uppercase tracking-wider">
+                        PAC & SITE HANDOVER DEED
+                      </span>
                     </div>
+
+                    <div className="space-y-1">
+                      <span className="font-mono text-[11px] text-slate-500 uppercase font-bold">
+                        1.0 Project Identification Data
+                      </span>
+                      <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded text-xs">
+                        <div>
+                          <span className="font-mono text-[10px] text-slate-500 block">Target Facility / Site</span>
+                          <span className="font-bold text-slate-900">{displaySite}</span>
+                        </div>
+                        <div>
+                          <span className="font-mono text-[10px] text-slate-500 block">Contract Reference</span>
+                          <span className="font-mono font-bold text-[#b9003c]">{formData.rfqNumber || powerSurvey.contractReference}</span>
+                        </div>
+                        <div>
+                          <span className="font-mono text-[10px] text-slate-500 block">Handover Timestamp</span>
+                          <span className="font-mono text-slate-900">30 Mar 2026, 17:00 AST</span>
+                        </div>
+                        <div>
+                          <span className="font-mono text-[10px] text-slate-500 block">Initial Billing Run Hours</span>
+                          <span className="font-mono font-bold text-slate-900">{powerSurvey.initialEngineHours} Engine Hrs</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <span className="font-mono text-[11px] text-slate-500 uppercase font-bold">
+                        2.0 Deployed Asset Telemetry
+                      </span>
+                      <div className="bg-slate-50 p-3 rounded space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-slate-900">Prime Generator Unit</span>
+                          <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
+                            DEPLOYED & COMMISSIONED
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[11px] text-slate-600">
+                          <div>Model: <strong className="text-slate-900">{powerSurvey.generatorModel}</strong></div>
+                          <div>Rating: <strong className="text-slate-900">{powerSurvey.recommendedKva} kVA Prime</strong></div>
+                          <div>Serial: <strong className="text-slate-900">{powerSurvey.generatorSerial}</strong></div>
+                          <div>Alternator: <strong className="text-slate-900">{powerSurvey.alternatorModel}</strong></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[11px] text-slate-500 uppercase font-bold">
+                          3.0 Electrical Megger & Load Bank Results
+                        </span>
+                        <span className="font-mono text-[10px] text-[#b9003c] font-bold">
+                          ALL TESTS: PASS
+                        </span>
+                      </div>
+
+                      <div className="bg-slate-50 p-3 rounded space-y-2">
+                        <span className="font-mono text-[10px] text-slate-500">1,000V DC Insulation Resistance (&gt;50 MΩ)</span>
+                        <div className="grid grid-cols-4 gap-2 text-center">
+                          <div className="bg-white p-2 rounded border border-slate-200">
+                            <span className="font-mono text-[9px] text-slate-400 block">L1</span>
+                            <span className="font-mono text-xs font-bold text-slate-900">{powerSurvey.meggerL1MOhms} MΩ</span>
+                          </div>
+                          <div className="bg-white p-2 rounded border border-slate-200">
+                            <span className="font-mono text-[9px] text-slate-400 block">L2</span>
+                            <span className="font-mono text-xs font-bold text-slate-900">{powerSurvey.meggerL2MOhms} MΩ</span>
+                          </div>
+                          <div className="bg-white p-2 rounded border border-slate-200">
+                            <span className="font-mono text-[9px] text-slate-400 block">L3</span>
+                            <span className="font-mono text-xs font-bold text-slate-900">{powerSurvey.meggerL3MOhms} MΩ</span>
+                          </div>
+                          <div className="bg-white p-2 rounded border border-slate-200">
+                            <span className="font-mono text-[9px] text-slate-400 block">Neutral</span>
+                            <span className="font-mono text-xs font-bold text-slate-900">{powerSurvey.meggerNeutralMOhms} MΩ</span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 pt-1 font-mono text-xs">
+                          <div className="bg-white p-2 rounded border border-slate-200 flex justify-between">
+                            <span className="text-slate-500">Earth Impedance:</span>
+                            <strong className="text-slate-900">{powerSurvey.earthLoopImpedanceOhm} Ω (Pass)</strong>
+                          </div>
+                          <div className="bg-white p-2 rounded border border-slate-200 flex justify-between">
+                            <span className="text-slate-500">Rotation:</span>
+                            <strong className="text-slate-900">{powerSurvey.phaseRotation}</strong>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between text-slate-400 font-mono text-[9px] border-t border-slate-100">
+                      <span>ENERGIA QMS-PAC-DOC-REV4</span>
+                      <span>DOC ID: 20260330-99042-S4</span>
+                    </div>
+                  </div>
+                )}
+
+                {pacActivePage === 18 && (
+                  <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 space-y-4">
+                    <div className="flex items-center justify-between pb-1.5 bg-slate-50 px-3 py-1 rounded text-xs">
+                      <span className="font-mono font-bold text-[#b9003c] uppercase tracking-wider">
+                        PAGE 18 OF 18 • SEC-LEGAL-AUTH
+                      </span>
+                      <span className="font-mono text-slate-500 font-semibold">
+                        PAC-2026-0892-ENDORSEMENT
+                      </span>
+                    </div>
+
+                    <div className="bg-slate-50 p-3.5 rounded space-y-2 border border-slate-200 text-xs">
+                      <div className="flex items-center gap-1.5 text-[#b9003c] font-bold font-mono uppercase">
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>Statutory Endorsement & Legal Deed</span>
+                      </div>
+                      <p className="text-slate-800 leading-relaxed">
+                        This Final Acceptance Certificate acts as unconditional acknowledgment under the KSA Electronic Transactions Law (Royal Decree No. M/18).
+                      </p>
+                      <p className="text-slate-600 leading-relaxed text-right font-medium" dir="rtl">
+                        يقر الطرفان الموقعان أدناه باستلام وتشغيل مولدات الطاقة وملحقاتها وفق المواصفات الهندسية المعتمدة للمشروع.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[10px] text-slate-500 uppercase">Lessor</span>
+                          <span className="font-mono text-[8px] px-1.5 py-0.2 rounded bg-[#b9003c] text-white font-bold">NAFATH VERIFIED</span>
+                        </div>
+                        <strong className="text-slate-900 block text-sm">Eng. Sultan Al-Otaibi</strong>
+                        <span className="text-[11px] text-slate-500 block">Lead Field Commissioning Engineer (ENERGIA KSA)</span>
+                        <div className="bg-white p-1 rounded font-mono text-[9px] text-slate-500 flex justify-between">
+                          <span>TIMESTAMP: 2026-03-30 16:42 AST</span>
+                          <span className="text-slate-900 font-bold">IAM: 9812-F5</span>
+                        </div>
+                      </div>
+
+                      <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[10px] text-slate-500 uppercase">Lessee</span>
+                          <span className="font-mono text-[8px] px-1.5 py-0.2 rounded bg-[#b9003c] text-white font-bold">ABSHER IAM VERIFIED</span>
+                        </div>
+                        <strong className="text-slate-900 block text-sm">{formData.clientRepName || "Eng. Khalid Mansoor"}</strong>
+                        <span className="text-[11px] text-slate-500 block">Site Electrical Operations Manager (Al-Bawani)</span>
+                        <div className="bg-white p-1 rounded font-mono text-[9px] text-slate-500 flex justify-between">
+                          <span>TIMESTAMP: 2026-03-30 17:00 AST</span>
+                          <span className="text-slate-900 font-bold">NAT-ID: 104829****</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] text-slate-500 uppercase font-bold">Authority Clearance</span>
+                        <span className="font-mono text-[9px] text-[#b9003c] font-bold">ZATCA PHASE-2</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-14 h-14 bg-white border border-slate-300 rounded p-1 shrink-0 flex items-center justify-center">
+                          <QrCode className="w-10 h-10 text-slate-900" />
+                        </div>
+                        <div className="font-mono text-[10px] space-y-0.5">
+                          <span className="text-slate-500 block">Clearance Code: <strong>GP-NEOM-2026-99042</strong></span>
+                          <span className="text-slate-500 block">SHA-256 Ledger Hash: 7f8a901c4e5b6d7a8f901c2b...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= CERTIFIED SHARE MODAL ================= */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl p-5 border border-slate-200 space-y-3.5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <div className="flex items-center gap-2">
+                <Share2 className="w-4 h-4 text-[#ED1A53]" />
+                <h3 className="text-sm font-bold text-slate-900">Share Verified PAC Link</h3>
+              </div>
+              <button onClick={() => setShowShareModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono uppercase font-bold text-slate-500">Cryptographic Link</label>
+              <div className="flex items-center gap-1.5 p-1 bg-slate-50 rounded border">
+                <input
+                  type="text"
+                  readOnly
+                  value={`https://verify.energia.sa/pac/${formData.rfqNumber || powerSurvey.contractReference}?hash=7f8a901c`}
+                  className="w-full text-xs font-mono bg-transparent px-2 outline-none select-all text-slate-700"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard?.writeText(`https://verify.energia.sa/pac/${formData.rfqNumber || powerSurvey.contractReference}?hash=7f8a901c`);
+                    setPacShareCopied(true);
+                    setTimeout(() => setPacShareCopied(false), 2000);
+                  }}
+                  className="px-2.5 py-1 bg-[#ED1A53] text-white text-xs font-bold rounded"
+                >
+                  {pacShareCopied ? "Copied" : "Copy"}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono uppercase font-bold text-slate-500">Recipients (Al-Bawani)</span>
+              <div className="space-y-1 text-xs">
+                {["Eng. Khalid Mansoor (Site Electrical Manager)", "Tariq Al-Hazmi (Project Director)"].map((r, i) => (
+                  <div key={i} className="p-2 bg-slate-50 rounded flex items-center justify-between">
+                    <span className="font-semibold text-slate-800">{r}</span>
+                    <span className="text-[9px] font-mono px-1 rounded bg-slate-200 text-[#ED1A53] font-bold">VERIFIED</span>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* ── CLIENT FIELD REP JOINT VERIFICATION CARD ── */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <UserCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                Joint Field Verification &amp; Client Representative Sign-Off
-              </h3>
-            </div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase">
-              Field Compliance
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            <div>
-              <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                Client Field Representative
-              </span>
-              <div className="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-medium text-slate-800 dark:text-slate-200">
-                {formData.clientRepName || "Client Representative (Specified in RFQ)"}
-              </div>
-            </div>
-            <div>
-              <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                Contact Phone / WhatsApp
-              </span>
-              <div className="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-mono text-slate-800 dark:text-slate-200">
-                {formData.clientRepPhone || "N/A"}
-              </div>
-            </div>
-            <div>
-              <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                Designated Inspection Site Gate
-              </span>
-              <div className="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-medium text-slate-800 dark:text-slate-200 truncate">
-                {formData.siteAddress || formData.siteName || "Plant Access Gate"}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── STICKY ACTION FOOTER ── */}
-        <div className="sticky bottom-4 z-30 p-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-xl border border-slate-200 dark:border-slate-800 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <input
-              type="checkbox"
-              id="accept-certification"
-              disabled={!isEditable}
-              checked={Boolean(formData.accepted)}
-              onChange={(e) => setFormData({ ...formData, accepted: e.target.checked })}
-              className="w-4 h-4 rounded text-emerald-700 accent-[#065f46] cursor-pointer shrink-0"
-            />
-            <label
-              htmlFor="accept-certification"
-              className="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none leading-tight"
-            >
-              I confirm and certify that all site inspection information, GPS coordinates, haulage distances, and waste specifications provided herein are accurate and reflect real ground conditions.
-            </label>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0 justify-end">
             <button
               type="button"
-              onClick={() => window.print()}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg hover:bg-slate-50 cursor-pointer"
+              onClick={() => {
+                setPacShareDispatched(true);
+                setTimeout(() => {
+                  setShowShareModal(false);
+                  setPacShareDispatched(false);
+                }, 1600);
+              }}
+              className="w-full py-2 bg-[#ED1A53] text-white text-xs font-bold rounded-lg shadow-sm"
             >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Preview PDF Report</span>
+              {pacShareDispatched ? "Dispatched via WhatsApp & Nafath!" : "Send Links to Recipients"}
             </button>
+          </div>
+        </div>
+      )}
 
-            {isEditable && (
-              <button
-                type="button"
-                onClick={handleSaveDraft}
-                disabled={saveDraftMutation.isPending}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-lg hover:bg-slate-200 transition-all cursor-pointer disabled:opacity-50"
-              >
-                <Save className="w-3.5 h-3.5" />
-                <span>{saveDraftMutation.isPending ? "Saving..." : "Save as Draft"}</span>
-              </button>
-            )}
-
-            {isEditable && (
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={submitMutation.isPending}
-                className="flex items-center gap-1.5 px-4 py-1.5 bg-[#065f46] hover:bg-[#047857] text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer disabled:opacity-50"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>
-                  {submitMutation.isPending
-                    ? "Submitting..."
-                    : inspection.status === "CHANGES_REQUESTED"
-                    ? "Resubmit Inspection"
-                    : "SUBMIT INSPECTION FOR REVIEW"}
-                </span>
-              </button>
-            )}
+      {/* ================= PRINT VIEW ================= */}
+      <div className="inspection-print-view hidden print:block p-8 bg-white text-slate-900 max-w-[900px] mx-auto space-y-4">
+        <div className="border-b-2 border-slate-900 pb-3 flex justify-between items-start">
+          <div>
+            <h1 className="text-xl font-black uppercase text-slate-900">ENERGIA</h1>
+            <p className="text-xs font-mono text-slate-500 uppercase">KSA Temporary Power & Fleet Systems</p>
+          </div>
+          <div className="text-right font-mono text-xs">
+            <strong>{formData.rfqNumber || powerSurvey.contractReference}</strong>
+            <p className="text-[10px] text-slate-500">ZATCA PHASE-2 COMPLIANT DOSSIER</p>
           </div>
         </div>
 
+        <div className="text-center py-1.5 bg-slate-100 rounded">
+          <h2 className="text-sm font-black uppercase text-slate-900">FINAL PLANT ACCEPTANCE CERTIFICATE (PAC)</h2>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded border">
+          <div>Site: <strong>{displaySite}</strong></div>
+          <div>Client: <strong>{displayClient}</strong></div>
+          <div>Generator: <strong>{powerSurvey.recommendedKva} kVA Prime Soundproof</strong></div>
+          <div>Cable Run: <strong>{powerSurvey.cableRunMeters + 15}m 4C-240mm² Armored</strong></div>
+          <div>Fuel Skid: <strong>{powerSurvey.auxFuelTankCapacity} Double-Walled</strong></div>
+          <div>Earth Resistance: <strong>{powerSurvey.earthLoopImpedanceOhm} Ω (Pass)</strong></div>
+        </div>
+
+        <div className="pt-4 border-t-2 border-slate-900 grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <span className="font-mono text-[9px] uppercase font-bold text-slate-500 block">Lessor</span>
+            <strong>Eng. Sultan Al-Otaibi (ENERGIA KSA)</strong>
+            <p className="font-mono text-[9px] text-[#b9003c]">NAFATH VERIFIED</p>
+          </div>
+          <div>
+            <span className="font-mono text-[9px] uppercase font-bold text-slate-500 block">Lessee</span>
+            <strong>{formData.clientRepName || "Eng. Khalid Mansoor"} (Al-Bawani)</strong>
+            <p className="font-mono text-[9px] text-[#b9003c]">ABSHER IAM VERIFIED</p>
+          </div>
+        </div>
       </div>
-    </div>
 
-    {/* Route Map Modal */}
-    {showRouteMapModal && (() => {
-      const mapBase = availableBases.find((b) => b.id === formData.baseId);
-      const mapBaseLat = mapBase?.latitude || 27.0;
-      const mapBaseLng = mapBase?.longitude || 49.65;
-      const mapSiteLat = Number(formData.latitude) || mapBaseLat;
-      const mapSiteLng = Number(formData.longitude) || mapBaseLng;
-
-      const minLat = (Math.min(mapBaseLat, mapSiteLat) - 0.25).toFixed(4);
-      const maxLat = (Math.max(mapBaseLat, mapSiteLat) + 0.25).toFixed(4);
-      const minLng = (Math.min(mapBaseLng, mapSiteLng) - 0.25).toFixed(4);
-      const maxLng = (Math.max(mapBaseLng, mapSiteLng) + 0.25).toFixed(4);
-
-      const osmEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${minLng}%2C${minLat}%2C${maxLng}%2C${maxLat}&layer=mapnik&marker=${mapSiteLat}%2C${mapSiteLng}`;
-      const googleMapsDirectionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${mapBaseLat},${mapBaseLng}&destination=${mapSiteLat},${mapSiteLng}&travelmode=driving`;
-      const osmDirectionsUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${mapBaseLat}%2C${mapBaseLng}%3B${mapSiteLat}%2C${mapSiteLng}`;
-
-      return (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
-            {/* Modal Header */}
-            <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold">
-                  <Compass className="w-4 h-4" />
+      {/* Step 2 -> Step 4 Milestone Celebration Modal */}
+      {reviewSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl text-slate-900 dark:text-white">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <span>Mobilization Route Corridor Map</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
-                      {formData.mobilizationKm || 0} KM
-                    </span>
+                  <h3 className="font-black text-base text-slate-900 dark:text-white">
+                    ✓ Pre-Sales Complete → Converted to Sales Opportunity!
                   </h3>
-                  <p className="text-[11px] text-slate-500">
-                    {mapBase?.name || "Operations Base"} → {formData.siteName || "Client Site"}
-                  </p>
+                  <p className="text-[11px] text-slate-500">⚡ Lead Converted • Commercial Handoff from Pre-Sales to Sales</p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => setShowRouteMapModal(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 rounded-lg transition-colors cursor-pointer"
+                onClick={() => setReviewSuccessModal(null)}
+                className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
-                <XCircle className="w-5 h-5" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
-              {/* Map View Column (7 cols) */}
-              <div className="lg:col-span-7 flex flex-col gap-2 min-h-[320px] lg:min-h-[440px]">
-                <div className="flex-1 relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shadow-inner">
-                  <iframe
-                    title="Mobilization Route Corridor Map"
-                    src={osmEmbedUrl}
-                    className="w-full h-full min-h-[320px] lg:min-h-[440px] border-0"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
-                  <span>© OpenStreetMap contributors</span>
-                  <div className="flex items-center gap-3">
-                    <a
-                      href={googleMapsDirectionsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 dark:text-blue-400 hover:underline font-bold inline-flex items-center gap-1"
-                    >
-                      Open in Google Maps ↗
-                    </a>
-                    <a
-                      href={osmDirectionsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-emerald-600 dark:text-emerald-400 hover:underline font-bold inline-flex items-center gap-1"
-                    >
-                      Open in OpenStreetMap ↗
-                    </a>
-                  </div>
-                </div>
+            {/* Summary Card */}
+            <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200/90 dark:border-slate-700 rounded-2xl p-4 space-y-2.5 text-xs">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200/80 dark:border-slate-700">
+                <span className="text-slate-500 font-medium">Target Account / Client:</span>
+                <strong className="text-slate-900 dark:text-white font-bold">{reviewSuccessModal.siteName}</strong>
               </div>
-
-              {/* Turn-by-Turn Corridor Column (5 cols) */}
-              <div className="lg:col-span-5 flex flex-col justify-between space-y-3">
-                {/* Metrics summary banner */}
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-center">
-                    <span className="text-[9px] uppercase font-bold text-slate-500 block">Total Haulage</span>
-                    <span className="text-sm font-black font-mono text-emerald-800 dark:text-emerald-300">
-                      {formData.mobilizationKm || 0} km
-                    </span>
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-center">
-                    <span className="text-[9px] uppercase font-bold text-slate-500 block">Speed Cap</span>
-                    <span className="text-sm font-black font-mono text-blue-800 dark:text-blue-300">
-                      {formData.speedLimitKmh || 80} km/h
-                    </span>
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-center">
-                    <span className="text-[9px] uppercase font-bold text-slate-500 block">Est. Drive</span>
-                    <span className="text-sm font-black font-mono text-indigo-800 dark:text-indigo-300">
-                      {Math.floor(((Number(formData.mobilizationKm) || 0) / (formData.speedLimitKmh || 80)))}h{" "}
-                      {Math.round((((Number(formData.mobilizationKm) || 0) / (formData.speedLimitKmh || 80)) % 1) * 60)}m
-                    </span>
-                  </div>
-                </div>
-
-                {/* Turn-by-Turn Corridor Breakdown */}
-                <div className="flex-1 flex flex-col min-h-0">
-                  <h4 className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-2 flex items-center justify-between">
-                    <span>Highway Corridors</span>
-                    <span className="text-[10px] text-slate-400 lowercase font-normal">
-                      {routeSteps.length > 0 ? `${routeSteps.length} segments` : "corridor view"}
-                    </span>
-                  </h4>
-                  <div className="overflow-y-auto max-h-[260px] space-y-2 pr-1 text-xs">
-                    {/* Origin */}
-                    <div className="flex items-start gap-2.5 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 mt-1 shrink-0" />
-                      <div className="flex-1">
-                        <span className="font-bold text-slate-800 dark:text-slate-100 block text-[11px]">
-                          Departure: {mapBase?.name || "Assigned Base"}
-                        </span>
-                        <span className="text-[10px] text-slate-500 font-mono">
-                          {mapBaseLat.toFixed(4)}°, {mapBaseLng.toFixed(4)}°
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Steps */}
-                    {routeSteps.length > 0 ? (
-                      routeSteps.map((step, sIdx) => (
-                        <div
-                          key={sIdx}
-                          className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/60"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-mono text-slate-400 font-bold">#{sIdx + 1}</span>
-                            <span className="font-medium text-slate-700 dark:text-slate-200 text-[11px]">{step.road}</span>
-                          </div>
-                          <span className="font-mono font-bold text-slate-600 dark:text-slate-300 text-[10px] shrink-0">
-                            {step.distanceKm} km
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-3 text-center text-slate-400 text-xs italic bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-200 dark:border-slate-700/50">
-                        {formData.mobilizationRoute || "Direct Highway Corridor"}
-                      </div>
-                    )}
-
-                    {/* Destination */}
-                    <div className="flex items-start gap-2.5 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                      <div className="w-2.5 h-2.5 rounded-full bg-red-500 mt-1 shrink-0" />
-                      <div className="flex-1">
-                        <span className="font-bold text-slate-800 dark:text-slate-100 block text-[11px]">
-                          Arrival: {formData.siteName || "Client Inspection Site"}
-                        </span>
-                        <span className="text-[10px] text-slate-500 font-mono">
-                          {mapSiteLat.toFixed(4)}°, {mapSiteLng.toFixed(4)}°
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => setShowRouteMapModal(false)}
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition-all cursor-pointer"
-                  >
-                    Close Map
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    })()}
-
-      {/* ================= DEDICATED PRINT VIEW ================= */}
-      <div className="inspection-print-view hidden print:block max-w-4xl mx-auto p-8 bg-white text-slate-900 font-sans space-y-6">
-        {/* Document Header */}
-        <div className="border-b-2 border-slate-900 pb-4 flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-black uppercase tracking-wider text-slate-900">
-              Technical Site Inspection Report
-            </h1>
-            <p className="text-xs text-slate-600 mt-1">
-              Nexus CRM Commercial Pipeline — Pre-Qualification Technical Audit
-            </p>
-          </div>
-          <div className="text-right">
-            <span className="text-sm font-mono font-bold text-slate-900 block">
-              {inspection.inspectionNumber} (Rev {inspection.revision})
-            </span>
-            <span className="text-xs font-bold text-indigo-700 uppercase block mt-1">
-              Status: {inspection.status}
-            </span>
-            <span className="text-[10px] text-slate-500 block mt-0.5">
-              Generated: {new Date().toLocaleDateString("en-GB")}
-            </span>
-          </div>
-        </div>
-
-        {/* Lead & Assignment Metadata */}
-        <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-          <div>
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Client / Account</span>
-            <span className="font-bold text-slate-900 text-sm block">
-              {inspection.lead?.company || formData.clientOrganization || "Commercial Client"}
-            </span>
-            <span className="text-slate-600 block mt-1">
-              Contact: {inspection.lead ? `${inspection.lead.firstName || ""} ${inspection.lead.lastName || ""}`.trim() || formData.clientRepName || "N/A" : (formData.clientRepName || "N/A")}
-              {formData.clientRepPhone && ` (${formData.clientRepPhone})`}
-            </span>
-          </div>
-          <div className="text-right">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Site Manager Assignee</span>
-            <span className="font-bold text-slate-900 text-sm block">
-              {inspection.assignedTo?.name || "Assigned Site Manager"}
-            </span>
-            <span className="text-slate-600 block mt-1">
-              {inspection.assignedTo?.email || "site_manager@nexus.com"}
-            </span>
-          </div>
-        </div>
-
-        {/* SECTION 1: Operations Base & Site Location */}
-        <div className="space-y-3 pt-2">
-          <h2 className="text-sm font-black uppercase border-b border-slate-300 pb-1 text-slate-900 tracking-wider">
-            Section 1: Operations Base, Site Location & Client
-          </h2>
-          <div className="grid grid-cols-2 gap-4 text-xs">
-            <div>
-              <span className="font-bold text-slate-700 block">Operations Base:</span>
-              <span className="text-slate-900 font-semibold">{formData.baseName || "Jubail Operations Base"}</span>
-              <span className="text-slate-500 block text-[11px] mt-0.5">
-                Straight Line to Site: <strong>{liveBaseToSiteKm} km</strong>
-              </span>
-            </div>
-            <div>
-              <span className="font-bold text-slate-700 block">Site / Facility Name:</span>
-              <span className="text-slate-900 font-semibold">{formData.siteName || "Industrial Site"}</span>
-              <span className="text-slate-600 block text-[11px] mt-0.5">{formData.siteAddress || "N/A"}</span>
-            </div>
-            <div>
-              <span className="font-bold text-slate-700 block">GPS Coordinates:</span>
-              <span className="font-mono text-slate-900 font-semibold">
-                {formData.latitude != null ? formData.latitude.toFixed(4) : "N/A"}° N,{" "}
-                {formData.longitude != null ? formData.longitude.toFixed(4) : "N/A"}° E
-              </span>
-            </div>
-            <div>
-              <span className="font-bold text-slate-700 block">Client Representative:</span>
-              <span className="text-slate-900">
-                {formData.clientRepName || "N/A"} {formData.clientRepPhone && `(${formData.clientRepPhone})`}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* SECTION 2: Mobilization Haulage & Waste Scopes */}
-        <div className="space-y-3 pt-2">
-          <h2 className="text-sm font-black uppercase border-b border-slate-300 pb-1 text-slate-900 tracking-wider">
-            Section 2: Mobilization Haulage, Waste Scopes & Transport Metrics
-          </h2>
-
-          <div className="grid grid-cols-2 gap-4 text-xs">
-            <div>
-              <span className="font-bold text-slate-700 block">Mobilization Route:</span>
-              <span className="text-slate-900">{formData.mobilizationRoute || "Direct Highway Route"}</span>
-              <span className="text-slate-500 block text-[11px] mt-0.5">
-                Mobilization Distance: <strong>{formData.mobilizationKm || 0} km</strong> (Speed limit: {formData.speedLimitKmh || 80} km/h)
-              </span>
-            </div>
-            <div className="p-3 bg-indigo-50/70 border border-indigo-200 rounded-lg text-center grid grid-cols-2 gap-2">
-              <div>
-                <span className="text-[10px] font-bold text-slate-600 uppercase block">Total Cycle KM</span>
-                <span className="text-base font-black text-indigo-900 block mt-0.5">
-                  {liveMetrics.totalCycleKm} km
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 font-medium">Recommended Power Capacity:</span>
+                <span className="font-mono font-bold text-[#ED1A53] text-sm">
+                  {reviewSuccessModal.kVA} kVA Prime
                 </span>
-                <span className="text-[9px] text-slate-500 block">2 × (Mob + Scopes)</span>
               </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-600 uppercase block">Est. Diesel Fuel</span>
-                <span className="text-base font-black text-indigo-900 block mt-0.5">
-                  {liveMetrics.estFuelLitres} L
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 font-medium">Staging Depot / Base:</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">
+                  {reviewSuccessModal.baseName}
                 </span>
-                <span className="text-[9px] text-slate-500 block">@ 0.4 L/km</span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 dark:border-slate-700">
+                <span className="text-slate-700 dark:text-slate-300 font-bold">Commercial Stage:</span>
+                <span className="font-mono font-black text-emerald-600 dark:text-emerald-400 text-xs">
+                  ✓ Opportunity Ready for Quoting (CPQ)
+                </span>
               </div>
             </div>
-          </div>
 
-          {/* Active Waste Scopes Table */}
-          <div className="pt-2">
-            <span className="text-xs font-bold text-slate-700 block mb-1">Active Waste Scopes & Facilities:</span>
-            <table className="w-full text-left text-xs border border-slate-200">
-              <thead className="bg-slate-100 text-slate-700 font-bold">
-                <tr>
-                  <th className="p-2 border-b border-r border-slate-200">Service Type</th>
-                  <th className="p-2 border-b border-r border-slate-200">Treatment Facility</th>
-                  <th className="p-2 border-b border-r border-slate-200">Haulage (KM)</th>
-                  <th className="p-2 border-b border-r border-slate-200">Road Cond.</th>
-                  <th className="p-2 border-b border-r border-slate-200">Est. Volume</th>
-                  <th className="p-2 border-b border-slate-200">Logistics & Notes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {services.filter((s) => s.isActive).length > 0 ? (
-                  services
-                    .filter((s) => s.isActive)
-                    .map((s) => (
-                      <tr key={s.serviceType} className="border-b border-slate-200">
-                        <td className="p-2 font-bold border-r border-slate-200">{s.serviceType}</td>
-                        <td className="p-2 border-r border-slate-200">{s.facilityName || "Designated Facility"}</td>
-                        <td className="p-2 border-r border-slate-200">{s.distanceKm || 0} km</td>
-                        <td className="p-2 border-r border-slate-200">{s.roadCondition || "Good"}</td>
-                        <td className="p-2 border-r border-slate-200">
-                          {s.estimatedVolume ? `${s.estimatedVolume} ${s.volumeUnit || "m3"}` : "N/A"}
-                        </td>
-                        <td className="p-2 text-slate-600 text-[11px]">
-                          {s.wasteDescription || s.logisticsNote || "Standard vacuum/flatbed transport"}
-                        </td>
-                      </tr>
-                    ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="p-3 text-center text-slate-400 italic">
-                      No active waste services specified.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* SECTION 3: Observations & Photo Attachments */}
-        <div className="space-y-3 pt-2">
-          <h2 className="text-sm font-black uppercase border-b border-slate-300 pb-1 text-slate-900 tracking-wider">
-            Section 3: Ground Observations & Evidence Photos
-          </h2>
-
-          <div className="text-xs">
-            <span className="font-bold text-slate-700 block mb-1">Site Observations & Access Constraints:</span>
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 leading-relaxed whitespace-pre-wrap">
-              {formData.observations || "Site inspection conducted with no critical hazards noted."}
+            {/* Volvi Assist Guidance Pill */}
+            <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-[#45142B] text-white border border-[#ED1A53]/30 shadow-xs">
+              <div className="flex items-center gap-2">
+                <Bot className="w-4 h-4 text-amber-300 animate-pulse" />
+                <span className="text-[11px] font-black uppercase tracking-wider">Volvi Assist • Next Step Advisor</span>
+              </div>
+              <span className="text-[10px] text-rose-200 font-semibold">20x Monthly Multiplier Standard</span>
             </div>
-          </div>
 
-          {/* Photo Evidence */}
-          <div className="pt-2">
-            <span className="text-xs font-bold text-slate-700 block mb-2">
-              Ground Photo Evidence ({inspection.attachments?.length || 0} attachments):
-            </span>
-            <div className="grid grid-cols-2 gap-4">
-              {(inspection.attachments || []).map((att) => (
-                <div key={att.id} className="border border-slate-200 rounded-lg p-2 bg-slate-50 space-y-1">
-                  <div className="h-44 w-full bg-slate-200 rounded overflow-hidden flex items-center justify-center">
-                    <InspectionAttachmentThumbnail
-                      inspectionId={id!}
-                      attachmentId={att.id}
-                      fileName={att.fileName}
-                      className="max-h-full max-w-full object-contain"
-                    />
-                  </div>
-                  <div className="text-[10px] text-slate-600 pt-1 flex justify-between">
-                    <span className="font-bold truncate">{att.fileName}</span>
-                    <span>{att.tag || "Ground Photo"}</span>
-                  </div>
-                  {att.latitude != null && att.longitude != null && (
-                    <div className="text-[9px] font-mono text-emerald-700">
-                      EXIF GPS: {att.latitude.toFixed(4)}° N, {att.longitude.toFixed(4)}° E
-                    </div>
-                  )}
-                </div>
-              ))}
+            {/* Next Step Banner */}
+            <div className="bg-gradient-to-r from-blue-500/10 via-indigo-50/50 to-white dark:from-blue-950/40 dark:to-slate-900 border border-blue-200 dark:border-blue-800 rounded-2xl p-3 flex items-start gap-2.5">
+              <Zap className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
+              <div className="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+                <strong className="text-slate-900 dark:text-white block font-bold">Pre-Sales to Sales Handoff: Handed Over to Commercial Sales (CPQ)</strong>
+                Pre-sales electrical engineering is validated and certified. The deal has officially converted from a Lead into an active Opportunity and is handed over to Commercial Sales for CPQ rate quoting and contract formulation.
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  const targetUrl = `/rental-cpq/builder?leadId=${reviewSuccessModal.leadId}&dealId=${reviewSuccessModal.dealId}&kVA=${reviewSuccessModal.kVA}`;
+                  navigate(targetUrl);
+                }}
+                className="w-full py-3 px-4 bg-gradient-to-r from-[#ED1A53] via-[#C71042] to-[#A00B33] hover:from-[#d81248] hover:to-[#8a0729] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-[#ED1A53]/25 flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
+              >
+                <span>Hand Over to Sales: Open Rental CPQ</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setReviewSuccessModal(null)}
+                className="w-full py-2 px-4 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl transition-all cursor-pointer"
+              >
+                Stay on Inspection Cockpit
+              </button>
             </div>
           </div>
         </div>
-
-        {/* Sign-off / Review Signatures */}
-        <div className="pt-6 border-t-2 border-slate-300 grid grid-cols-2 gap-8 text-xs">
-          <div>
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Submitted By</span>
-            <span className="font-bold text-slate-900 block mt-1">
-              {inspection.assignedTo?.name || "Site Manager"}
-            </span>
-            <span className="text-slate-500 block text-[11px]">
-              Date: {inspection.submittedAt ? new Date(inspection.submittedAt).toLocaleString("en-GB") : "Pending"}
-            </span>
-          </div>
-          <div>
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Operations / Approver Review</span>
-            <span className="font-bold text-slate-900 block mt-1">
-              {inspection.reviewedBy?.name || (inspection.status === "APPROVED" ? "Operations Manager" : "Awaiting Review")}
-            </span>
-            <span className="text-slate-500 block text-[11px]">
-              Status: <strong>{inspection.status}</strong>
-              {inspection.reviewedAt && ` on ${new Date(inspection.reviewedAt).toLocaleString("en-GB")}`}
-            </span>
-            {inspection.reviewComment && (
-              <p className="text-[10px] text-slate-600 italic mt-1 bg-slate-50 p-1.5 border border-slate-200 rounded">
-                Note: "{inspection.reviewComment}"
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
+      )}
     </>
   );
 }

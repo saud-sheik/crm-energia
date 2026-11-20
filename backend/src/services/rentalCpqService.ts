@@ -1,5 +1,6 @@
 import { sequelize } from "@nexus-crm/database";
 import { Quote, QuoteLineItem, Deal, Account, Contact, Lead } from "@nexus-crm/database";
+import { CreditKycService } from "./creditKycService";
 
 export interface PowerEquipmentItem {
   id: string;
@@ -71,6 +72,23 @@ export const POWER_EQUIPMENT_CATALOG: PowerEquipmentItem[] = [
     defaultMobFee: 950,
     defaultDemobFee: 950,
     specSummary: "250 kVA Prime, Volvo Penta TAD734GE engine, Synchronizing ready, Skid mounted with forklift pockets"
+  },
+  {
+    id: "bess-150kva",
+    name: "150 kVA / 300 kWh Hybrid Battery Storage (BESS) + Inverter",
+    category: "generator",
+    kvaRating: 150,
+    voltage: "400V / 230V or 480V 60Hz",
+    phase: "3-Phase",
+    frequencyHz: 50,
+    fuelConsumptionLph: 0,
+    dailyRate: 1100,
+    weeklyMultiplier: 5,
+    monthlyMultiplier: 20,
+    minimumHireDays: 5,
+    defaultMobFee: 900,
+    defaultDemobFee: 900,
+    specSummary: "150 kVA Pure Sine Inverter + 300 kWh LFP Lithium Battery. Zero noise, zero emissions, ideal for intermittent pump cycling & night shifts (saves 60% diesel)."
   },
   {
     id: "gen-500kva",
@@ -168,6 +186,7 @@ export interface RentalCalculationInput {
   operatorDayRate?: number; // Default: 250 for single shift, 450 for 24h
   discountPercent?: number;
   taxPercent?: number; // Default: 15%
+  paymentTerms?: string; // "100%_ADVANCE" | "30_DAYS" | "60_DAYS"
 }
 
 export interface RentalCalculationBreakdown {
@@ -494,6 +513,37 @@ export class RentalCpqService {
       await QuoteLineItem.bulkCreate(lineItemsToCreate, { transaction });
 
       await transaction.commit();
+
+      // Automatically keep parent deal value in sync with CPQ quote
+      try {
+        const deal = await Deal.findByPk(params.dealId);
+        if (deal) {
+          await deal.update({
+            value: breakdown.finalTotalAmount
+          });
+        }
+      } catch (dealErr) {
+        console.warn("[RentalCpqService] Note on deal sync:", dealErr);
+      }
+
+      // Fast-Track 100% Advance Payment: Auto-clear KYC application in background
+      if (params.calculationInput.paymentTerms === "100%_ADVANCE" || params.calculationInput.paymentTerms === "ADVANCE") {
+        try {
+          const dealWithAcc = await Deal.findByPk(params.dealId, { include: ["account"] });
+          if (dealWithAcc) {
+            await CreditKycService.submitApplication({
+              dealId: dealWithAcc.id,
+              accountId: dealWithAcc.accountId || undefined,
+              quoteId: quote.id,
+              requestedCreditLimit: 0,
+              requestedPaymentTerms: "ADVANCE",
+              notes: "Fast-track 100% advance deposit gate pre-cleared automatically via Rental CPQ Builder."
+            });
+          }
+        } catch (kycErr) {
+          console.warn("[RentalCpqService] Note on KYC auto-clear:", kycErr);
+        }
+      }
 
       return {
         success: true,

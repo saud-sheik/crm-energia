@@ -208,24 +208,28 @@ export default function Settings() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-surface h-[calc(100vh-64px)] relative">
-      <div className="max-w-[1000px] mx-auto p-8 space-y-8">
+    <div className="flex-1 overflow-y-auto h-[calc(100vh-64px)] relative">
+      <div className="max-w-[1000px] mx-auto p-6 md:p-8 space-y-8 animate-fade-in font-sans">
         
         {/* Page Header */}
         <div className="space-y-1">
-          <h2 className="text-4xl font-bold text-on-surface flex items-center gap-2.5">
-            <SettingsIcon className="w-9 h-9 text-primary" />
-            User Settings
-          </h2>
-          <p className="text-base text-on-surface-variant">Update your password, set availability, and manage direct reports.</p>
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-slate-100/90 border border-slate-200/80 flex items-center justify-center text-[#DC2626] shadow-sm">
+              <SettingsIcon className="w-5 h-5 text-[#DC2626]" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">User & Workspace Settings</h2>
+              <p className="text-xs text-slate-500 font-medium">Update your password, set availability, and manage direct reports and workspace configurations.</p>
+            </div>
+          </div>
         </div>
 
         {/* Quick Access to Workspace Configurations & Master Data */}
-        <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+        <div className="bg-white border border-white rounded-[24px] p-6 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] space-y-4 text-slate-900">
+          <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
             <div>
-              <h3 className="text-lg font-bold text-on-surface">Workspace Master Data & Administration</h3>
-              <p className="text-xs text-on-surface-variant">Access system parameters, price books, and workflow configurations.</p>
+              <h3 className="text-lg font-black text-slate-900">Workspace Master Data & Administration</h3>
+              <p className="text-xs text-slate-600 font-medium">Access system parameters, price books, and workflow configurations.</p>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -244,10 +248,10 @@ export default function Settings() {
               <a
                 key={item.name}
                 href={item.path}
-                className="p-3 bg-surface hover:bg-surface-container-high border border-outline-variant rounded-xl text-xs font-bold text-on-surface hover:text-primary transition-all flex items-center justify-between group"
+                className="p-3 bg-white/90 hover:bg-white border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 hover:text-[#DC2626] transition-all flex items-center justify-between group shadow-2xs"
               >
                 <span>{item.name}</span>
-                <span className="text-on-surface-variant group-hover:translate-x-0.5 transition-transform">→</span>
+                <span className="text-slate-400 group-hover:text-[#DC2626] group-hover:translate-x-0.5 transition-transform">→</span>
               </a>
             ))}
           </div>
@@ -262,7 +266,7 @@ export default function Settings() {
         )}
 
         {message && (
-          <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl p-4 text-sm font-semibold flex items-center gap-2 animate-fade-in">
+          <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl p-4 text-sm font-semibold flex items-center gap-2 animate-fade-in shadow-xs">
             <CheckCircle className="w-5 h-5 text-emerald-600" />
             {message}
           </div>
@@ -273,48 +277,48 @@ export default function Settings() {
           {/* Left Column: Security and Status */}
           <div className="space-y-8">
             {/* Availability card */}
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                <UserCheck className="w-5 h-5 text-primary" />
+            <div className="bg-white border border-white rounded-[24px] p-6 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] space-y-4 text-slate-900">
+              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                <UserCheck className="w-5 h-5 text-[#45142B]" />
                 Availability Status
               </h3>
-              <p className="text-sm text-on-surface-variant">Configure whether you are currently eligible to receive new lead assignments dynamically.</p>
+              <p className="text-xs text-slate-600 font-medium">Configure whether you are currently eligible to receive new lead assignments dynamically.</p>
               
-              <div className="flex items-center justify-between p-4 bg-surface rounded-xl border border-outline-variant">
+              <div className="flex items-center justify-between p-4 bg-white/90 rounded-xl border border-slate-200/90">
                 <div>
-                  <p className="font-bold text-sm">Accepting New Leads</p>
-                  <p className="text-xs text-on-surface-variant mt-0.5">Toggle availability status on the lead engine</p>
+                  <p className="font-bold text-sm text-slate-900">Accepting New Leads</p>
+                  <p className="text-xs text-slate-500 mt-0.5 font-medium">Toggle availability status on the lead engine</p>
                 </div>
                 <button 
                   onClick={handleAvailabilityToggle}
                   disabled={updateSettingsMutation.isPending}
-                  className="focus:outline-none hover:opacity-90 active:scale-95 transition-all"
+                  className="focus:outline-none hover:opacity-90 active:scale-95 transition-all cursor-pointer"
                 >
                   {mySettings?.isAvailable ? (
-                    <ToggleRight className="w-12 h-12 text-primary" />
+                    <ToggleRight className="w-12 h-12 text-[#ED1A53]" />
                   ) : (
-                    <ToggleLeft className="w-12 h-12 text-on-surface-variant" />
+                    <ToggleLeft className="w-12 h-12 text-slate-400" />
                   )}
                 </button>
               </div>
             </div>
 
             {/* Gmail Connector Card */}
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                <Mail className="w-5 h-5 text-primary" />
+            <div className="bg-white border border-white rounded-[24px] p-6 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] space-y-4 text-slate-900">
+              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                <Mail className="w-5 h-5 text-[#45142B]" />
                 Gmail Lead Ingestion
               </h3>
-              <p className="text-sm text-on-surface-variant">
+              <p className="text-xs text-slate-600 font-medium">
                 Connect your business Gmail account to automatically monitor and ingest incoming customer emails as leads.
               </p>
 
               {gmailConfig?.connected ? (
                 <div className="space-y-4">
-                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
+                  <div className="p-4 bg-emerald-50/90 border border-emerald-200 rounded-xl space-y-1">
                     <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Connected Account</p>
-                    <p className="text-sm font-bold text-emerald-950">{gmailConfig.email}</p>
-                    <p className="text-[11px] text-emerald-700">
+                    <p className="text-sm font-black text-emerald-950">{gmailConfig.email}</p>
+                    <p className="text-[11px] text-emerald-700 font-medium">
                       Last Checked: {gmailConfig.lastSyncedAt ? new Date(gmailConfig.lastSyncedAt).toLocaleString() : "Never"}
                     </p>
                   </div>
@@ -323,7 +327,7 @@ export default function Settings() {
                     <button
                       onClick={() => syncGmailMutation.mutate()}
                       disabled={syncGmailMutation.isPending}
-                      className="flex-1 py-2.5 bg-primary text-white font-bold rounded-lg hover:opacity-90 active:scale-95 transition-all text-xs shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-50"
+                      className="flex-1 py-2.5 bg-[#45142B] text-white font-bold rounded-xl hover:bg-[#320e1f] active:scale-95 transition-all text-xs shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
                     >
                       <RefreshCw className={`w-4 h-4 ${syncGmailMutation.isPending ? "animate-spin" : ""}`} />
                       Sync Now
@@ -335,7 +339,7 @@ export default function Settings() {
                         }
                       }}
                       disabled={disconnectGmailMutation.isPending}
-                      className="py-2.5 px-4 bg-surface-container text-error font-bold rounded-lg hover:bg-surface-container-high transition-colors text-xs"
+                      className="py-2.5 px-4 bg-rose-50 text-rose-700 border border-rose-200 font-bold rounded-xl hover:bg-rose-100 transition-colors text-xs cursor-pointer"
                     >
                       Disconnect
                     </button>
@@ -345,15 +349,15 @@ export default function Settings() {
                 <div className="space-y-4">
                   <button
                     onClick={handleStartOAuth}
-                    className="w-full py-3 bg-primary text-white font-bold rounded-lg hover:opacity-90 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2"
+                    className="w-full py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 text-xs cursor-pointer"
                   >
-                    <Mail className="w-5 h-5" />
+                    <Mail className="w-4 h-4" />
                     Connect Gmail Account
                   </button>
 
                   {showCodeInput && (
-                    <div className="border border-outline-variant rounded-xl p-4 bg-surface space-y-3">
-                      <p className="text-xs text-on-surface-variant leading-relaxed">
+                    <div className="border border-slate-200/90 rounded-xl p-4 bg-white/90 space-y-3">
+                      <p className="text-xs text-slate-600 leading-relaxed font-medium">
                         Consent tab opened in a new window. Copy the authorization code from the redirect URL and paste below to complete setup:
                       </p>
                       <div className="flex gap-2">
@@ -362,12 +366,12 @@ export default function Settings() {
                           value={authCode}
                           onChange={(e) => setAuthCode(e.target.value)}
                           placeholder="4/0AdQt8..."
-                          className="flex-1 bg-surface border border-outline rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                          className="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-[#45142B] focus:outline-none"
                         />
                         <button
                           onClick={() => connectGmailMutation.mutate(authCode)}
                           disabled={connectGmailMutation.isPending || !authCode.trim()}
-                          className="px-4 py-2 bg-secondary text-white text-xs font-bold rounded-lg hover:opacity-90 disabled:opacity-50"
+                          className="px-4 py-2 bg-[#45142B] text-white text-xs font-bold rounded-xl hover:bg-[#320e1f] active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
                         >
                           Submit
                         </button>
@@ -379,27 +383,27 @@ export default function Settings() {
             </div>
 
             {/* WhatsApp Business API Card */}
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
+            <div className="bg-white border border-white rounded-[24px] p-6 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] space-y-4 text-slate-900">
+              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
                 <MessageCircle className="w-5 h-5 text-emerald-600" />
                 WhatsApp Business API
               </h3>
-              <p className="text-sm text-on-surface-variant">
+              <p className="text-xs text-slate-600 font-medium">
                 Receive and send WhatsApp messages via Meta Cloud API. Incoming messages auto-create leads and activity logs.
               </p>
 
-              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-3">
+              <div className="p-4 bg-emerald-50/90 border border-emerald-200 rounded-xl space-y-3">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-xs font-bold text-emerald-800">Webhook Endpoint Registered</span>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Webhook URL (paste in Meta Developer Console)</p>
-                  <div className="flex items-center gap-2 bg-white border border-emerald-300 rounded-lg px-3 py-2">
+                  <div className="flex items-center gap-2 bg-white border border-emerald-300 rounded-xl px-3 py-2">
                     <code className="text-[11px] text-slate-700 flex-1 truncate font-mono">{webhookUrl}</code>
                     <button
                       onClick={copyWebhook}
-                      className="shrink-0 text-emerald-600 hover:text-emerald-800 transition-colors"
+                      className="shrink-0 text-emerald-600 hover:text-emerald-800 transition-colors cursor-pointer"
                       title="Copy webhook URL"
                     >
                       {copiedWebhook ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -419,7 +423,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-2 text-xs">
-                <p className="font-bold text-on-surface-variant uppercase tracking-wider text-[10px]">Setup Checklist</p>
+                <p className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Setup Checklist</p>
                 {[
                   { done: true, label: "WHATSAPP_TOKEN configured in .env" },
                   { done: true, label: "WHATSAPP_PHONE_NUMBER_ID configured in .env" },
@@ -427,14 +431,14 @@ export default function Settings() {
                   { done: false, label: "Register webhook URL in Meta Developer Console" },
                   { done: false, label: "Add phone number to WhatsApp Business API" },
                 ].map((step, i) => (
-                  <div key={i} className={`flex items-center gap-2 p-2 rounded-lg ${step.done ? "bg-emerald-50 text-emerald-800" : "bg-slate-50 text-slate-500"}`}>
+                  <div key={i} className={`flex items-center gap-2 p-2 rounded-xl ${step.done ? "bg-emerald-50 text-emerald-800 font-semibold" : "bg-white/80 text-slate-500 font-medium"}`}>
                     <CheckCircle className={`w-3.5 h-3.5 shrink-0 ${step.done ? "text-emerald-600" : "text-slate-300"}`} />
                     {step.label}
                   </div>
                 ))}
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-3">
+              <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between gap-3">
                 <a
                   href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started"
                   target="_blank"
@@ -448,7 +452,7 @@ export default function Settings() {
                 <button
                   type="button"
                   onClick={() => setShowDiagnostics(true)}
-                  className="px-3 py-1.5 rounded-lg bg-slate-900 text-emerald-400 hover:bg-slate-800 text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-sm"
+                  className="px-3 py-1.5 rounded-xl bg-slate-900 text-emerald-400 hover:bg-slate-800 text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
                 >
                   <ShieldAlert className="w-3.5 h-3.5" />
                   Launch Diagnostics & Logs
@@ -457,45 +461,45 @@ export default function Settings() {
             </div>
 
             {/* Profile info & Password change */}
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm space-y-6">
-              <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                <Shield className="w-5 h-5 text-secondary" />
+            <div className="bg-white border border-white rounded-[24px] p-6 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] space-y-6 text-slate-900">
+              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-[#45142B]" />
                 Security & Role info
               </h3>
 
-              <div className="space-y-2 text-sm">
-                <p><span className="font-bold">Role:</span> <span className="bg-secondary/15 text-secondary font-bold px-2 py-0.5 rounded text-xs">{mySettings?.role || user?.role}</span></p>
-                <p><span className="font-bold">Email:</span> {mySettings?.email || user?.email}</p>
+              <div className="space-y-2 text-xs">
+                <p><span className="font-bold text-slate-600">Role:</span> <span className="bg-[#45142B]/10 text-[#45142B] font-bold px-2 py-0.5 rounded text-xs uppercase tracking-wider">{mySettings?.role || user?.role}</span></p>
+                <p><span className="font-bold text-slate-600">Email:</span> <span className="font-semibold text-slate-800">{mySettings?.email || user?.email}</span></p>
               </div>
 
-              <form onSubmit={handlePasswordSubmit} className="space-y-4 border-t border-outline-variant pt-6">
-                <h4 className="font-bold text-sm">Update Password</h4>
+              <form onSubmit={handlePasswordSubmit} className="space-y-4 border-t border-slate-200/80 pt-6">
+                <h4 className="font-bold text-sm text-slate-900">Update Password</h4>
                 <div>
-                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">New Password</label>
+                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">New Password</label>
                   <input 
                     type="password" 
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-surface border border-outline rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary focus:outline-none"
+                    className="w-full bg-white/90 border border-slate-300 rounded-xl p-2.5 text-xs font-semibold focus:bg-white focus:ring-1 focus:ring-[#45142B] focus:outline-none"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Confirm New Password</label>
+                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Confirm New Password</label>
                   <input 
                     type="password" 
                     value={confirmPassword}
                     onChange={e => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-surface border border-outline rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary focus:outline-none"
+                    className="w-full bg-white/90 border border-slate-300 rounded-xl p-2.5 text-xs font-semibold focus:bg-white focus:ring-1 focus:ring-[#45142B] focus:outline-none"
                     required
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={updateSettingsMutation.isPending || !password.trim()}
-                  className="w-full py-3 bg-primary text-white font-bold rounded-lg hover:opacity-90 active:scale-95 transition-all shadow-md disabled:opacity-50"
+                  className="w-full py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl active:scale-95 transition-all shadow-md disabled:opacity-50 text-xs cursor-pointer"
                 >
                   Change Password
                 </button>
@@ -506,40 +510,40 @@ export default function Settings() {
 
           {/* Right Column: Team Management (if applicable) */}
           {["admin", "director", "manager"].includes(mySettings?.role || user?.role || "") && (
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm space-y-6">
-              <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
+            <div className="bg-white border border-white rounded-[24px] p-6 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] space-y-6 text-slate-900">
+              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
                 <Users className="w-5 h-5 text-emerald-600" />
                 Team Reports ({team?.length || 0})
               </h3>
-              <p className="text-sm text-on-surface-variant">View representatives reporting directly to you and manage their manager assignments.</p>
+              <p className="text-xs text-slate-600 font-medium">View representatives reporting directly to you and manage their manager assignments.</p>
 
-              <div className="space-y-4 divide-y divide-outline-variant">
+              <div className="space-y-4 divide-y divide-slate-200/80">
                 {team?.length === 0 ? (
-                  <p className="text-sm text-on-surface-variant py-4">No team members report to you directly.</p>
+                  <p className="text-xs text-slate-500 py-4 font-medium italic">No team members report to you directly.</p>
                 ) : (
                   team?.map((member: any) => (
                     <div key={member.id} className="pt-4 first:pt-0 space-y-2">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-bold text-sm">{member.name}</p>
-                          <p className="text-xs text-on-surface-variant">{member.email} | {member.role}</p>
+                          <p className="font-bold text-sm text-slate-900">{member.name}</p>
+                          <p className="text-xs text-slate-500">{member.email} | {member.role}</p>
                         </div>
-                        <span className={`text-xs px-2 py-0.5 rounded font-semibold ${
-                          member.isAvailable ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                          member.isAvailable ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"
                         }`}>
                           {member.isAvailable ? "Available" : "OOO"}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <label className="text-xs text-on-surface-variant font-bold whitespace-nowrap">Reassign Manager:</label>
+                        <label className="text-xs text-slate-600 font-bold whitespace-nowrap">Reassign Manager:</label>
                         <select
                           value={member.managerId || ""}
                           onChange={(e) => reassignManagerMutation.mutate({ 
                             memberId: member.id, 
                             managerId: e.target.value || null 
                           })}
-                          className="flex-1 bg-surface border border-outline rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                          className="flex-1 bg-white/90 border border-slate-300 rounded-xl px-2 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-[#45142B] focus:outline-none cursor-pointer"
                         >
                           <option value="">No Manager (Direct/Independent)</option>
                           {salespersons

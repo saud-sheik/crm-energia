@@ -1572,34 +1572,122 @@ export default function SalespersonTracker() {
           {/* Sub-view 1: Team Overview */}
           <div className={perfSubTab === "overview" ? "space-y-6" : "hidden"}>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-card border border-border rounded-xl p-4 shadow-2xs space-y-1">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Active Sales Reps</span>
-                <p className="text-xl font-black text-foreground">{salespersons.length}</p>
-                <span className="text-[11px] text-muted-foreground font-semibold">{salespersons.filter(s => s.isAvailable).length} available for routing</span>
+              {/* Active Sales Reps */}
+              <div className="bg-white rounded-[24px] p-5 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 shadow-2xs">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  {/* Top-Right Circular Progress Gauge */}
+                  <div className="relative flex items-center justify-center">
+                    <svg className="w-11 h-11 -rotate-90" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#E2E8F0" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#4F46E5" strokeWidth="3.2" strokeDasharray="88" strokeDashoffset="0" strokeLinecap="round" />
+                    </svg>
+                    <span className="absolute text-[10px] font-black text-indigo-700">100%</span>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Sales Reps</span>
+                  <div className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight mt-0.5">{salespersons.length}</div>
+                </div>
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+                  <span>Routing Available</span>
+                  <span className="text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full text-[10px]">
+                    {salespersons.filter(s => s.isAvailable).length} Active
+                  </span>
+                </div>
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 shadow-2xs space-y-1">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Closed Revenue</span>
-                <p className="text-xl font-black text-emerald-600">
-                  {formatRevenue(salespersons.reduce((acc, s) => acc + (s.revenueClosed || 0), 0))}
-                </p>
-                <span className="text-[11px] text-muted-foreground font-semibold">Attributed sales volume</span>
+
+              {/* Total Closed Revenue */}
+              <div className="bg-white rounded-[24px] p-5 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 shadow-2xs">
+                    <Target className="w-5 h-5" />
+                  </div>
+                  {/* Top-Right Circular Progress Gauge */}
+                  <div className="relative flex items-center justify-center">
+                    <svg className="w-11 h-11 -rotate-90" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#E2E8F0" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#10B981" strokeWidth="3.2" strokeDasharray="88" strokeDashoffset="12" strokeLinecap="round" />
+                    </svg>
+                    <span className="absolute text-[10px] font-black text-emerald-700">Closed</span>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Closed Revenue</span>
+                  <div className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight mt-0.5">
+                    {formatRevenue(salespersons.reduce((acc, s) => acc + (s.revenueClosed || 0), 0))}
+                  </div>
+                </div>
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-700">
+                  <span>Attributed Sales Volume</span>
+                  <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full text-[10px]">Won</span>
+                </div>
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 shadow-2xs space-y-1">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Company Quota Attainment</span>
-                <p className="text-xl font-black text-amber-600">
-                  {(() => {
-                    const withTarget = salespersons.filter(s => (s.revenueTarget || 0) > 0);
-                    const totTarget = withTarget.reduce((acc, s) => acc + (s.revenueTarget || 0), 0);
-                    const totRev = withTarget.reduce((acc, s) => acc + (s.revenueClosed || 0), 0);
-                    return totTarget > 0 ? `${Math.round((totRev / totTarget) * 100)}%` : "—";
-                  })()}
-                </p>
-                <span className="text-[11px] text-muted-foreground font-semibold">Total revenue / quota target</span>
+
+              {/* Company Quota Attainment */}
+              <div className="bg-white rounded-[24px] p-5 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+                {(() => {
+                  const withTarget = salespersons.filter(s => (s.revenueTarget || 0) > 0);
+                  const totTarget = withTarget.reduce((acc, s) => acc + (s.revenueTarget || 0), 0);
+                  const totRev = withTarget.reduce((acc, s) => acc + (s.revenueClosed || 0), 0);
+                  const pct = totTarget > 0 ? Math.round((totRev / totTarget) * 100) : null;
+                  const offset = pct !== null ? String(88 - (88 * Math.min(100, pct)) / 100) : "88";
+
+                  return (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-700 shadow-2xs">
+                          <BarChart3 className="w-5 h-5" />
+                        </div>
+                        {/* Top-Right Circular Progress Gauge */}
+                        <div className="relative flex items-center justify-center">
+                          <svg className="w-11 h-11 -rotate-90" viewBox="0 0 36 36">
+                            <circle cx="18" cy="18" r="14" fill="none" stroke="#E2E8F0" strokeWidth="3" />
+                            <circle cx="18" cy="18" r="14" fill="none" stroke="#F59E0B" strokeWidth="3.2" strokeDasharray="88" strokeDashoffset={offset} strokeLinecap="round" />
+                          </svg>
+                          <span className="absolute text-[10px] font-black text-amber-700">{pct !== null ? `${pct}%` : "—"}</span>
+                        </div>
+                      </div>
+                      <div className="mt-3">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Company Quota</span>
+                        <div className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight mt-0.5">
+                          {pct !== null ? `${pct}%` : "—"}
+                        </div>
+                      </div>
+                      <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-700">
+                        <span>Revenue / Target</span>
+                        <span className="text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded-full text-[10px]">Attainment</span>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 shadow-2xs space-y-1">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Active Teams</span>
-                <p className="text-xl font-black text-primary">{teamGroups.length}</p>
-                <span className="text-[11px] text-muted-foreground font-semibold">Sales units</span>
+
+              {/* Active Teams */}
+              <div className="bg-white rounded-[24px] p-5 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-2xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-700 shadow-2xs">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  {/* Top-Right Circular Progress Gauge */}
+                  <div className="relative flex items-center justify-center">
+                    <svg className="w-11 h-11 -rotate-90" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#E2E8F0" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#06B6D4" strokeWidth="3.2" strokeDasharray="88" strokeDashoffset="20" strokeLinecap="round" />
+                    </svg>
+                    <span className="absolute text-[10px] font-black text-cyan-700">Teams</span>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Teams</span>
+                  <div className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight mt-0.5">{teamGroups.length}</div>
+                </div>
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-cyan-700">
+                  <span>Sales Units</span>
+                  <span className="text-cyan-700 font-bold bg-cyan-50 px-2 py-0.5 rounded-full text-[10px]">Operational</span>
+                </div>
               </div>
             </div>
 

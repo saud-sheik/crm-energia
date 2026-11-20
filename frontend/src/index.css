@@ -52,18 +52,27 @@
   --primary-container: 344 85% 42%;
   --ring: 344 85% 52%;
   --accent-foreground: 344 85% 52%;
+
+  /* Exact Energia Executive Maroon Background (#45142B) with Light Titanium Slate Cards */
+  --energia-maroon: #45142B;
+  --energia-card: #F1F5F9;
 }
 
 :root.brand-energia.dark {
-  /* Dark Industrial Titanium Slate */
-  --background: 222 47% 7%;       /* #0B0F17 */
+  /* Energia Executive Maroon Background with Light Titanium Slate Cards */
+  --background: 331 55% 17%;       /* #45142B */
   --foreground: 210 40% 98%;
-  --card: 222 47% 10%;            /* #0F172A */
-  --card-foreground: 210 40% 98%;
-  --border: 222 30% 18%;          /* #1E293B */
-  --input: 222 30% 18%;
-  --muted: 222 35% 12%;
-  --muted-foreground: 215 20% 65%;
+  --card: 210 40% 96%;             /* #F1F5F9 light titanium grey cards */
+  --card-foreground: 222 47% 11%;  /* #0F172A */
+  --border: 331 35% 28%;
+}
+
+.bg-energia-maroon {
+  background-color: #45142B;
+}
+
+.bg-energia-card {
+  background-color: #F1F5F9;
 }
 
 @layer base {

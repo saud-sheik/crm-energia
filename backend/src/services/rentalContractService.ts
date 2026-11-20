@@ -1,4 +1,5 @@
-import { RentalContract, Deal, Account, Quote, User } from "@nexus-crm/database";
+import { RentalContract, Deal, Account, Quote, User, Asset, AssetBooking, Invoice } from "@nexus-crm/database";
+import { Op } from "sequelize";
 
 export interface GenerateContractInput {
   dealId: string;
@@ -42,7 +43,7 @@ export class RentalContractService {
       dealId: input.dealId,
       quoteId: input.quoteId || null,
       accountId,
-      status: "DRAFT",
+      status: "AWAITING_CLIENT_SIGNATURE",
       contractStartDate: new Date(input.contractStartDate),
       contractEndDate: new Date(input.contractEndDate),
       totalContractValue: input.totalContractValue,
@@ -155,6 +156,66 @@ export class RentalContractService {
       });
     }
 
+    // Auto-Lock Fleet Asset: Create/Update AssetBooking & set Asset to Deployed
+    try {
+      if (AssetBooking) {
+        let existingBooking = await AssetBooking.findOne({ where: { dealId: contract.dealId } });
+        if (existingBooking) {
+          await existingBooking.update({
+            bookingStatus: "DISPATCHED_ON_HIRE",
+            contractId: contract.id,
+            startDate: contract.contractStartDate,
+            endDate: contract.contractEndDate,
+            siteLocation: contract.siteLocation
+          });
+        } else if (Asset) {
+          const availableAsset = await Asset.findOne({
+            where: { status: "In Storage" }
+          });
+          if (availableAsset) {
+            await AssetBooking.create({
+              assetId: availableAsset.id,
+              dealId: contract.dealId,
+              contractId: contract.id,
+              customerId: contract.accountId || null,
+              startDate: contract.contractStartDate,
+              endDate: contract.contractEndDate,
+              bookingStatus: "DISPATCHED_ON_HIRE",
+              siteLocation: contract.siteLocation,
+              notes: `Auto-reserved via executed rental contract ${contract.contractNumber}`
+            });
+            await availableAsset.update({
+              status: "Deployed",
+              deployedAt: contract.contractStartDate,
+              expectedReturnDate: contract.contractEndDate,
+              dealId: contract.dealId,
+              customerId: contract.accountId || null
+            });
+          }
+        }
+      }
+    } catch (bookingErr) {
+      console.warn("[rentalContractService] Fleet auto-booking integration:", bookingErr);
+    }
+
+    // Auto-Generate Initial Rental Invoicing Record in Invoices desk
+    try {
+      if (Invoice) {
+        const invAmount = contract.monthlyRecurringRate || contract.totalContractValue || 50000;
+        await Invoice.create({
+          quoteId: contract.quoteId || null,
+          status: "Sent",
+          totalAmount: invAmount,
+          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          notes: `Mobilisation & First Month Hire for Contract ${contract.contractNumber} (${contract.siteLocation})`,
+          amountPaid: 0,
+          paymentStatus: "unpaid"
+        });
+      }
+    } catch (invErr) {
+      console.warn("[rentalContractService] Invoice auto-generation integration:", invErr);
+    }
+
     return contract;
   }
 
@@ -164,7 +225,13 @@ export class RentalContractService {
   public static async getContracts(filters?: { status?: string }) {
     const where: any = {};
     if (filters?.status && filters.status !== "ALL") {
-      where.status = filters.status;
+      if (filters.status === "CLIENT_SIGNING") {
+        where.status = { [Op.in]: ["AWAITING_CLIENT_SIGNATURE", "DRAFT"] };
+      } else if (filters.status === "COMPANY_SIGNING") {
+        where.status = "AWAITING_COMPANY_SIGNATURE";
+      } else {
+        where.status = filters.status;
+      }
     }
 
     return RentalContract.findAll({
@@ -185,12 +252,12 @@ export class RentalContractService {
         {
           model: User,
           as: "companySignatory",
-          attributes: ["id", "firstName", "lastName", "email"]
+          attributes: ["id", "name", "email"]
         },
         {
           model: User,
           as: "legalReviewer",
-          attributes: ["id", "firstName", "lastName", "email"]
+          attributes: ["id", "name", "email"]
         }
       ]
     });
@@ -216,12 +283,12 @@ export class RentalContractService {
         {
           model: User,
           as: "companySignatory",
-          attributes: ["id", "firstName", "lastName", "email"]
+          attributes: ["id", "name", "email"]
         },
         {
           model: User,
           as: "legalReviewer",
-          attributes: ["id", "firstName", "lastName", "email"]
+          attributes: ["id", "name", "email"]
         }
       ]
     });

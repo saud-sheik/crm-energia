@@ -1,4 +1,4 @@
-import { Activity, Quote, PurchaseOrder, Deal, Lead, PipelineStage, User } from "@nexus-crm/database";
+import { Activity, Quote, PurchaseOrder, Deal, Lead, PipelineStage, User, CreditApplication } from "@nexus-crm/database";
 import { Op } from "sequelize";
 
 export interface EvidenceItem {
@@ -277,6 +277,29 @@ export async function validateStageTransition(
           timestamp: new Date(),
           isCustomerSide: false
         });
+      }
+
+      // Enforce Credit & KYC Compliance
+      if (deal) {
+        try {
+          const creditApp = await CreditApplication.findOne({ where: { dealId: deal.id } });
+          if (creditApp) {
+            if (creditApp.status === "DECLINED" && !creditApp.fallbackToAdvancePayment) {
+              missingRequirements.push("Credit application was DECLINED by the Credit Department. Client must switch to 100% Advance Payment before closing as WON.");
+            } else if (creditApp.status === "PENDING_REVIEW" && !isManagerOrAdmin) {
+              missingRequirements.push("Credit & KYC application is currently PENDING review. Credit approval or Manager override is required.");
+            } else if (creditApp.status === "APPROVED") {
+              evidenceList.push({
+                type: "CREDIT_KYC_CLEARED",
+                description: `Credit & KYC approved (Limit: SAR ${Number(creditApp.approvedCreditLimit || 0).toLocaleString()} • Terms: ${creditApp.approvedPaymentTerms || "Net 30"})`,
+                timestamp: (creditApp as any).updatedAt || new Date(),
+                isCustomerSide: false
+              });
+            }
+          }
+        } catch (creditErr) {
+          console.warn("[stageValidationService] Credit KYC validation note:", creditErr);
+        }
       }
     }
   }

@@ -156,20 +156,20 @@ export function DealAssignmentSettingsCard() {
   };
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm space-y-6">
+    <div className="bg-white border border-white rounded-[24px] p-6 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] space-y-6 text-slate-900">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-outline-variant/60 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
         <div>
-          <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
-            <Sliders className="w-5 h-5 text-primary" />
+          <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+            <Sliders className="w-5 h-5 text-[#45142B]" />
             Senior AE Deal Assignment &amp; Capacity
           </h3>
-          <p className="text-xs text-on-surface-variant mt-0.5">
+          <p className="text-xs text-slate-600 font-medium mt-0.5">
             Configure deal-value ceilings and open-deal capacity limits for Senior Account Executives.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/90 text-[#45142B] border border-slate-200 shadow-2xs">
             Phase 2 Pipeline Controls
           </span>
         </div>

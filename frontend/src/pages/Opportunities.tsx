@@ -194,27 +194,27 @@ export default function Opportunities() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-5">
-      {/* ── MINIMAL HEADER ── */}
+    <div className="p-6 max-w-7xl mx-auto space-y-5 animate-fade-in text-slate-900">
+      {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Opportunities</h1>
-          <p className="text-xs text-slate-500">
-            Manage your sales pipeline and track deal progression.
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Opportunities</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Manage your sales pipeline, high-value commercial bids, and track deal progression.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate("/leads")}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+            className="px-3.5 py-2 text-xs font-bold text-slate-800 bg-slate-100/90 border border-slate-300 rounded-xl hover:bg-white transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
           >
-            <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+            <Briefcase className="w-3.5 h-3.5 text-slate-500" />
             <span>Leads</span>
           </button>
           <button
             onClick={() => navigate("/quotes/new")}
-            className="px-3.5 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+            className="px-4 py-2 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl transition-all flex items-center gap-1.5 shadow-md shadow-red-600/20 active:scale-95 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Quotation</span>
@@ -222,24 +222,24 @@ export default function Opportunities() {
         </div>
       </div>
 
-      {/* ── UNIFIED FILTER & SEARCH BAR ── */}
-      <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+      {/* ── UNIFIED FILTER & SEARCH BAR (ELEVATED WHITE CARD) ── */}
+      <div className="bg-white p-3.5 rounded-[24px] border border-white shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] flex flex-col md:flex-row md:items-center justify-between gap-3 text-slate-900">
         {/* Left Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
           <button
             onClick={() => {
               setStatusFilter("OPEN");
               setPhaseFilter("ALL");
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === "OPEN"
-                ? "bg-slate-900 text-white"
-                : "text-slate-600 hover:bg-slate-100"
+                ? "bg-[#45142B] text-white shadow-sm font-extrabold"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
             }`}
           >
             <span>Open</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-              statusFilter === "OPEN" ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600"
+              statusFilter === "OPEN" ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700"
             }`}>
               {openCount}
             </span>
@@ -250,15 +250,15 @@ export default function Opportunities() {
               setStatusFilter("WON");
               setPhaseFilter("ALL");
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === "WON"
-                ? "bg-emerald-600 text-white"
-                : "text-slate-600 hover:bg-slate-100"
+                ? "bg-emerald-600 text-white shadow-sm font-extrabold"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
             }`}
           >
             <span>Won</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-              statusFilter === "WON" ? "bg-emerald-700 text-white" : "bg-slate-100 text-slate-600"
+              statusFilter === "WON" ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700"
             }`}>
               {wonCount}
             </span>
@@ -269,15 +269,15 @@ export default function Opportunities() {
               setStatusFilter("LOST");
               setPhaseFilter("ALL");
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === "LOST"
-                ? "bg-rose-600 text-white"
-                : "text-slate-600 hover:bg-slate-100"
+                ? "bg-[#DC2626] text-white shadow-sm font-extrabold"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
             }`}
           >
             <span>Lost</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-              statusFilter === "LOST" ? "bg-rose-700 text-white" : "bg-slate-100 text-slate-600"
+              statusFilter === "LOST" ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700"
             }`}>
               {lostCount}
             </span>
@@ -288,15 +288,15 @@ export default function Opportunities() {
               setStatusFilter("ALL");
               setPhaseFilter("ALL");
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === "ALL"
-                ? "bg-slate-900 text-white"
-                : "text-slate-600 hover:bg-slate-100"
+                ? "bg-[#45142B] text-white shadow-sm font-extrabold"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
             }`}
           >
             <span>All Deals</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-              statusFilter === "ALL" ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600"
+              statusFilter === "ALL" ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700"
             }`}>
               {totalCount}
             </span>
@@ -306,8 +306,8 @@ export default function Opportunities() {
         {/* Right Search & Pipeline Value */}
         <div className="flex items-center gap-3">
           {statusFilter === "OPEN" && (
-            <span className="text-xs text-slate-500 hidden lg:inline">
-              Pipeline: <strong className="text-slate-900">{formatCurrency(totalOpenValue)}</strong>
+            <span className="text-xs text-slate-600 font-semibold hidden lg:inline">
+              Pipeline: <strong className="text-slate-900 font-mono font-bold">{formatCurrency(totalOpenValue)}</strong>
             </span>
           )}
           <div className="relative w-full sm:w-64">
@@ -325,8 +325,8 @@ export default function Opportunities() {
 
       {/* ── INLINE PHASE PILLS (FOR OPEN DEALS) ── */}
       {statusFilter === "OPEN" && (
-        <div className="flex items-center gap-1 text-xs">
-          <span className="text-slate-400 text-[11px] font-medium mr-1">Phase:</span>
+        <div className="flex items-center gap-1.5 text-xs p-1">
+          <span className="text-slate-300 text-[11px] font-bold uppercase tracking-wider mr-1">Phase:</span>
           {(["ALL", "Discovery", "Negotiation", "PO"] as CommercialPhaseFilter[]).map((phase) => {
             const count =
               phase === "ALL"
@@ -339,38 +339,38 @@ export default function Opportunities() {
               <button
                 key={phase}
                 onClick={() => setPhaseFilter(phase)}
-                className={`px-2.5 py-1 rounded-lg font-semibold transition-colors cursor-pointer flex items-center gap-1 text-xs ${
+                className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 text-xs ${
                   phaseFilter === phase
-                    ? "bg-slate-200/80 text-slate-900 font-bold"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
+                    ? "bg-slate-100 text-slate-900 shadow-sm"
+                    : "text-slate-300 hover:text-white hover:bg-white/10"
                 }`}
               >
                 <span>{phase === "ALL" ? "All Open" : phase}</span>
-                <span className="text-[10px] opacity-70">({count})</span>
+                <span className="text-[10px] opacity-75 font-mono">({count})</span>
               </button>
             );
           })}
         </div>
       )}
 
-      {/* ── OPPORTUNITIES TABLE ── */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
+      {/* ── OPPORTUNITIES TABLE (ELEVATED WHITE CARD) ── */}
+      <div className="bg-white rounded-[24px] border border-white shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] overflow-hidden text-slate-900">
         {isLoading ? (
           <div className="p-12 text-center">
             <div className="animate-spin w-6 h-6 border-2 border-slate-900 border-t-transparent rounded-full mx-auto" />
-            <p className="text-xs text-slate-400 mt-2 font-medium">Loading deals...</p>
+            <p className="text-xs text-slate-500 mt-2 font-medium">Loading deals...</p>
           </div>
         ) : filteredOpportunities.length === 0 ? (
-          <div className="p-12 text-center space-y-2 text-xs text-slate-400">
-            <Target className="w-8 h-8 mx-auto text-slate-300" />
-            <p className="font-semibold text-slate-700 text-sm">No opportunities found</p>
+          <div className="p-12 text-center space-y-2 text-xs text-slate-500">
+            <Target className="w-8 h-8 mx-auto text-slate-400" />
+            <p className="font-semibold text-slate-800 text-sm">No opportunities found</p>
             <p>{search ? "Try adjusting your search query." : "No deals in this category."}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                <tr className="bg-slate-200/80 backdrop-blur-sm border-b border-slate-300 text-[11px] font-bold text-slate-700 uppercase tracking-wider font-mono">
                   <th className="py-3 px-4">Deal &amp; Account</th>
                   <th className="py-3 px-4">Status &amp; Phase</th>
                   <th className="py-3 px-4">Owner</th>
@@ -380,7 +380,7 @@ export default function Opportunities() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-200/80">
                 {filteredOpportunities.map((opp) => {
                   const phaseInfo = deriveOpportunityPhase(opp);
                   const isWon = opp.status === "WON";

@@ -28,6 +28,7 @@ import {
 import { siteInspectionApi } from "../api/siteInspection";
 import { getStatusStyle, getInspectionRag, SiteInspectionRecord, APPROVER_ROLES } from "../lib/siteInspection";
 import { useAuth } from "../context/AuthContext";
+import { useVolviAssist } from "../context/VolviAssistContext";
 import { SiteInspectionSettingsModal } from "../components/SiteInspectionSettingsModal";
 import { SiteInspectionRouteModal } from "../components/SiteInspectionRouteModal";
 import { SiteInspectionLocationModal } from "../components/SiteInspectionLocationModal";
@@ -39,6 +40,7 @@ export default function SiteInspections() {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  const { triggerGuidance } = useVolviAssist();
 
   const isSiteManager = user?.role === "site_manager";
   const isApprover = Boolean(user?.role && APPROVER_ROLES.includes(user.role.toLowerCase()));
@@ -68,6 +70,26 @@ export default function SiteInspections() {
     queryKey: ["site-inspections", isSiteManager],
     queryFn: () => siteInspectionApi.listInspections({ mine: isSiteManager }),
   });
+
+  // Proactive Volvi Assist Step 2 Guidance
+  React.useEffect(() => {
+    if (inspections && inspections.length > 0) {
+      const timer = setTimeout(() => {
+        triggerGuidance({
+          stepNumber: 2,
+          stageName: "Step 2 Active • Pre-Sales Technical Sizing",
+          message: `${inspections.length} Technical Surveys in Desk`,
+          explanation: "Review electrical single-line diagrams, voltage drops, and mechanical access before approving for Step 3 Commercial Quoting.",
+          recommendedAction: "Review Technical Surveys in Desk",
+          actionLabel: "Plan Optimized Route ➔",
+          onAction: () => setIsRouteModalOpen(true),
+          technicalTip: "SEC Standard: Inrush multiplier 3.0x requires 250 kVA Prime generator with 25% safety reserve headroom.",
+          suggestedPrompt: "How do I calculate motor inrush kVA for site survey clearance?"
+        });
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [inspections?.length]);
 
   const now = new Date();
 
@@ -198,18 +220,18 @@ export default function SiteInspections() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 font-sans">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-face-line dark:border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E5D4DE] dark:border-slate-800 pb-5">
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-face-green text-white flex items-center justify-center shadow-md shadow-face-green/20">
-              <ClipboardCheck className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#5C1A3C] to-[#45142B] text-white flex items-center justify-center shadow-md shadow-[#45142B]/20 border border-[#7A2350]/30">
+              <ClipboardCheck className="w-5 h-5 text-[#E0B571]" />
             </div>
             <div>
-              <h1 className="text-lg font-extrabold uppercase tracking-tight text-face-ink dark:text-white">
+              <h1 className="text-lg font-extrabold uppercase tracking-tight text-slate-900 dark:text-white">
                 {isSiteManager ? "My Site Inspections" : "Site Inspections & Audits"}
               </h1>
-              <p className="text-sm text-face-muted font-medium">
-                Mandatory qualification gate & environmental waste haulage assessments
+              <p className="text-sm text-[#551938]/80 dark:text-slate-400 font-medium">
+                Mandatory qualification gate &amp; environmental waste haulage assessments
               </p>
             </div>
           </div>
@@ -234,14 +256,14 @@ export default function SiteInspections() {
             </button>
           )}
 
-          <div className="px-3 py-1.5 rounded-xl bg-face-field dark:bg-slate-800 text-face-ink dark:text-slate-300 text-sm font-bold border border-face-line dark:border-slate-700">
+          <div className="px-3 py-1.5 rounded-xl bg-[#F8F4F6] dark:bg-slate-800 text-[#551938] dark:text-slate-300 text-sm font-bold border border-[#E5D4DE] dark:border-slate-700">
             Total: {inspections.length}
           </div>
 
           {/* Route Optimization Button */}
           <button
             onClick={() => setIsRouteModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-xs transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-[#ED1A53] to-[#B00F38] hover:from-[#d81248] hover:to-[#960a2d] text-white text-sm font-bold rounded-xl shadow-md shadow-[#ED1A53]/25 transition-all active:scale-95 cursor-pointer"
             title="Optimize daily visit sequence to minimize travel kilometers and save fuel"
           >
             <Compass className="w-3.5 h-3.5" />
@@ -252,9 +274,9 @@ export default function SiteInspections() {
           {isApprover && (
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-face-green hover:bg-face-green-dark text-white text-sm font-bold rounded-xl shadow-xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#F8F4F6] hover:bg-[#F0E4EC] text-[#551938] dark:bg-slate-800 dark:text-slate-200 border border-[#E5D4DE] dark:border-slate-700 text-sm font-bold rounded-xl transition-all cursor-pointer"
             >
-              <Settings className="w-3.5 h-3.5" />
+              <Settings className="w-3.5 h-3.5 text-[#551938] dark:text-slate-300" />
               <span>Engine Settings</span>
             </button>
           )}
@@ -264,7 +286,7 @@ export default function SiteInspections() {
       {/* Control Bar: Tabs & Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Tabs */}
-        <div className="flex items-center p-1 bg-face-field dark:bg-slate-800/80 rounded-xl border border-face-line dark:border-slate-700/80">
+        <div className="flex items-center p-1 bg-[#F8F4F6] dark:bg-slate-800/80 rounded-xl border border-[#E5D4DE] dark:border-slate-700/80">
           {[
             { key: "todo", label: "To do" },
             { key: "awaiting_approval", label: "Awaiting Approval" },
@@ -279,8 +301,8 @@ export default function SiteInspections() {
               onClick={() => setActiveTab(tab.key as TabType)}
               className={`px-3.5 py-1.5 rounded-lg text-sm font-bold transition-all cursor-pointer ${
                 activeTab === tab.key
-                  ? "bg-white dark:bg-slate-900 text-face-green dark:text-face-green-mint shadow-xs"
-                  : "text-face-muted hover:text-face-ink dark:hover:text-white"
+                  ? "bg-[#45142B] text-white shadow-xs font-black"
+                  : "text-[#551938]/80 hover:text-[#45142B] hover:bg-white/80 dark:hover:text-white"
               }`}
             >
               {tab.label}
@@ -290,13 +312,13 @@ export default function SiteInspections() {
 
         {/* Search */}
         <div className="relative sm:w-80">
-          <Search className="w-4 h-4 text-face-muted absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[#551938]/60 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by SI#, client, site, area..."
-            className="w-full pl-9 pr-3 py-2 bg-face-field dark:bg-slate-900 border border-face-line dark:border-slate-800 rounded-xl text-sm font-medium placeholder-face-muted text-face-ink dark:text-white focus:outline-hidden focus:ring-2 focus:ring-face-green/20 focus:border-face-green"
+            className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-900 border border-[#E5D4DE] dark:border-slate-800 rounded-xl text-sm font-medium placeholder-[#551938]/50 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-[#551938]/20 focus:border-[#551938]"
           />
         </div>
       </div>
@@ -378,10 +400,10 @@ export default function SiteInspections() {
             return (
               <div
                 key={ins.id}
-                className={`bg-white dark:bg-slate-900 border rounded-3xl p-5 sm:p-6 shadow-[0_2px_16px_rgba(40,50,120,0.06)] hover:shadow-[0_4px_20px_rgba(40,50,120,0.1)] transition-all flex flex-col justify-between space-y-4 group relative ${
+                className={`bg-white dark:bg-slate-900 border-2 rounded-3xl p-5 sm:p-6 shadow-[0_4px_20px_-2px_rgba(85,25,56,0.05)] hover:shadow-[0_8px_24px_rgba(85,25,56,0.12)] transition-all flex flex-col justify-between space-y-4 group relative ${
                   isSelected
                     ? "border-amber-500 ring-2 ring-amber-500/20"
-                    : "border-face-line dark:border-slate-800"
+                    : "border-[#E5D4DE] dark:border-[#551938]/40 hover:border-[#6E1C47]"
                 }`}
               >
                 {/* Header */}
@@ -402,11 +424,11 @@ export default function SiteInspections() {
                           className="rounded accent-amber-600"
                         />
                       )}
-                      <span className="font-mono text-sm font-black text-face-green dark:text-face-green-mint">
+                      <span className="font-mono text-sm font-black text-[#551938] dark:text-rose-300">
                         {ins.inspectionNumber}
                       </span>
                       {appliedSequenceMap.has(ins.id) && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-600 text-white shadow-xs">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#45142B] text-white shadow-xs">
                           #{appliedSequenceMap.get(ins.id)} Stop
                         </span>
                       )}
@@ -443,7 +465,7 @@ export default function SiteInspections() {
                   </div>
 
                   <div>
-                    <h3 className="text-base font-black text-face-ink dark:text-white group-hover:text-face-green transition-colors line-clamp-1">
+                    <h3 className="text-base font-black text-slate-900 dark:text-white group-hover:text-[#551938] dark:group-hover:text-rose-300 transition-colors line-clamp-1">
                       {ins.clientOrganization || ins.lead?.company || "Unnamed Client"}
                     </h3>
 
@@ -460,13 +482,13 @@ export default function SiteInspections() {
                           <button
                             type="button"
                             onClick={() => setLocationModalInspection(ins)}
-                            className="text-xs font-semibold text-face-ink dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5 mt-1 text-left cursor-pointer group/loc"
+                            className="text-xs font-semibold text-slate-800 dark:text-slate-200 hover:text-[#551938] dark:hover:text-rose-300 transition-colors flex items-center gap-1.5 mt-1 text-left cursor-pointer group/loc"
                             title="Click to view or edit site location pin"
                           >
-                            <MapPin className={`w-3.5 h-3.5 shrink-0 ${hasGps ? "text-emerald-600" : "text-face-muted"}`} />
+                            <MapPin className={`w-3.5 h-3.5 shrink-0 ${hasGps ? "text-[#ED1A53]" : "text-[#551938]/60"}`} />
                             <span className="truncate">{displayArea}</span>
                             {hasGps ? (
-                              <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300">
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-[#F8F4F6] dark:bg-slate-800 text-[#551938] dark:text-rose-300 border border-[#E5D4DE] dark:border-slate-700">
                                 GPS
                               </span>
                             ) : (
@@ -551,7 +573,7 @@ export default function SiteInspections() {
                       activeScopes.map((svc) => (
                         <span
                           key={svc.serviceType}
-                          className="px-2 py-0.5 bg-face-green-light dark:bg-face-green-dark/40 text-face-green-dark dark:text-face-green-mint border border-face-green/30 dark:border-face-green-dark text-[11px] font-bold rounded-md"
+                          className="px-2.5 py-0.5 bg-[#F8F4F6] dark:bg-slate-800 text-[#551938] dark:text-rose-200 border border-[#E5D4DE] dark:border-slate-700 text-[11px] font-bold rounded-lg"
                         >
                           {svc.serviceType}
                         </span>
@@ -618,7 +640,7 @@ export default function SiteInspections() {
 
                     <Link
                       to={`/site-inspections/${ins.id}`}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-face-green hover:bg-face-green-dark text-white text-sm font-bold rounded-xl transition-all shadow-xs shrink-0"
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#45142B] hover:bg-[#5C1A3C] text-white text-sm font-bold rounded-xl transition-all shadow-xs shrink-0 cursor-pointer"
                     >
                       <span>{ins.status === "SUBMITTED" ? "Review" : "View"}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -668,7 +690,7 @@ export default function SiteInspections() {
                 <select
                   value={reassignTargetId}
                   onChange={(e) => setReassignTargetId(e.target.value)}
-                  className="w-full px-3 py-2 bg-face-field dark:bg-slate-800/60 border border-face-line dark:border-slate-700 rounded-xl text-face-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-face-green/20 focus:border-face-green"
+                  className="w-full px-3 py-2 bg-face-field dark:bg-slate-800/60 border border-face-line dark:border-slate-700 rounded-xl text-face-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-[#551938]/20 focus:border-[#551938]"
                   required
                 >
                   <option value="">Select Site Manager...</option>
@@ -689,7 +711,7 @@ export default function SiteInspections() {
                   value={reassignReason}
                   onChange={(e) => setReassignReason(e.target.value)}
                   placeholder="e.g. Previous inspector on leave; reassigning to Ras Tanura team."
-                  className="w-full px-3 py-2 bg-face-field dark:bg-slate-800/60 border border-face-line dark:border-slate-700 rounded-xl text-sm text-face-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-face-green/20 focus:border-face-green"
+                  className="w-full px-3 py-2 bg-face-field dark:bg-slate-800/60 border border-face-line dark:border-slate-700 rounded-xl text-sm text-face-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-[#551938]/20 focus:border-[#551938]"
                   required
                 />
               </div>
@@ -705,7 +727,7 @@ export default function SiteInspections() {
                 <button
                   type="submit"
                   disabled={isReassigning}
-                  className="px-4 py-2 bg-face-green hover:bg-face-green-dark text-white font-bold rounded-xl shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+                  className="px-4 py-2 bg-[#45142B] hover:bg-[#5C1A3C] text-white font-bold rounded-xl shadow-xs transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {isReassigning ? "Saving..." : "Confirm Reassignment"}
                 </button>

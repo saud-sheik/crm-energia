@@ -279,13 +279,13 @@ export default function Accounts() {
   }
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto font-sans bg-slate-50/50 min-h-screen">
+    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto font-sans animate-fade-in">
       {/* ── TOP HEADER BAR ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-              <Building2 className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-slate-100/90 border border-slate-200/80 flex items-center justify-center text-[#DC2626] shadow-sm">
+              <Building2 className="w-5 h-5 text-[#DC2626]" />
             </div>
             <div>
               <h1 className="text-2xl font-black text-slate-900 tracking-tight">Accounts & Organizations</h1>
@@ -299,14 +299,14 @@ export default function Accounts() {
         <div className="flex items-center gap-2.5">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold shadow-2xs transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 text-xs font-bold shadow-2xs transition-all cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <Download className="w-3.5 h-3.5 text-slate-600" />
             Export CSV
           </button>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold shadow-md shadow-blue-500/25 hover:shadow-lg transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold shadow-md active:scale-95 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             New Account
@@ -314,70 +314,112 @@ export default function Accounts() {
         </div>
       </div>
 
-      {/* ── SUMMARY KPI METRIC CARDS ── */}
+      {/* ── SUMMARY KPI METRIC CARDS (Pinterest Web 2.0 Elevated Cards with Circular Telemetry Rings) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: Total Accounts */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-slate-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Accounts</span>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Building2 className="w-4 h-4" />
+        <div className="bg-white p-5 rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between text-slate-900 group">
+          <div className="flex items-start justify-between">
+            <div className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-[#45142B] shadow-2xs group-hover:scale-105 transition-transform">
+              <Building2 className="w-5 h-5 text-[#45142B]" />
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 shadow-2xs">
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <svg className="w-4 h-4 -rotate-90 transform" viewBox="0 0 36 36">
+                  <path className="text-slate-200" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path className="text-[#ED1A53]" strokeDasharray="85, 100" strokeWidth="4" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+              </div>
+              <span className="text-[10px] font-black text-slate-700 font-mono">Orgs</span>
             </div>
           </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-slate-900">{metrics.totalAccounts}</div>
-            <div className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1 mt-0.5">
-              <TrendingUp className="w-3 h-3" />
-              <span>Active client organizations</span>
-            </div>
+          <div className="mt-3.5 space-y-1">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Accounts</span>
+            <div className="text-2xl lg:text-3xl font-black text-slate-800">{metrics.totalAccounts}</div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+            <TrendingUp className="w-3.5 h-3.5" />
+            <span>Active client organizations</span>
           </div>
         </div>
 
         {/* Metric 2: Total Active Pipeline */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-slate-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Pipeline</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <DollarSign className="w-4 h-4" />
+        <div className="bg-white p-5 rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between text-slate-900 group">
+          <div className="flex items-start justify-between">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 shadow-2xs group-hover:scale-105 transition-transform">
+              <DollarSign className="w-5 h-5" />
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 shadow-2xs">
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <svg className="w-4 h-4 -rotate-90 transform" viewBox="0 0 36 36">
+                  <path className="text-slate-200" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path className="text-emerald-500" strokeDasharray="70, 100" strokeWidth="4" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+              </div>
+              <span className="text-[10px] font-black text-emerald-700 font-mono">Deals</span>
             </div>
           </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-slate-900">{formatCurrency(metrics.totalPipeline)}</div>
-            <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Across all commercial opportunities</div>
+          <div className="mt-3.5 space-y-1">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Pipeline</span>
+            <div className="text-2xl lg:text-3xl font-black text-slate-800">{formatCurrency(metrics.totalPipeline)}</div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px] font-semibold text-slate-600">
+            Across commercial opportunities
           </div>
         </div>
 
         {/* Metric 3: Associated Contacts */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-slate-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Key Contacts</span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-              <Users className="w-4 h-4" />
+        <div className="bg-white p-5 rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between text-slate-900 group">
+          <div className="flex items-start justify-between">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 shadow-2xs group-hover:scale-105 transition-transform">
+              <Users className="w-5 h-5" />
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 shadow-2xs">
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <svg className="w-4 h-4 -rotate-90 transform" viewBox="0 0 36 36">
+                  <path className="text-slate-200" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path className="text-indigo-500" strokeDasharray="60, 100" strokeWidth="4" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+              </div>
+              <span className="text-[10px] font-black text-indigo-700 font-mono">VIP</span>
             </div>
           </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-slate-900">{metrics.totalContacts}</div>
-            <div className="text-[11px] font-semibold text-indigo-600 mt-0.5">Stakeholders & Decision Makers</div>
+          <div className="mt-3.5 space-y-1">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Key Contacts</span>
+            <div className="text-2xl lg:text-3xl font-black text-slate-800">{metrics.totalContacts}</div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px] font-semibold text-indigo-700">
+            Stakeholders & Decision Makers
           </div>
         </div>
 
         {/* Metric 4: Avg Opportunity Size */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-slate-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Avg Opportunity</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-              <Award className="w-4 h-4" />
+        <div className="bg-white p-5 rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] border border-white hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between text-slate-900 group">
+          <div className="flex items-start justify-between">
+            <div className="w-10 h-10 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700 shadow-2xs group-hover:scale-105 transition-transform">
+              <Award className="w-5 h-5" />
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 shadow-2xs">
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <svg className="w-4 h-4 -rotate-90 transform" viewBox="0 0 36 36">
+                  <path className="text-slate-200" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path className="text-purple-500" strokeDasharray="50, 100" strokeWidth="4" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+              </div>
+              <span className="text-[10px] font-black text-purple-700 font-mono">Tier 1</span>
             </div>
           </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-slate-900">{formatCurrency(metrics.avgDealValue)}</div>
-            <div className="text-[11px] font-semibold text-purple-600 mt-0.5">Enterprise contract tier</div>
+          <div className="mt-3.5 space-y-1">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Avg Opportunity</span>
+            <div className="text-2xl lg:text-3xl font-black text-slate-800">{formatCurrency(metrics.avgDealValue)}</div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px] font-semibold text-purple-700">
+            Enterprise contract tier
           </div>
         </div>
       </div>
 
-      {/* ── FILTER & SEARCH TOOLBAR ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+      {/* ── FILTER & SEARCH TOOLBAR (Elevated White Panel) ── */}
+      <div className="bg-white rounded-[24px] shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] border border-white p-4 flex flex-col md:flex-row md:items-center justify-between gap-3.5 text-slate-900">
         <div className="flex flex-1 flex-wrap items-center gap-3">
           {/* Search Box */}
           <div className="relative min-w-[220px] sm:min-w-[280px] flex-1 max-w-md">
@@ -387,7 +429,7 @@ export default function Accounts() {
               placeholder="Search by company name, industry, location, email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-50/80 border border-slate-200/90 rounded-xl pl-9 pr-8 py-2 text-xs font-semibold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+              className="w-full bg-white/80 border border-slate-300/80 rounded-xl pl-9 pr-8 py-2 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#45142B] focus:ring-2 focus:ring-[#45142B]/10 transition-all"
             />
             {searchTerm && (
               <button
@@ -401,11 +443,11 @@ export default function Accounts() {
 
           {/* Industry Filter Dropdown */}
           <div className="flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-slate-400" />
+            <Filter className="w-3.5 h-3.5 text-slate-500" />
             <select
               value={selectedIndustry}
               onChange={(e) => setSelectedIndustry(e.target.value)}
-              className="bg-slate-50/80 border border-slate-200/90 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:bg-white focus:outline-none focus:border-blue-500 cursor-pointer"
+              className="bg-white/80 border border-slate-300/80 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-[#45142B] cursor-pointer"
             >
               <option value="all">All Industries ({accounts.length})</option>
               {availableIndustries.map((ind) => (
@@ -418,11 +460,11 @@ export default function Accounts() {
 
           {/* Sort By Dropdown */}
           <div className="flex items-center gap-1.5">
-            <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
+            <ArrowUpDown className="w-3.5 h-3.5 text-slate-500" />
             <select
               value={sortBy}
               onChange={(e: any) => setSortBy(e.target.value)}
-              className="bg-slate-50/80 border border-slate-200/90 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:bg-white focus:outline-none focus:border-blue-500 cursor-pointer"
+              className="bg-white/80 border border-slate-300/80 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-[#45142B] cursor-pointer"
             >
               <option value="pipeline_desc">Highest Pipeline</option>
               <option value="name_asc">Company Name (A-Z)</option>
@@ -433,11 +475,11 @@ export default function Accounts() {
         </div>
 
         {/* View Switcher: Table vs Grid */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl shrink-0 self-end md:self-auto">
+        <div className="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl shrink-0 self-end md:self-auto border border-slate-300/60">
           <button
             onClick={() => setViewMode("table")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              viewMode === "table" ? "bg-white text-blue-600 shadow-xs" : "text-slate-500 hover:text-slate-800"
+              viewMode === "table" ? "bg-white text-[#45142B] shadow-xs font-extrabold" : "text-slate-600 hover:text-slate-900"
             }`}
           >
             <List className="w-3.5 h-3.5" />
@@ -446,7 +488,7 @@ export default function Accounts() {
           <button
             onClick={() => setViewMode("grid")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              viewMode === "grid" ? "bg-white text-blue-600 shadow-xs" : "text-slate-500 hover:text-slate-800"
+              viewMode === "grid" ? "bg-white text-[#45142B] shadow-xs font-extrabold" : "text-slate-600 hover:text-slate-900"
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -457,12 +499,12 @@ export default function Accounts() {
 
       {/* ── ACCOUNTS LIST SECTION ── */}
       {filteredAccounts.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3 shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+        <div className="bg-white rounded-[24px] border border-white p-12 text-center space-y-3 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] text-slate-900">
+          <div className="w-12 h-12 rounded-2xl bg-white/80 text-slate-500 border border-slate-200 flex items-center justify-center mx-auto">
             <Building2 className="w-6 h-6" />
           </div>
-          <h3 className="text-sm font-bold text-slate-800">No matching accounts found</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <h3 className="text-sm font-bold text-slate-900">No matching accounts found</h3>
+          <p className="text-xs text-slate-600 max-w-sm mx-auto font-medium">
             Try adjusting your search criteria or industry filter to find what you are looking for.
           </p>
           <button
@@ -471,18 +513,18 @@ export default function Accounts() {
               setSelectedIndustry("all");
               setSelectedTier("all");
             }}
-            className="px-3.5 py-1.5 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-bold transition-all cursor-pointer"
+            className="px-3.5 py-1.5 rounded-xl bg-[#45142B] text-white hover:bg-[#320e1f] text-xs font-bold transition-all cursor-pointer shadow-xs"
           >
             Reset Filters
           </button>
         </div>
       ) : viewMode === "table" ? (
         /* ─── DATA TABLE VIEW ─── */
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="bg-white rounded-[24px] border border-white shadow-[0_12px_28px_-6px_rgba(100,116,180,0.10),0_4px_10px_-2px_rgba(100,116,180,0.05)] overflow-hidden text-slate-900">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <tr className="border-b border-slate-300 bg-slate-200/80 text-[11px] font-bold text-slate-700 uppercase tracking-wider font-mono">
                   <th className="py-3.5 px-5">Company</th>
                   <th className="py-3.5 px-4">Industry</th>
                   <th className="py-3.5 px-4">HQ Location</th>
@@ -492,7 +534,7 @@ export default function Accounts() {
                   <th className="py-3.5 px-5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-200/70 font-medium">
                 {filteredAccounts.map((account) => {
                   const nameInit = (account.name || "A").trim().charAt(0).toUpperCase();
                   const deals = Array.isArray(account.deals) ? account.deals : [];
@@ -510,20 +552,20 @@ export default function Accounts() {
                     <tr
                       key={account.id}
                       onClick={() => navigate(`/accounts/${account.id}`)}
-                      className="group hover:bg-blue-50/30 transition-colors cursor-pointer"
+                      className="group hover:bg-white/60 transition-colors cursor-pointer"
                     >
                       {/* Company Info */}
                       <td className="py-4 px-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#45142B] to-[#782348] text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
                             {nameInit}
                           </div>
                           <div className="min-w-0">
-                            <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
+                            <div className="font-bold text-slate-900 group-hover:text-[#ED1A53] transition-colors truncate">
                               {account.name || "Untitled Organization"}
                             </div>
                             {websiteDomain && (
-                              <div className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-600 truncate mt-0.5">
+                              <div className="flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-700 truncate mt-0.5">
                                 <Globe className="w-3 h-3 text-slate-400" />
                                 <span>{websiteDomain}</span>
                               </div>
@@ -544,7 +586,7 @@ export default function Accounts() {
                       </td>
 
                       {/* Location */}
-                      <td className="py-4 px-4 text-slate-600 font-medium">
+                      <td className="py-4 px-4 text-slate-700 font-medium">
                         <div className="flex items-center gap-1.5 truncate max-w-[200px]">
                           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <span className="truncate">{account.address || "Global / Unassigned"}</span>
@@ -555,7 +597,7 @@ export default function Accounts() {
                       <td className="py-4 px-4">
                         <div>
                           <div className="font-black text-slate-900">{formatCurrency(pipeVal)}</div>
-                          <div className="text-[11px] font-semibold text-slate-400">
+                          <div className="text-[11px] font-semibold text-slate-500">
                             {activeDeals.length} {activeDeals.length === 1 ? "active deal" : "active deals"}
                           </div>
                         </div>
@@ -564,11 +606,11 @@ export default function Accounts() {
                       {/* Contacts */}
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-200/60 text-indigo-700 text-[10px] font-black flex items-center justify-center">
+                          <div className="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[10px] font-black flex items-center justify-center">
                             {contacts.length}
                           </div>
                           {primaryContact && (
-                            <span className="text-[11px] text-slate-600 font-medium truncate max-w-[130px]">
+                            <span className="text-[11px] text-slate-700 font-medium truncate max-w-[130px]">
                               {primaryContact.firstName} {primaryContact.lastName || ""}
                             </span>
                           )}
@@ -577,7 +619,7 @@ export default function Accounts() {
 
                       {/* Status */}
                       <td className="py-4 px-4">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/90 text-slate-800 border border-slate-300">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           {account.status || "ACTIVE"}
                         </span>
@@ -590,7 +632,7 @@ export default function Accounts() {
                             e.stopPropagation();
                             navigate(`/accounts/${account.id}`);
                           }}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-blue-600 hover:text-white border border-slate-200/90 text-slate-700 text-xs font-bold shadow-2xs transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/90 hover:bg-[#45142B] hover:text-white border border-slate-300 text-slate-700 text-xs font-bold shadow-2xs transition-all cursor-pointer"
                         >
                           <span>View 360</span>
                           <ChevronRight className="w-3.5 h-3.5" />
@@ -622,21 +664,21 @@ export default function Accounts() {
               <div
                 key={account.id}
                 onClick={() => navigate(`/accounts/${account.id}`)}
-                className="group bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-blue-300 transition-all cursor-pointer flex flex-col justify-between"
+                className="group bg-white rounded-[24px] border border-white p-5 shadow-[0_12px_28px_-6px_rgba(100,116,180,0.12),0_4px_10px_-2px_rgba(100,116,180,0.06)] hover:shadow-[0_18px_38px_-6px_rgba(100,116,180,0.20)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col justify-between text-slate-900"
               >
                 <div>
                   {/* Card Header */}
-                  <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
+                  <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-200">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 text-white font-black text-base flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#45142B] to-[#782348] text-white font-black text-base flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
                         {nameInit}
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-black text-slate-900 text-sm group-hover:text-blue-600 transition-colors truncate">
+                        <h3 className="font-black text-slate-900 text-sm group-hover:text-[#ED1A53] transition-colors truncate">
                           {account.name || "Untitled Organization"}
                         </h3>
                         {websiteDomain && (
-                          <div className="text-[11px] text-slate-400 font-medium truncate mt-0.5">{websiteDomain}</div>
+                          <div className="text-[11px] text-slate-500 font-medium truncate mt-0.5">{websiteDomain}</div>
                         )}
                       </div>
                     </div>
@@ -651,7 +693,7 @@ export default function Accounts() {
                   </div>
 
                   {/* Card Description/Location */}
-                  <div className="py-3 space-y-1.5 text-xs text-slate-500">
+                  <div className="py-3 space-y-1.5 text-xs text-slate-600 font-medium">
                     <div className="flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       <span className="truncate">{account.address || "Global / Unassigned HQ"}</span>
@@ -665,26 +707,26 @@ export default function Accounts() {
                   </div>
 
                   {/* Micro Metrics */}
-                  <div className="grid grid-cols-2 gap-2 bg-slate-50/80 p-3 rounded-xl border border-slate-100 mb-4">
+                  <div className="grid grid-cols-2 gap-2 bg-white/70 p-3 rounded-xl border border-slate-200 mb-4">
                     <div>
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pipeline</div>
+                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Pipeline</div>
                       <div className="text-sm font-black text-slate-900">{formatCurrency(pipeVal)}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Deals</div>
+                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Active Deals</div>
                       <div className="text-sm font-black text-slate-900">{activeDeals.length}</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Card Footer */}
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
+                <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold">
                     <Users className="w-3.5 h-3.5 text-slate-400" />
                     <span>{contacts.length} Contacts</span>
                   </div>
 
-                  <span className="text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
+                  <span className="text-xs font-bold text-[#DC2626] group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
                     <span>Open 360</span>
                     <ChevronRight className="w-4 h-4" />
                   </span>
@@ -824,7 +866,7 @@ export default function Accounts() {
                 <button
                   type="submit"
                   disabled={createAccountMutation.isPending}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold shadow-md shadow-blue-500/25 transition-all cursor-pointer flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold shadow-md active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   {createAccountMutation.isPending && (
                     <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
