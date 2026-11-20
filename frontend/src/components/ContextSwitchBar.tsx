@@ -79,8 +79,8 @@ export function ContextSwitchBar() {
                 to="/leads"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/leads")
-                    ? "bg-[#45142B] text-white shadow-xs font-extrabold"
-                    : "text-[#551938]/85 hover:text-[#45142B] hover:bg-white"
+                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    : "text-[#551938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
                 <span>1. Leads</span>
@@ -91,8 +91,8 @@ export function ContextSwitchBar() {
                 to="/site-inspections"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/site-inspections")
-                    ? "bg-[#45142B] text-white shadow-xs font-extrabold"
-                    : "text-[#551938]/85 hover:text-[#45142B] hover:bg-white"
+                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    : "text-[#551938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
                 <span>2. Sizing</span>
@@ -111,8 +111,8 @@ export function ContextSwitchBar() {
                 to="/pipeline"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/pipeline") || currentPath.startsWith("/opportunities")
-                    ? "bg-[#45142B] text-white shadow-xs font-extrabold"
-                    : "text-[#7A1938]/85 hover:text-[#45142B] hover:bg-white"
+                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    : "text-[#7A1938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
                 <span>3. Pipeline</span>
@@ -123,8 +123,8 @@ export function ContextSwitchBar() {
                 to="/rental-cpq/builder"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/rental-cpq")
-                    ? "bg-[#45142B] text-white shadow-xs font-extrabold"
-                    : "text-[#7A1938]/85 hover:text-[#45142B] hover:bg-white"
+                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    : "text-[#7A1938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
                 <span>4. Rental CPQ</span>
@@ -135,8 +135,8 @@ export function ContextSwitchBar() {
                 to="/credit-kyc"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/credit-kyc")
-                    ? "bg-[#45142B] text-white shadow-xs font-extrabold"
-                    : "text-[#7A1938]/85 hover:text-[#45142B] hover:bg-white"
+                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    : "text-[#7A1938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
                 <span>5. Credit & KYC</span>
@@ -147,8 +147,8 @@ export function ContextSwitchBar() {
                 to="/rental-contracts"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/rental-contracts")
-                    ? "bg-[#45142B] text-white shadow-xs font-extrabold"
-                    : "text-[#7A1938]/85 hover:text-[#45142B] hover:bg-white"
+                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    : "text-[#7A1938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
                 <span>6. Contracts</span>
@@ -167,8 +167,8 @@ export function ContextSwitchBar() {
                 to="/fleet-availability"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/fleet-availability")
-                    ? "bg-[#45142B] text-white shadow-xs font-extrabold"
-                    : "text-[#2C4830]/85 hover:text-[#1F3322] hover:bg-white"
+                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    : "text-[#2C4830]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
                 <span>7. Fleet Dispatch</span>
@@ -182,8 +182,8 @@ export function ContextSwitchBar() {
                 to="/approvals"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/approvals")
-                    ? "bg-[#45142B] text-white shadow-xs font-extrabold"
-                    : "text-slate-700 hover:text-slate-900 hover:bg-white"
+                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    : "text-slate-700 hover:text-sky-900 hover:bg-white"
                 }`}
               >
                 <span>8. Approvals</span>
@@ -202,7 +202,7 @@ export function ContextSwitchBar() {
               to="/accounts"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/accounts")
-                  ? "bg-[#45142B] text-white shadow-xs font-extrabold"
+                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -214,7 +214,7 @@ export function ContextSwitchBar() {
               to="/contacts"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/contacts")
-                  ? "bg-[#45142B] text-white shadow-xs font-extrabold"
+                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -226,7 +226,7 @@ export function ContextSwitchBar() {
               to="/salespersons"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/salespersons")
-                  ? "bg-[#45142B] text-white shadow-xs font-extrabold"
+                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -238,7 +238,7 @@ export function ContextSwitchBar() {
               to="/work-orders"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/work-orders") || currentPath.startsWith("/purchase-orders")
-                  ? "bg-[#45142B] text-white shadow-xs font-extrabold"
+                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -258,7 +258,7 @@ export function ContextSwitchBar() {
               to="/settings"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath === "/settings"
-                  ? "bg-[#45142B] text-white shadow-xs font-extrabold"
+                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -270,7 +270,7 @@ export function ContextSwitchBar() {
               to="/master-data/requirements"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/master-data/requirements")
-                  ? "bg-[#45142B] text-white shadow-xs font-extrabold"
+                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -282,7 +282,7 @@ export function ContextSwitchBar() {
               to="/master-data/line-items"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/master-data/line-items")
-                  ? "bg-[#45142B] text-white shadow-xs font-extrabold"
+                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -293,7 +293,7 @@ export function ContextSwitchBar() {
               to="/master-data/pricing"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/master-data/pricing")
-                  ? "bg-[#45142B] text-white shadow-xs font-extrabold"
+                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >

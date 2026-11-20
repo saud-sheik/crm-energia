@@ -902,25 +902,25 @@ export default function FleetAvailabilityDesk() {
       {/* 3. ZONE 2: PERFORMANCE SHOWCASE GRID (MAROON & BENTO ACCENTS) */}
       <section className="relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-          {/* A. Left Maroon Gradient Speedometer Card (lg:col-span-4) */}
+          {/* A. Left Sky Blue Speedometer Card (lg:col-span-4) */}
           <div
             onClick={() => setIsDiagnosticsModalOpen(true)}
-            className="lg:col-span-4 rounded-[24px] bg-gradient-to-b from-[#4A152E] via-[#380E22] to-[#240816] text-white p-5 shadow-[0_16px_36px_-8px_rgba(69,20,43,0.35)] relative overflow-hidden flex flex-col justify-between cursor-pointer group hover:scale-[1.01] transition-transform border border-rose-500/20"
+            className="lg:col-span-4 rounded-[24px] bg-gradient-to-b from-[#7BBDE8] via-[#65AEE4] to-[#4F9FDA] text-slate-900 p-5 shadow-[0_16px_36px_-8px_rgba(123,189,232,0.35)] relative overflow-hidden flex flex-col justify-between cursor-pointer group hover:scale-[1.01] transition-transform border border-sky-300/50"
           >
             {/* Ambient Background Warm Glow */}
-            <div className="absolute top-0 right-0 w-36 h-36 bg-[#ED1A53]/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-36 h-36 bg-white/20 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="flex items-center justify-between relative z-10 pb-2 border-b border-white/10">
+            <div className="flex items-center justify-between relative z-10 pb-2 border-b border-sky-300/40">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-sm shadow-amber-400/50" />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-300 animate-pulse shadow-sm shadow-amber-300/50" />
                 <div>
-                  <span className="text-xs sm:text-[13px] font-black tracking-wider uppercase text-white block leading-tight">
+                  <span className="text-xs sm:text-[13px] font-black tracking-wider uppercase text-sky-950 block leading-tight">
                     Active Fleet Performance
                   </span>
-                  <span className="text-[10px] font-medium text-rose-200/80">Real-time Load Balancing</span>
+                  <span className="text-[10px] font-semibold text-sky-950/75">Real-time Load Balancing</span>
                 </div>
               </div>
-              <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-rose-200 group-hover:bg-white/20 transition">
+              <div className="w-7 h-7 rounded-full bg-white/30 flex items-center justify-center text-sky-950 group-hover:bg-white/40 transition">
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </div>
             </div>
@@ -934,7 +934,7 @@ export default function FleetAvailabilityDesk() {
                     cy="80"
                     r="62"
                     fill="transparent"
-                    stroke="rgba(255, 255, 255, 0.15)"
+                    stroke="rgba(255, 255, 255, 0.4)"
                     strokeWidth="13"
                     strokeDasharray="390"
                     strokeDashoffset="195"
@@ -954,8 +954,8 @@ export default function FleetAvailabilityDesk() {
                   />
                 </svg>
                 <div className="absolute bottom-1 flex flex-col items-center">
-                  <span className="text-2xl font-black tracking-tight text-white">90%</span>
-                  <span className="text-[9px] font-bold text-rose-200/90 uppercase tracking-widest">
+                  <span className="text-2xl font-black tracking-tight text-sky-950">90%</span>
+                  <span className="text-[9px] font-extrabold text-sky-950/80 uppercase tracking-widest">
                     Load Factor
                   </span>
                 </div>
@@ -963,8 +963,8 @@ export default function FleetAvailabilityDesk() {
             </div>
 
             {/* Bottom Financial & Asset Stat -> Navigates to /invoices */}
-            <div className="relative z-10 border-t border-white/10 pt-3">
-              <span className="text-[11px] text-rose-200 font-bold uppercase tracking-wider block">
+            <div className="relative z-10 border-t border-sky-300/40 pt-3">
+              <span className="text-[11px] text-sky-950/80 font-bold uppercase tracking-wider block">
                 Total Active Contract Valuation
               </span>
               <div
@@ -972,19 +972,19 @@ export default function FleetAvailabilityDesk() {
                   e.stopPropagation();
                   navigate("/invoices");
                 }}
-                className="text-2xl font-black text-white tracking-tight mt-0.5 hover:text-rose-200 transition"
+                className="text-2xl font-black text-sky-950 tracking-tight mt-0.5 hover:text-white transition"
                 title="Open Invoices & Billing Desk"
               >
                 SAR 24,850,000
               </div>
-              <div className="flex items-center justify-between text-[10px] text-rose-200/80 mt-1">
+              <div className="flex items-center justify-between text-[10px] text-sky-950/80 mt-1">
                 <span>342 Units Dispatched • GPS Sat: Locked</span>
                 <span
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsDiagnosticsModalOpen(true);
                   }}
-                  className="text-amber-400 font-bold group-hover:underline"
+                  className="text-amber-800 font-extrabold group-hover:underline"
                 >
                   Deep Diagnostics ↗
                 </span>
@@ -1101,11 +1101,11 @@ export default function FleetAvailabilityDesk() {
               </button>
             </div>
 
-            {/* Floating Tooltip Pill (Maroon Styled) */}
+            {/* Floating Tooltip Pill (Sky Blue Styled) */}
             <div className="relative mt-4 mb-1">
-              <div className="absolute -top-6 left-[22%] -translate-x-1/2 bg-[#45142B] text-white text-[9px] font-bold px-2 py-0.5 rounded shadow-md flex items-center gap-1 z-10 pointer-events-none">
+              <div className="absolute -top-6 left-[22%] -translate-x-1/2 bg-[#7BBDE8] text-sky-950 text-[9px] font-black px-2 py-0.5 rounded shadow-md flex items-center gap-1 z-10 pointer-events-none border border-sky-300">
                 <span>Mar 2026: 90% Peak</span>
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#45142B] rotate-45" />
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#7BBDE8] rotate-45 border-r border-b border-sky-300" />
               </div>
 
               {/* 8 Modern Rounded Vertical Pillars */}
@@ -1126,14 +1126,14 @@ export default function FleetAvailabilityDesk() {
                         style={{ height: bar.height }}
                         className={`w-full rounded-full transition-all duration-300 group-hover:opacity-90 ${
                           bar.active
-                            ? "bg-gradient-to-t from-[#ED1A53] via-[#7D224D] to-[#45142B] shadow-md shadow-[#ED1A53]/30"
-                            : "bg-[#EEDFE5] hover:bg-[#E2CBD6] dark:bg-slate-800"
+                            ? "bg-gradient-to-t from-[#7BBDE8] via-[#5BA4DC] to-[#3B8BC8] shadow-md shadow-[#7BBDE8]/30"
+                            : "bg-[#E1EFF8] hover:bg-[#D0E5F5] dark:bg-slate-800"
                         }`}
                       />
                     </div>
                     <span
                       className={`text-[10px] font-semibold ${
-                        bar.active ? "text-[#ED1A53] dark:text-rose-400 font-bold" : "text-slate-400"
+                        bar.active ? "text-[#3B8BC8] dark:text-sky-400 font-extrabold" : "text-slate-400"
                       }`}
                     >
                       {bar.month}
@@ -2038,8 +2038,8 @@ export default function FleetAvailabilityDesk() {
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#45142B] to-[#7D224D] text-white flex items-center justify-center shadow-md">
-                  <Activity className="w-5 h-5 text-rose-300" />
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#7BBDE8] to-[#4F9FDA] text-sky-950 flex items-center justify-center shadow-md">
+                  <Activity className="w-5 h-5 text-sky-950" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
@@ -2065,30 +2065,30 @@ export default function FleetAvailabilityDesk() {
             </div>
 
             {/* Asset Identity & Active Deployment Banner */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-[#45142B] via-[#5A1938] to-[#45142B] text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-[#7BBDE8] via-[#65AEE4] to-[#4F9FDA] text-sky-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-md bg-white/15 text-[11px] font-mono font-bold">
+                  <span className="px-2 py-0.5 rounded-md bg-white/40 text-[11px] font-mono font-bold text-sky-950">
                     {selectedAsset.code}
                   </span>
-                  <span className="text-sm font-black text-white">{selectedAsset.model}</span>
-                  <span className="text-xs text-rose-200/80">• {selectedAsset.ratingKva} kVA Prime Power</span>
+                  <span className="text-sm font-black text-sky-950">{selectedAsset.model}</span>
+                  <span className="text-xs text-sky-900">• {selectedAsset.ratingKva} kVA Prime Power</span>
                 </div>
-                <div className="text-xs text-rose-100/70 mt-1 flex items-center gap-2">
+                <div className="text-xs text-sky-900 mt-1 flex items-center gap-2">
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-rose-300" />
-                    Hub: <strong className="text-white">{selectedAsset.hub}</strong>
+                    <MapPin className="w-3 h-3 text-sky-900" />
+                    Hub: <strong className="text-sky-950">{selectedAsset.hub}</strong>
                   </span>
                   <span>•</span>
-                  <span>Active Project: <strong className="text-white">Aramco Khurais PKG-4 (#ARM-9021)</strong></span>
+                  <span>Active Project: <strong className="text-sky-950">Aramco Khurais PKG-4 (#ARM-9021)</strong></span>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-800 border border-emerald-400/30 text-xs font-bold flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
                   {selectedAsset.status}
                 </span>
-                <span className="px-2.5 py-1 rounded-full bg-white/10 text-rose-100 text-xs font-mono font-bold">
+                <span className="px-2.5 py-1 rounded-full bg-white/40 text-sky-950 text-xs font-mono font-bold">
                   Day 42 / 180
                 </span>
               </div>
@@ -2123,9 +2123,9 @@ export default function FleetAvailabilityDesk() {
                 <svg className="w-full h-full" viewBox="0 0 800 160" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="telemetryGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ED1A53" stopOpacity="0.45" />
-                      <stop offset="70%" stopColor="#45142B" stopOpacity="0.15" />
-                      <stop offset="100%" stopColor="#45142B" stopOpacity="0.0" />
+                      <stop offset="0%" stopColor="#7BBDE8" stopOpacity="0.65" />
+                      <stop offset="70%" stopColor="#7BBDE8" stopOpacity="0.2" />
+                      <stop offset="100%" stopColor="#7BBDE8" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
 
@@ -2293,9 +2293,9 @@ export default function FleetAvailabilityDesk() {
                     setIsDiagnosticsModalOpen(false);
                     setIsGanttModalOpen(true);
                   }}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#45142B] hover:bg-[#320e1f] text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#7BBDE8] hover:bg-[#65AEE4] text-sky-950 font-bold text-xs transition flex items-center gap-1.5 shadow-md"
                 >
-                  <Maximize2 className="w-3.5 h-3.5 text-rose-300" />
+                  <Maximize2 className="w-3.5 h-3.5 text-sky-900" />
                   <span>Master Gantt Matrix</span>
                 </button>
               </div>

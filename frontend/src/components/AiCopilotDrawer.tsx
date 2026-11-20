@@ -209,11 +209,11 @@ export function AiCopilotDrawer({ isOpen, onClose }: { isOpen: boolean; onClose:
         onClick={e => e.stopPropagation()}
       >
         
-        {/* Luxury Maroon Header */}
-        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-[#45142B] via-[#5C1A3C] to-[#360515] text-white shrink-0 shadow-sm">
+        {/* Luxury Sky Blue Header */}
+        <div className="p-4 border-b border-sky-300/40 flex items-center justify-between bg-gradient-to-r from-[#7BBDE8] via-[#65AEE4] to-[#519DDA] text-sky-950 shrink-0 shadow-sm">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-white/10 rounded-xl backdrop-blur-xs ring-1 ring-white/20 shadow-xs">
-              <Bot className="w-5 h-5 text-amber-300 animate-pulse" />
+            <div className="p-2 bg-white/40 rounded-xl backdrop-blur-xs ring-1 ring-white/60 shadow-xs text-sky-950">
+              <Bot className="w-5 h-5 text-amber-600 animate-pulse" />
             </div>
             <div>
               <h2 className="text-sm font-extrabold flex items-center gap-2">

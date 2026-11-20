@@ -365,7 +365,7 @@ export function Layout() {
                         </span>
                       </div>
                     </div>
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#8F0D30] via-[#541837] to-[#360515] text-white font-extrabold text-xs flex items-center justify-center ring-2 ring-[#ED1A53]/30 shadow-sm shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#7BBDE8] to-[#4F9FDA] text-sky-950 font-black text-xs flex items-center justify-center ring-2 ring-[#7BBDE8]/40 shadow-sm shrink-0">
                       {initials}
                     </div>
                   </div>
