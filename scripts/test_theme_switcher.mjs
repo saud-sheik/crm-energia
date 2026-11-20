@@ -18,17 +18,17 @@ async function run() {
     await page.waitForTimeout(1000);
   }
 
-  // Set localStorage to expanded and ruby theme initially
+  // Set localStorage to expanded and sky blue theme initially
   await page.evaluate(() => {
     localStorage.setItem("sidebar_collapsed", "false");
-    localStorage.setItem("sidebar_theme", "ruby");
+    localStorage.setItem("sidebar_theme", "sky");
   });
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForTimeout(1000);
 
-  // 1. Take screenshot with Electric Ruby theme (expanded)
-  console.log("Capturing Electric Ruby expanded state...");
-  await page.screenshot({ path: path.join(artifactDir, "test_theme_ruby_expanded.png") });
+  // 1. Take screenshot with Sky Blue theme (expanded)
+  console.log("Capturing Sky Blue expanded state...");
+  await page.screenshot({ path: path.join(artifactDir, "test_theme_sky_expanded.png") });
 
   // 2. Click Velvet Maroon switcher button
   console.log("Switching to Velvet Maroon...");
@@ -38,19 +38,19 @@ async function run() {
   console.log("Capturing Velvet Maroon expanded state...");
   await page.screenshot({ path: path.join(artifactDir, "test_theme_velvet_expanded.png") });
 
-  // 3. Switch back to Electric Ruby
-  console.log("Switching back to Electric Ruby...");
-  const rubyBtn = page.getByRole("button", { name: /Electric Ruby/i });
-  await rubyBtn.click();
+  // 3. Switch back to Sky Blue
+  console.log("Switching back to Sky Blue...");
+  const skyBtn = page.getByRole("button", { name: /Sky Blue/i });
+  await skyBtn.click();
   await page.waitForTimeout(600);
 
   // 4. Test Collapse Sidebar
-  console.log("Testing Collapse Sidebar in Electric Ruby...");
+  console.log("Testing Collapse Sidebar in Sky Blue...");
   const collapseBtn = page.getByTitle("Collapse sidebar");
   await collapseBtn.click();
   await page.waitForTimeout(600);
-  console.log("Capturing Electric Ruby collapsed state...");
-  await page.screenshot({ path: path.join(artifactDir, "test_theme_ruby_collapsed.png") });
+  console.log("Capturing Sky Blue collapsed state...");
+  await page.screenshot({ path: path.join(artifactDir, "test_theme_sky_collapsed.png") });
 
   // 5. Test Theme Toggle in Collapsed state
   console.log("Testing Theme Toggle in Collapsed state (Palette icon)...");
@@ -60,7 +60,7 @@ async function run() {
   console.log("Capturing Velvet Maroon collapsed state...");
   await page.screenshot({ path: path.join(artifactDir, "test_theme_velvet_collapsed.png") });
 
-  // Toggle back to Ruby in Collapsed state
+  // Toggle back to Sky Blue in Collapsed state
   await paletteBtn.click();
   await page.waitForTimeout(600);
 
@@ -74,8 +74,8 @@ async function run() {
   const leadsLink = page.getByRole("link", { name: /1\. Inbound Leads/i });
   await leadsLink.click();
   await page.waitForTimeout(1000);
-  console.log("Capturing Leads navigated page in Electric Ruby...");
-  await page.screenshot({ path: path.join(artifactDir, "test_theme_ruby_leads_navigated.png") });
+  console.log("Capturing Leads navigated page in Sky Blue...");
+  await page.screenshot({ path: path.join(artifactDir, "test_theme_sky_leads_navigated.png") });
 
   console.log("All verifications passed perfectly!");
   await browser.close();
