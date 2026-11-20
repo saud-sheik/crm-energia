@@ -1030,38 +1030,42 @@ export default function FleetAvailabilityDesk() {
               </div>
             </div>
 
-            {/* Bottom Stacked Card: Live Fleet Asset Value (Industrial Sage Card) */}
+            {/* Bottom Stacked Card: Yard Readiness & PM Overhaul (Industrial Reserve Desk) */}
             <div
               onClick={() => navigate("/assets")}
               className="flex-1 p-4 rounded-[20px] bg-white dark:bg-slate-900 border-2 border-[#D6DFD6] dark:border-[#2C4830]/40 hover:border-[#2C4830] shadow-[0_6px_20px_rgba(44,82,52,0.05)] hover:shadow-[0_10px_28px_rgba(44,82,52,0.12)] flex flex-col justify-between cursor-pointer transition"
-              title="Open Equipment Asset Tracking Registry"
+              title="Inspect 38 Standby Units: 26 Dispatch-Ready in Yard vs 12 in 250h PM Service"
             >
               {/* Distinct High-Contrast Header Bar */}
               <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200/60 flex items-center justify-center text-[#ED1A53] shadow-sm">
-                    <Activity className="w-4 h-4 stroke-[2.5]" />
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/60 flex items-center justify-center text-emerald-600 shadow-sm">
+                    <Wrench className="w-4 h-4 stroke-[2.5]" />
                   </div>
                   <div>
                     <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white block leading-tight">
-                      Fleet Asset Value
+                      Yard Readiness
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Capital Asset Registry</span>
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Standby & PM Overhaul</span>
                   </div>
                 </div>
-                <div className="w-7 h-7 rounded-full border-2 border-[#ED1A53]/30 border-t-[#ED1A53] flex items-center justify-center text-[10px] font-black text-[#ED1A53]">
-                  85%
-                </div>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-black border border-emerald-200">
+                  26 Ready
+                </span>
               </div>
 
               {/* Big Bold Metric */}
               <div className="my-2">
-                <div className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                  SAR 82.4M
+                <div className="text-2xl font-black text-slate-900 dark:text-white leading-tight flex items-baseline gap-1.5">
+                  <span>26</span>
+                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">Deployable</span>
+                  <span className="text-slate-300 dark:text-slate-600 mx-1">•</span>
+                  <span className="text-base font-extrabold text-amber-600 dark:text-amber-400">12</span>
+                  <span className="text-xs font-bold text-slate-400">in Shop</span>
                 </div>
                 <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1">
-                  <span>Fuel Avg: <b className="text-slate-700 dark:text-slate-300">82%</b></span>
-                  <span className="text-emerald-600 font-bold">0 Overheats</span>
+                  <span>Mob SLA: <b className="text-slate-700 dark:text-slate-300">&lt;4 hrs</b></span>
+                  <span className="text-emerald-600 font-bold">100% PM Compliant</span>
                 </div>
               </div>
             </div>
@@ -1082,7 +1086,7 @@ export default function FleetAvailabilityDesk() {
                   <h3 className="font-black text-slate-900 dark:text-white text-xs sm:text-[13px] uppercase tracking-wider">
                     Fleet Utilization Trend
                   </h3>
-                  <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Monthly Average Dispatch Load (Feb–Sep)</span>
+                  <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Monthly Average Dispatch Load • Q2 Off-Hire Horizon</span>
                 </div>
               </div>
               <button
@@ -1141,7 +1145,7 @@ export default function FleetAvailabilityDesk() {
 
             {/* Bottom Insight */}
             <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Peak: <b className="text-slate-700 dark:text-slate-200">March (90%)</b> • 38 Standby Margin</span>
+              <span>Peak: <b className="text-slate-700 dark:text-slate-200">March (90%)</b> • 14 Off-Hire Expirations (42 MVA) in Q2</span>
               <span className="text-[#ED1A53] dark:text-rose-400 font-bold hover:underline flex items-center gap-0.5">
                 <span>12-Week Gantt</span>
                 <ArrowUpRight className="w-3 h-3" />
