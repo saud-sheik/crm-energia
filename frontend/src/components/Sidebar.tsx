@@ -5,7 +5,7 @@ import {
   Users, BarChart, Settings, Clock, ChevronLeft, 
   ChevronRight, MessageSquare, CheckSquare, Search, Bell, Sparkles, LogOut, ChevronDown, Layers, Package, Building2, LifeBuoy, Target,
   UserCheck, Shield, Briefcase, Megaphone, Wrench, ShieldAlert, Zap, FileCheck, CalendarClock, ShieldCheck,
-  Bot
+  Bot, Palette
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
@@ -48,6 +48,18 @@ export function Sidebar({
     const saved = localStorage.getItem("sidebar_collapsed");
     return saved !== null ? saved === "true" : false;
   });
+
+  type SidebarTheme = "velvet" | "ruby";
+
+  const [sidebarTheme, setSidebarTheme] = useState<SidebarTheme>(() => {
+    const saved = localStorage.getItem("sidebar_theme");
+    return (saved === "velvet" || saved === "ruby") ? (saved as SidebarTheme) : "ruby";
+  });
+
+  const toggleTheme = (newTheme: SidebarTheme) => {
+    setSidebarTheme(newTheme);
+    localStorage.setItem("sidebar_theme", newTheme);
+  };
 
   const [showClockPopover, setShowClockPopover] = useState(false);
   const [hoveredPillar, setHoveredPillar] = useState<string | null>(null);
@@ -187,14 +199,28 @@ export function Sidebar({
 
   return (
     <aside
-      className={`flex flex-col justify-between transition-all duration-300 select-none bg-[#45142B] text-slate-100 shrink-0 ${
+      className={`flex flex-col justify-between transition-all duration-300 select-none text-slate-100 shrink-0 ${
+        sidebarTheme === "ruby"
+          ? "bg-gradient-to-b from-[#ED1A53] via-[#DC1449] to-[#B00F38]"
+          : "bg-[#45142B]"
+      } ${
         isCollapsed
-          ? "w-[72px] my-3 ml-3 rounded-[32px] border border-[#ED1A53]/30 shadow-[0_16px_40px_rgba(69,20,43,0.35)] h-[calc(100%-24px)]"
-          : "w-64 my-3 ml-3 rounded-[28px] border border-[#ED1A53]/30 shadow-[0_16px_40px_rgba(69,20,43,0.35)] h-[calc(100%-24px)]"
+          ? `w-[72px] my-3 ml-3 rounded-[32px] border ${
+              sidebarTheme === "ruby"
+                ? "border-rose-400/40 shadow-[0_16px_40px_rgba(237,26,83,0.35)]"
+                : "border-[#ED1A53]/30 shadow-[0_16px_40px_rgba(69,20,43,0.35)]"
+            } h-[calc(100%-24px)]`
+          : `w-64 my-3 ml-3 rounded-[28px] border ${
+              sidebarTheme === "ruby"
+                ? "border-rose-400/40 shadow-[0_16px_40px_rgba(237,26,83,0.35)]"
+                : "border-[#ED1A53]/30 shadow-[0_16px_40px_rgba(69,20,43,0.35)]"
+            } h-[calc(100%-24px)]`
       }`}
     >
       {/* Sidebar Header */}
-      <div className="p-3.5 border-b border-[#5e1c3b] space-y-3 relative z-10">
+      <div className={`p-3.5 border-b space-y-2.5 relative z-10 ${
+        sidebarTheme === "ruby" ? "border-white/20" : "border-[#5e1c3b]"
+      }`}>
         <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"}`}>
           {!isCollapsed ? (
             <div className="flex items-center gap-2.5">
@@ -207,11 +233,17 @@ export function Sidebar({
                 />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[9px] font-black uppercase tracking-wider text-rose-200/90 leading-tight">
+                <span className={`text-[9px] font-black uppercase tracking-wider leading-tight ${
+                  sidebarTheme === "ruby" ? "text-rose-100" : "text-rose-200/90"
+                }`}>
                   KSA Operations
                 </span>
-                <span className="text-[10px] font-extrabold text-[#ED1A53] tracking-wider uppercase mt-0.5 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#ED1A53] animate-pulse" />
+                <span className={`text-[10px] font-extrabold tracking-wider uppercase mt-0.5 flex items-center gap-1.5 ${
+                  sidebarTheme === "ruby" ? "text-white" : "text-[#ED1A53]"
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    sidebarTheme === "ruby" ? "bg-white animate-pulse" : "bg-[#ED1A53] animate-pulse"
+                  }`} />
                   Fleet Core
                 </span>
               </div>
@@ -230,21 +262,70 @@ export function Sidebar({
           )}
         </div>
 
+        {/* Theme Color Switcher (Velvet Maroon vs Electric Ruby) */}
+        {!isCollapsed ? (
+          <div className="flex items-center bg-black/25 p-1 rounded-xl border border-white/15">
+            <button
+              type="button"
+              onClick={() => toggleTheme("ruby")}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1 px-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                sidebarTheme === "ruby"
+                  ? "bg-white text-[#ED1A53] shadow-sm font-black"
+                  : "text-white/70 hover:text-white"
+              }`}
+              title="Switch to Electric Ruby (Option 3)"
+            >
+              <span className="w-2 h-2 rounded-full bg-[#ED1A53] shrink-0" />
+              <span>Electric Ruby</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleTheme("velvet")}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1 px-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                sidebarTheme === "velvet"
+                  ? "bg-white text-[#45142B] shadow-sm font-black"
+                  : "text-white/70 hover:text-white"
+              }`}
+              title="Switch to Classic Velvet Maroon"
+            >
+              <span className="w-2 h-2 rounded-full bg-[#45142B] border border-white/40 shrink-0" />
+              <span>Velvet Maroon</span>
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center pt-0.5">
+            <button
+              type="button"
+              onClick={() => toggleTheme(sidebarTheme === "ruby" ? "velvet" : "ruby")}
+              className="w-10 h-7 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs"
+              title={`Theme Switcher: Active is ${sidebarTheme === "ruby" ? "Electric Ruby" : "Velvet Maroon"}. Click to toggle.`}
+            >
+              <Palette className="w-3.5 h-3.5 text-white/90" />
+            </button>
+          </div>
+        )}
+
         {/* Global Search & AI Quick Triggers in Sidebar */}
         <div className="space-y-1.5 pt-0.5">
           {onOpenSearch && (
             <button
               onClick={onOpenSearch}
-              className={`w-full flex items-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/15 text-white/90 hover:text-white border border-white/10 shadow-2xs rounded-xl px-2.5 py-2 text-xs font-bold transition-all group cursor-pointer ${
+              className={`w-full flex items-center gap-2 ${
+                sidebarTheme === "ruby"
+                  ? "bg-white/15 hover:bg-white/25 border-white/20 text-white"
+                  : "bg-white/10 hover:bg-white/15 border-white/10 text-white/90"
+              } backdrop-blur-md hover:text-white border shadow-2xs rounded-xl px-2.5 py-2 text-xs font-bold transition-all group cursor-pointer ${
                 isCollapsed ? "justify-center" : ""
               }`}
               title="Search (Ctrl+K)"
             >
-              <Search className="w-3.5 h-3.5 text-[#ED1A53] shrink-0" />
+              <Search className={`w-3.5 h-3.5 shrink-0 ${sidebarTheme === "ruby" ? "text-white" : "text-[#ED1A53]"}`} />
               {!isCollapsed && (
                 <div className="flex-1 flex justify-between items-center">
-                  <span className="text-white/70 font-semibold">Search...</span>
-                  <kbd className="px-1.5 py-0.5 text-[9px] font-mono bg-white/10 border border-white/20 rounded text-white/70">Ctrl+K</kbd>
+                  <span className={`${sidebarTheme === "ruby" ? "text-white/80" : "text-white/70"} font-semibold`}>Search...</span>
+                  <kbd className={`px-1.5 py-0.5 text-[9px] font-mono ${
+                    sidebarTheme === "ruby" ? "bg-white/20 border-white/30 text-white/90" : "bg-white/10 border-white/20 text-white/70"
+                  } border rounded`}>Ctrl+K</kbd>
                 </div>
               )}
             </button>
@@ -254,7 +335,11 @@ export function Sidebar({
             {onOpenAi && (
               <button
                 onClick={onOpenAi}
-                className={`w-full flex items-center justify-between bg-white/10 backdrop-blur-md hover:bg-white/15 text-white border border-white/10 shadow-2xs rounded-xl px-2.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                className={`w-full flex items-center justify-between ${
+                  sidebarTheme === "ruby"
+                    ? "bg-white/15 hover:bg-white/25 border-white/20"
+                    : "bg-white/10 hover:bg-white/15 border-white/10"
+                } backdrop-blur-md text-white border shadow-2xs rounded-xl px-2.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
                   isCollapsed ? "justify-center" : ""
                 }`}
                 title="Volvi Copilot (Industrial RAG & Alerts)"
@@ -264,7 +349,9 @@ export function Sidebar({
                   {!isCollapsed && <span className="font-extrabold text-white">Volvi Copilot</span>}
                 </div>
                 {!isCollapsed && unreadCount > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full bg-[#ED1A53] text-white text-[9px] font-black shadow-xs">
+                  <span className={`px-1.5 py-0.2 rounded-full ${
+                    sidebarTheme === "ruby" ? "bg-white text-[#ED1A53]" : "bg-[#ED1A53] text-white"
+                  } text-[9px] font-black shadow-xs`}>
                     {unreadCount}
                   </span>
                 )}
@@ -298,8 +385,12 @@ export function Sidebar({
                   to={targetPath}
                   className={`w-11 h-11 rounded-[16px] flex items-center justify-center transition-all duration-200 cursor-pointer ${
                     isItemActive
-                      ? "bg-gradient-to-tr from-[#ED1A53] via-[#DC1449] to-[#B00F38] text-white shadow-md shadow-[#ED1A53]/40 border border-white/25 scale-105"
-                      : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-white/10 hover:scale-105"
+                      ? sidebarTheme === "ruby"
+                        ? "bg-white text-[#ED1A53] shadow-md shadow-black/20 border border-white scale-105"
+                        : "bg-gradient-to-tr from-[#ED1A53] via-[#DC1449] to-[#B00F38] text-white shadow-md shadow-[#ED1A53]/40 border border-white/25 scale-105"
+                      : sidebarTheme === "ruby"
+                        ? "bg-white/15 hover:bg-white/25 text-white/90 hover:text-white border border-white/20 hover:scale-105"
+                        : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-white/10 hover:scale-105"
                   }`}
                   title={item.label}
                 >
@@ -330,7 +421,9 @@ export function Sidebar({
                             to={sub.path}
                             className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                               isSubActive
-                                ? "bg-[#45142B] text-white shadow-2xs font-extrabold"
+                                ? sidebarTheme === "ruby"
+                                  ? "bg-[#ED1A53] text-white shadow-2xs font-extrabold"
+                                  : "bg-[#45142B] text-white shadow-2xs font-extrabold"
                                 : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                             }`}
                           >
@@ -359,8 +452,12 @@ export function Sidebar({
                 key={item.label} 
                 className={`rounded-2xl transition-all duration-200 ${
                   isItemActive 
-                    ? "bg-[#5C1A3C] border border-[#ED1A53]/50 shadow-md" 
-                    : "bg-[#501533]/80 hover:bg-[#5C1A3C] border border-[#7A244E]/40 shadow-2xs"
+                    ? sidebarTheme === "ruby"
+                      ? "bg-black/15 border border-white/25 shadow-md"
+                      : "bg-[#5C1A3C] border border-[#ED1A53]/50 shadow-md" 
+                    : sidebarTheme === "ruby"
+                      ? "bg-black/10 hover:bg-black/15 border border-white/10 shadow-2xs"
+                      : "bg-[#501533]/80 hover:bg-[#5C1A3C] border border-[#7A244E]/40 shadow-2xs"
                 } p-1.5`}
               >
                 <button
@@ -368,7 +465,9 @@ export function Sidebar({
                   onClick={() => toggleDropdown(item.label)}
                   className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl font-bold text-xs transition-all group cursor-pointer ${
                     isItemActive
-                      ? "text-white bg-[#6E1C47]/60 shadow-2xs"
+                      ? sidebarTheme === "ruby"
+                        ? "text-white bg-white/20 shadow-xs font-black"
+                        : "text-white bg-[#6E1C47]/60 shadow-2xs"
                       : "text-white/90 hover:text-white hover:bg-white/10"
                   }`}
                 >
@@ -376,19 +475,25 @@ export function Sidebar({
                     <div className={`p-1.5 rounded-lg transition-colors ${
                       isItemActive 
                         ? "text-[#ED1A53] bg-white shadow-2xs" 
-                        : "text-white/90 group-hover:text-white bg-white/10 shadow-2xs"
+                        : sidebarTheme === "ruby"
+                          ? "text-white bg-white/15 shadow-2xs"
+                          : "text-white/90 group-hover:text-white bg-white/10 shadow-2xs"
                     }`}>
                       <Icon className="w-3.5 h-3.5" />
                     </div>
                     <span className="truncate font-extrabold">{item.label}</span>
                   </div>
 
-                  <ChevronDown className={`w-3.5 h-3.5 text-white/60 transition-transform duration-200 ${isDropdownOpen ? "rotate-0" : "-rotate-90"}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 ${sidebarTheme === "ruby" ? "text-white/80" : "text-white/60"} transition-transform duration-200 ${isDropdownOpen ? "rotate-0" : "-rotate-90"}`} />
                 </button>
 
                 {/* Sub-items list */}
                 {isDropdownOpen && (
-                  <div className="mt-1.5 space-y-1 p-1 bg-[#340C20] rounded-xl border border-[#5E163B]/60 shadow-inner">
+                  <div className={`mt-1.5 space-y-1 p-1 rounded-xl shadow-inner ${
+                    sidebarTheme === "ruby"
+                      ? "bg-black/20 border border-white/15"
+                      : "bg-[#340C20] border border-[#5E163B]/60"
+                  }`}>
                     {item.subItems!.map((sub) => {
                       const SubIcon = sub.icon;
                       const isSubActive = location.pathname === sub.path || (sub.path !== "/" && location.pathname.startsWith(sub.path));
@@ -399,8 +504,12 @@ export function Sidebar({
                           to={sub.path}
                           className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                             isSubActive
-                              ? "bg-gradient-to-r from-[#ED1A53] via-[#DC1449] to-[#B00F38] text-white shadow-md shadow-[#ED1A53]/30 font-extrabold border border-white/20"
-                              : "text-white/80 hover:text-white hover:bg-white/10"
+                              ? sidebarTheme === "ruby"
+                                ? "bg-white text-[#ED1A53] shadow-md shadow-black/15 font-black border border-white/90"
+                                : "bg-gradient-to-r from-[#ED1A53] via-[#DC1449] to-[#B00F38] text-white shadow-md shadow-[#ED1A53]/30 font-extrabold border border-white/20"
+                              : sidebarTheme === "ruby"
+                                ? "text-white/85 hover:text-white hover:bg-white/15 font-semibold"
+                                : "text-white/80 hover:text-white hover:bg-white/10"
                           }`}
                         >
                           <div className="flex items-center gap-2 min-w-0">
@@ -409,7 +518,9 @@ export function Sidebar({
                           </div>
                           {sub.badge && (
                             <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
-                              isSubActive ? "bg-white text-[#ED1A53]" : "bg-rose-500 text-white"
+                              isSubActive 
+                                ? sidebarTheme === "ruby" ? "bg-[#ED1A53] text-white" : "bg-white text-[#ED1A53]" 
+                                : "bg-rose-500 text-white"
                             }`}>
                               {sub.badge}
                             </span>
@@ -429,12 +540,18 @@ export function Sidebar({
               to={item.path!}
               className={`flex items-center gap-2.5 px-3 py-2 rounded-2xl font-bold text-xs transition-all group cursor-pointer ${
                 isItemActive
-                  ? "bg-gradient-to-r from-[#ED1A53] via-[#DC1449] to-[#B00F38] text-white shadow-md shadow-[#ED1A53]/30 border border-white/20"
-                  : "bg-[#501533]/80 hover:bg-[#5C1A3C] text-white/90 hover:text-white border border-[#7A244E]/40 shadow-2xs"
+                  ? sidebarTheme === "ruby"
+                    ? "bg-white text-[#ED1A53] shadow-md shadow-black/15 border border-white/90 font-black"
+                    : "bg-gradient-to-r from-[#ED1A53] via-[#DC1449] to-[#B00F38] text-white shadow-md shadow-[#ED1A53]/30 border border-white/20"
+                  : sidebarTheme === "ruby"
+                    ? "bg-black/10 hover:bg-black/15 text-white/90 hover:text-white border border-white/10 shadow-2xs font-bold"
+                    : "bg-[#501533]/80 hover:bg-[#5C1A3C] text-white/90 hover:text-white border border-[#7A244E]/40 shadow-2xs font-bold"
               }`}
             >
               <div className={`p-1.5 rounded-lg transition-colors ${
-                isItemActive ? "text-white bg-white/20" : "text-white/80 group-hover:text-white bg-white/10 shadow-2xs"
+                isItemActive 
+                  ? sidebarTheme === "ruby" ? "text-[#ED1A53] bg-[#ED1A53]/15" : "text-white bg-white/20" 
+                  : sidebarTheme === "ruby" ? "text-white bg-white/15" : "text-white/80 group-hover:text-white bg-white/10 shadow-2xs"
               }`}>
                 <Icon className="w-3.5 h-3.5" />
               </div>
@@ -458,8 +575,12 @@ export function Sidebar({
             onClick={toggleCollapse}
             className={`transition-all duration-200 cursor-pointer flex items-center ${
               isCollapsed
-                ? "w-11 h-11 rounded-[16px] justify-center bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 hover:scale-105"
-                : "w-full gap-2.5 px-3 py-2 rounded-2xl bg-white/5 hover:bg-white/15 text-white/70 hover:text-white border border-white/10 text-xs font-bold"
+                ? sidebarTheme === "ruby"
+                  ? "w-11 h-11 rounded-[16px] justify-center bg-white/15 hover:bg-white/25 text-white border border-white/20 hover:scale-105"
+                  : "w-11 h-11 rounded-[16px] justify-center bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 hover:scale-105"
+                : sidebarTheme === "ruby"
+                  ? "w-full gap-2.5 px-3 py-2 rounded-2xl bg-white/15 hover:bg-white/25 text-white hover:text-white border border-white/20 text-xs font-bold"
+                  : "w-full gap-2.5 px-3 py-2 rounded-2xl bg-white/5 hover:bg-white/15 text-white/70 hover:text-white border border-white/10 text-xs font-bold"
             }`}
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
@@ -480,7 +601,11 @@ export function Sidebar({
         <Link
           to="/fleet-availability"
           title="Click to view Fleet Availability & Telemetry Desk"
-          className="mx-3 mb-2 p-3 bg-white/10 backdrop-blur-md hover:bg-white/15 rounded-2xl border border-white/15 shadow-2xs hover:shadow-md transition-all duration-300 block group cursor-pointer relative overflow-hidden z-10"
+          className={`mx-3 mb-2 p-3 ${
+            sidebarTheme === "ruby"
+              ? "bg-white/15 hover:bg-white/20 border-white/25"
+              : "bg-white/10 hover:bg-white/15 border-white/15"
+          } backdrop-blur-md rounded-2xl border shadow-2xs hover:shadow-md transition-all duration-300 block group cursor-pointer relative overflow-hidden z-10`}
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
@@ -488,19 +613,25 @@ export function Sidebar({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
               </span>
-              <span className="text-[10px] uppercase tracking-wider text-white/70 font-extrabold group-hover:text-white transition-colors">
+              <span className="text-[10px] uppercase tracking-wider text-white/80 font-extrabold group-hover:text-white transition-colors">
                 Active Fleet Ratio
               </span>
             </div>
-            <span className="text-[11px] font-black text-[#ED1A53] flex items-center gap-1">
+            <span className={`text-[11px] font-black flex items-center gap-1 ${
+              sidebarTheme === "ruby" ? "text-white bg-white/20 px-2 py-0.5 rounded-full text-[10px]" : "text-[#ED1A53]"
+            }`}>
               90% On-Hire
-              <ChevronRight className="w-3 h-3 text-[#ED1A53] transform group-hover:translate-x-0.5 transition-transform" />
+              <ChevronRight className={`w-3 h-3 ${sidebarTheme === "ruby" ? "text-white" : "text-[#ED1A53]"} transform group-hover:translate-x-0.5 transition-transform`} />
             </span>
           </div>
-          
+
           <div className="w-full bg-black/30 h-1.5 rounded-full overflow-hidden mb-2 p-0.5">
             <div 
-              className="bg-gradient-to-r from-[#ED1A53] to-rose-500 h-full rounded-full transition-all duration-500 shadow-xs shadow-[#ED1A53]/50" 
+              className={`${
+                sidebarTheme === "ruby"
+                  ? "bg-white"
+                  : "bg-gradient-to-r from-[#ED1A53] to-rose-500"
+              } h-full rounded-full transition-all duration-500 shadow-xs`} 
               style={{ width: "90%" }}
             ></div>
           </div>
@@ -512,14 +643,16 @@ export function Sidebar({
             </div>
             <div className="text-right">
               <span className="block text-[9px] uppercase tracking-wider text-white/60 font-bold">Live Grid</span>
-              <span className="text-xs font-black text-emerald-400">142.8 MW</span>
+              <span className={`text-xs font-black ${sidebarTheme === "ruby" ? "text-emerald-300" : "text-emerald-400"}`}>142.8 MW</span>
             </div>
           </div>
         </Link>
       )}
 
       {/* Sidebar Footer User Info & Shift Status ("Buttons on Down") */}
-      <div className="p-2 border-t border-[#5e1c3b] bg-black/20 space-y-1.5 relative z-10">
+      <div className={`p-2 border-t ${
+        sidebarTheme === "ruby" ? "border-white/20" : "border-[#5e1c3b]"
+      } bg-black/20 space-y-1.5 relative z-10`}>
         {!isCollapsed ? (
           <>
             <div className="pb-1">
@@ -528,21 +661,27 @@ export function Sidebar({
             <div className="flex items-center justify-between gap-2.5 pt-1 border-t border-white/10">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="relative shrink-0">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#8F0D30] via-[#541837] to-[#360515] text-white font-black text-xs flex items-center justify-center border border-white/30 shadow-sm">
+                  <div className={`w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center border shadow-sm ${
+                    sidebarTheme === "ruby"
+                      ? "bg-white text-[#ED1A53] border-white"
+                      : "bg-gradient-to-br from-[#8F0D30] via-[#541837] to-[#360515] text-white border-white/30"
+                  }`}>
                     {user?.name?.charAt(0) || "U"}
                   </div>
-                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-[#45142B]"></span>
+                  <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border ${
+                    sidebarTheme === "ruby" ? "border-[#DC1449]" : "border-[#45142B]"
+                  }`}></span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-extrabold text-white truncate">{user?.name || "Sophia Martinez"}</p>
-                  <p className="text-[10px] text-white/60 truncate uppercase font-bold tracking-wider">
+                  <p className="text-[10px] text-white/70 truncate uppercase font-bold tracking-wider">
                     {user?.role?.replace("_", " ") || "Admin / Lvl 4"}
                   </p>
                 </div>
               </div>
               <button 
                 onClick={() => logout()} 
-                className="p-1.5 text-white/60 hover:text-rose-400 hover:bg-white/10 rounded-xl border border-transparent transition-all cursor-pointer" 
+                className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-xl border border-transparent transition-all cursor-pointer" 
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
@@ -562,7 +701,11 @@ export function Sidebar({
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               </button>
               {showClockPopover && (
-                <div className="absolute left-[64px] bottom-0 z-50 w-72 bg-[#45142B] border border-[#5e1c3b] p-3 rounded-2xl shadow-2xl text-white">
+                <div className={`absolute left-[64px] bottom-0 z-50 w-72 ${
+                  sidebarTheme === "ruby"
+                    ? "bg-gradient-to-b from-[#ED1A53] to-[#B00F38] border-white/25"
+                    : "bg-[#45142B] border-[#5e1c3b]"
+                } border p-3 rounded-2xl shadow-2xl text-white`}>
                   <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-2">
                     <span className="text-xs font-bold text-white">Shift Attendance</span>
                     <button onClick={() => setShowClockPopover(false)} className="text-white/60 hover:text-white text-xs cursor-pointer">✕</button>
@@ -598,7 +741,11 @@ export function Sidebar({
             {/* User Avatar with Sign Out */}
             <button 
               onClick={() => logout()} 
-              className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8F0D30] via-[#541837] to-[#360515] text-white font-black text-xs flex items-center justify-center border border-white/30 shadow-sm hover:ring-2 hover:ring-rose-500/50 transition-all cursor-pointer mt-0.5" 
+              className={`w-9 h-9 rounded-xl font-black text-xs flex items-center justify-center border shadow-sm transition-all cursor-pointer mt-0.5 ${
+                sidebarTheme === "ruby"
+                  ? "bg-white text-[#ED1A53] border-white hover:ring-2 hover:ring-white/50"
+                  : "bg-gradient-to-br from-[#8F0D30] via-[#541837] to-[#360515] text-white border-white/30 hover:ring-2 hover:ring-rose-500/50"
+              }`} 
               title={`Signed in as ${user?.name || 'User'} · Click to Sign Out`}
             >
               {user?.name?.charAt(0) || "U"}
