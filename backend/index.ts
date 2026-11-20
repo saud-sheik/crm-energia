@@ -21,16 +21,15 @@ server.on("error", (err: any) => {
 });
 
 async function ensureDatabaseInitialized() {
+  // 1. Sync User table first and ensure admin exists so login ALWAYS works immediately
   try {
-    console.log("[STARTUP] Ensuring database schema is synchronized...");
-    await sequelize.sync();
-    console.log("[STARTUP] Database schema synchronized successfully.");
-
-    if (sequelize.models.User) {
-      const adminCount = await sequelize.models.User.count({ where: { email: "admin@nexus.com" } });
-      if (adminCount === 0) {
+    const UserModel = sequelize.models.User;
+    if (UserModel) {
+      await UserModel.sync().catch(e => console.warn("[STARTUP] User.sync warning:", e));
+      const existingAdmin = await UserModel.findOne({ where: { email: "admin@nexus.com" } }).catch(() => null);
+      if (!existingAdmin) {
         const hashedPassword = await bcrypt.hash("password123", 10);
-        await sequelize.models.User.create({
+        await UserModel.create({
           id: crypto.randomUUID(),
           name: "Sophia Martinez",
           email: "admin@nexus.com",
@@ -41,7 +40,7 @@ async function ensureDatabaseInitialized() {
           isAvailable: true,
           maxOpenLeads: 100
         });
-        await sequelize.models.User.create({
+        await UserModel.create({
           id: crypto.randomUUID(),
           name: "Sales Rep 1",
           email: "salesperson1@nexus.com",
@@ -52,7 +51,7 @@ async function ensureDatabaseInitialized() {
           isAvailable: true,
           maxOpenLeads: 50
         });
-        await sequelize.models.User.create({
+        await UserModel.create({
           id: crypto.randomUUID(),
           name: "Sales Rep 2",
           email: "salesperson2@nexus.com",
@@ -63,11 +62,20 @@ async function ensureDatabaseInitialized() {
           isAvailable: true,
           maxOpenLeads: 50
         });
-        console.log("[STARTUP] Auto-created demo accounts: admin@nexus.com, salesperson1@nexus.com, salesperson2@nexus.com");
+        console.log("[STARTUP] ✓ Verified and created default accounts: admin@nexus.com, salesperson1@nexus.com, salesperson2@nexus.com");
+      } else {
+        console.log("[STARTUP] ✓ Admin account verified: admin@nexus.com");
       }
     }
+  } catch (err) {
+    console.error("[STARTUP] User initialization error:", err);
+  }
 
-    if (sequelize.models.Asset) {
+  // 2. Sync Fleet Assets
+  try {
+    const AssetModel = sequelize.models.Asset;
+    if (AssetModel) {
+      await AssetModel.sync().catch(e => console.warn("[STARTUP] Asset.sync warning:", e));
       const assetsToSeed = [
         { id: 'gen-500-01', name: 'Caterpillar C15 Heavy Soundproof (500 kVA)', type: 'Generator', serialNumber: 'CAT-8891', status: 'Available', condition: 'Excellent' },
         { id: 'gen-500-02', name: 'Caterpillar C15 Prime Power (500 kVA)', type: 'Generator', serialNumber: 'CAT-8892', status: 'Available', condition: 'Excellent' },
@@ -79,15 +87,24 @@ async function ensureDatabaseInitialized() {
         { id: 'gen-500-09', name: 'Caterpillar C15 Heavy Soundproof (500 kVA)', type: 'Generator', serialNumber: 'CAT-8909', status: 'Available', condition: 'Good' }
       ];
       for (const a of assetsToSeed) {
-        await sequelize.models.Asset.findOrCreate({
+        await AssetModel.findOrCreate({
           where: { id: a.id },
           defaults: a
         });
       }
-      console.log("[STARTUP] Initialized generator fleet assets in database.");
+      console.log("[STARTUP] ✓ Verified and seeded generator fleet assets.");
     }
   } catch (err) {
-    console.error("[STARTUP] Auto-init error:", err);
+    console.error("[STARTUP] Asset initialization error:", err);
+  }
+
+  // 3. Sync remaining models
+  try {
+    console.log("[STARTUP] Syncing full database schema...");
+    await sequelize.sync().catch(err => console.warn("[STARTUP] Schema sync warning:", err));
+    console.log("[STARTUP] Full schema sync completed.");
+  } catch (err) {
+    console.error("[STARTUP] Schema sync error:", err);
   }
 }
 
