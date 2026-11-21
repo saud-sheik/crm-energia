@@ -38,9 +38,9 @@ async function run() {
   console.log("Capturing Velvet Maroon expanded state...");
   await page.screenshot({ path: path.join(artifactDir, "test_theme_velvet_expanded.png") });
 
-  // 3. Switch back to Sky Blue
-  console.log("Switching back to Sky Blue...");
-  const skyBtn = page.getByRole("button", { name: /Sky Blue/i });
+  // 3. Switch back to Light Blue
+  console.log("Switching back to Light Blue...");
+  const skyBtn = page.getByRole("button", { name: /Light Blue|Sky Blue/i });
   await skyBtn.click();
   await page.waitForTimeout(600);
 

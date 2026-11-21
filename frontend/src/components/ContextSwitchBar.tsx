@@ -5,13 +5,19 @@ import {
   ClipboardCheck, ShieldAlert, Building2, UserCheck, Wrench, Settings, BookOpen, Layers
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useBrand } from "../context/BrandContext";
 import { leadFilterApi } from "../api";
 
 export function ContextSwitchBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { themeColor } = useBrand();
   const currentPath = location.pathname;
+
+  const activePillClass = themeColor === "sky"
+    ? "bg-[#2563EB] text-white shadow-xs font-black border border-blue-600"
+    : "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60";
 
   const ALLOWED_FILTER_ROLES = ["admin", "director", "manager", "sales_manager"];
   const isFilterRoleAllowed = Boolean(user && ALLOWED_FILTER_ROLES.includes((user?.role || "").toLowerCase()));
@@ -79,7 +85,7 @@ export function ContextSwitchBar() {
                 to="/leads"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/leads")
-                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    ? activePillClass
                     : "text-[#551938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
@@ -91,7 +97,7 @@ export function ContextSwitchBar() {
                 to="/site-inspections"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/site-inspections")
-                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    ? activePillClass
                     : "text-[#551938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
@@ -111,7 +117,7 @@ export function ContextSwitchBar() {
                 to="/pipeline"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/pipeline") || currentPath.startsWith("/opportunities")
-                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    ? activePillClass
                     : "text-[#7A1938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
@@ -123,7 +129,7 @@ export function ContextSwitchBar() {
                 to="/rental-cpq/builder"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/rental-cpq")
-                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    ? activePillClass
                     : "text-[#7A1938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
@@ -135,7 +141,7 @@ export function ContextSwitchBar() {
                 to="/credit-kyc"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/credit-kyc")
-                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    ? activePillClass
                     : "text-[#7A1938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
@@ -147,7 +153,7 @@ export function ContextSwitchBar() {
                 to="/rental-contracts"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/rental-contracts")
-                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    ? activePillClass
                     : "text-[#7A1938]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
@@ -167,7 +173,7 @@ export function ContextSwitchBar() {
                 to="/fleet-availability"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/fleet-availability")
-                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    ? activePillClass
                     : "text-[#2C4830]/85 hover:text-sky-900 hover:bg-white"
                 }`}
               >
@@ -182,7 +188,7 @@ export function ContextSwitchBar() {
                 to="/approvals"
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   currentPath.startsWith("/approvals")
-                    ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                    ? activePillClass
                     : "text-slate-700 hover:text-sky-900 hover:bg-white"
                 }`}
               >
@@ -202,7 +208,7 @@ export function ContextSwitchBar() {
               to="/accounts"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/accounts")
-                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                  ? activePillClass
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -214,7 +220,7 @@ export function ContextSwitchBar() {
               to="/contacts"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/contacts")
-                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                  ? activePillClass
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -226,7 +232,7 @@ export function ContextSwitchBar() {
               to="/salespersons"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/salespersons")
-                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                  ? activePillClass
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -238,7 +244,7 @@ export function ContextSwitchBar() {
               to="/work-orders"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/work-orders") || currentPath.startsWith("/purchase-orders")
-                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                  ? activePillClass
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -258,7 +264,7 @@ export function ContextSwitchBar() {
               to="/settings"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath === "/settings"
-                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                  ? activePillClass
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -270,7 +276,7 @@ export function ContextSwitchBar() {
               to="/master-data/requirements"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/master-data/requirements")
-                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                  ? activePillClass
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -282,7 +288,7 @@ export function ContextSwitchBar() {
               to="/master-data/line-items"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/master-data/line-items")
-                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                  ? activePillClass
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -293,7 +299,7 @@ export function ContextSwitchBar() {
               to="/master-data/pricing"
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 currentPath.startsWith("/master-data/pricing")
-                  ? "bg-[#7BBDE8] text-sky-950 shadow-xs font-black border border-sky-300/60"
+                  ? activePillClass
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
