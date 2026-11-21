@@ -248,11 +248,7 @@ export function AttendanceClockWidget({
         type="button"
         disabled={clockInMutation.isPending}
         onClick={() => clockInMutation.mutate()}
-        className={`w-full flex items-center justify-center gap-2 py-2 px-3 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer group select-none ${
-          dark 
-            ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-950/50 border border-emerald-400/20" 
-            : "bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 shadow-2xs"
-        }`}
+        className="w-full flex items-center justify-center gap-2 py-2 px-3 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer group select-none bg-[#16A34A] hover:bg-[#15803D] active:bg-[#15803D]"
         title="Punch In for Today"
       >
         {clockInMutation.isPending ? (

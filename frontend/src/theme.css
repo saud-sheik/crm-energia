@@ -39,6 +39,34 @@
   --crm-status-critical-bg: #FEE2E2;
   --crm-status-info-text: #2563EB;
   --crm-status-info-bg: #DBEAFE;
+
+  /* Sidebar Tokens - Light Grey Theme */
+  --crm-sidebar-bg: #F3F5F8;
+  --crm-sidebar-border: #E3E8F0;
+  --crm-sidebar-panel-bg: #FFFFFF;
+  --crm-sidebar-panel-border: #E3E8F0;
+  --crm-sidebar-heading: #0F172A;
+  --crm-sidebar-text: #334155;
+  --crm-sidebar-icon: #64748B;
+  --crm-sidebar-hover: #E8ECF2;
+  --crm-sidebar-active-bg: #2563EB;
+  --crm-sidebar-active-text: #FFFFFF;
+  --crm-sidebar-box-bg: #FFFFFF;
+  --crm-sidebar-box-border: #E3E8F0;
+  --crm-sidebar-toggle-bg: #E8ECF2;
+  --crm-sidebar-toggle-active-bg: #FFFFFF;
+  --crm-sidebar-toggle-active-text: #2563EB;
+  --crm-sidebar-ratio-bg: #FFFFFF;
+  --crm-sidebar-ratio-border: #E3E8F0;
+  --crm-sidebar-progress-track: #E3E8F0;
+  --crm-sidebar-progress-fill: #2563EB;
+  --crm-sidebar-pill-bg: #EFF4FF;
+  --crm-sidebar-pill-text: #2563EB;
+  --crm-sidebar-dot: #22C55E;
+  --crm-sidebar-punch-bg: #16A34A;
+  --crm-sidebar-punch-hover: #15803D;
+  --crm-sidebar-user-name: #0F172A;
+  --crm-sidebar-user-role: #64748B;
 }
 
 :root.theme-velvet {
@@ -76,6 +104,34 @@
   --crm-status-critical-bg: #FEE2E2;
   --crm-status-info-text: #9F1239;
   --crm-status-info-bg: #FBE4E9;
+
+  /* Sidebar Tokens - Velvet Maroon Light Theme */
+  --crm-sidebar-bg: #F8F4F5;
+  --crm-sidebar-border: #F1DDE1;
+  --crm-sidebar-panel-bg: #FFFFFF;
+  --crm-sidebar-panel-border: #F1DDE1;
+  --crm-sidebar-heading: #0F172A;
+  --crm-sidebar-text: #334155;
+  --crm-sidebar-icon: #64748B;
+  --crm-sidebar-hover: #E8ECF2;
+  --crm-sidebar-active-bg: #9F1239;
+  --crm-sidebar-active-text: #FFFFFF;
+  --crm-sidebar-box-bg: #FFFFFF;
+  --crm-sidebar-box-border: #F1DDE1;
+  --crm-sidebar-toggle-bg: #E8ECF2;
+  --crm-sidebar-toggle-active-bg: #FFFFFF;
+  --crm-sidebar-toggle-active-text: #9F1239;
+  --crm-sidebar-ratio-bg: #FFFFFF;
+  --crm-sidebar-ratio-border: #F1DDE1;
+  --crm-sidebar-progress-track: #F1DDE1;
+  --crm-sidebar-progress-fill: #9F1239;
+  --crm-sidebar-pill-bg: #EFF4FF;
+  --crm-sidebar-pill-text: #9F1239;
+  --crm-sidebar-dot: #22C55E;
+  --crm-sidebar-punch-bg: #16A34A;
+  --crm-sidebar-punch-hover: #15803D;
+  --crm-sidebar-user-name: #0F172A;
+  --crm-sidebar-user-role: #64748B;
 }
 
 /* Helper Utilities */
