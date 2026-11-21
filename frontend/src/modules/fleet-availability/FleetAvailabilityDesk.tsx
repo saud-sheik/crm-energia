@@ -647,44 +647,28 @@ export default function FleetAvailabilityDesk() {
   });
 
   return (
-    <div className={`w-full min-h-screen ${
-      themeColor === "sky"
-        ? "bg-gradient-to-b from-[#F0F7FC] via-[#F5FAFE] to-[#EBF4FA] text-slate-900"
-        : "bg-gradient-to-b from-[#FDF1F4] via-[#FFF9FA] to-[#F5F6FA] text-[#0B1C30]"
-    } dark:bg-[#0B0F17] dark:text-slate-100 p-3 lg:p-5 space-y-3.5 font-sans relative overflow-hidden`}>
+    <div className="w-full min-h-screen bg-[var(--crm-bg-page)] text-[var(--crm-text-body)] dark:bg-[#0B0F17] dark:text-slate-100 p-3 lg:p-5 space-y-3.5 font-sans relative overflow-hidden">
       {/* Ambient Top Glow */}
-      <div className={`absolute top-0 right-10 w-[550px] h-[320px] rounded-full blur-3xl pointer-events-none -z-0 ${
-        themeColor === "sky"
-          ? "bg-gradient-to-b from-[#7BBDE8]/25 via-[#7BBDE8]/8 to-transparent"
-          : "bg-gradient-to-b from-[#ED1A53]/15 via-[#ED1A53]/5 to-transparent"
-      }`} />
-      <div className={`absolute top-4 left-1/4 w-[380px] h-[220px] rounded-full blur-2xl pointer-events-none -z-0 ${
-        themeColor === "sky"
-          ? "bg-[#7BBDE8]/15"
-          : "bg-[#ED1A53]/8"
-      }`} />
+      <div className="absolute top-0 right-10 w-[550px] h-[320px] rounded-full blur-3xl pointer-events-none -z-0 bg-[var(--crm-primary)]/5" />
+      <div className="absolute top-4 left-1/4 w-[380px] h-[220px] rounded-full blur-2xl pointer-events-none -z-0 bg-[var(--crm-primary)]/5" />
 
       {/* 1. TOP HEADER & OPERATIONAL GREETING */}
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
         <div>
           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-            <span className={`px-2 py-0.5 rounded-full font-mono text-[10px] uppercase tracking-widest font-extrabold border shadow-2xs ${
-              themeColor === "sky"
-                ? "bg-sky-100/90 text-[#0E355C] border-sky-300/60 dark:text-sky-300"
-                : "bg-rose-100/80 text-[#ED1A53] dark:text-rose-400 border-[#ED1A53]/25"
-            }`}>
+            <span className="px-2 py-0.5 rounded-full font-mono text-[10px] uppercase tracking-widest font-extrabold border bg-[var(--crm-primary-soft)] text-[var(--crm-primary)] border-[var(--crm-chip-light)] shadow-xs">
               Fleet Core V3.8
             </span>
-            <span className="text-slate-500 dark:text-slate-400 text-xs">• Live Synced 12s ago</span>
-            <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
+            <span className="text-[var(--crm-text-muted)] text-xs">• Live Synced 12s ago</span>
+            <span className="inline-flex items-center gap-1.5 text-emerald-600 text-xs font-semibold">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               KSA Telemetry Stream Active (Riyadh • Jubail • Dammam)
             </span>
           </div>
-          <h1 className="text-xl lg:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-xl lg:text-2xl font-black text-[var(--crm-text-heading)] tracking-tight">
             Good Morning, Sophia
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 cursor-pointer hover:text-slate-800">
+          <p className="text-xs text-[var(--crm-text-muted)] flex items-center gap-1 cursor-pointer hover:text-[var(--crm-text-body)]">
             <span>Regional Fleet Operations & Telemetry Overview</span>
             <ChevronRight className="w-3 h-3 rotate-90" />
           </p>
@@ -694,30 +678,22 @@ export default function FleetAvailabilityDesk() {
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setIsGanttModalOpen(true)}
-            className={`px-3 py-1.5 rounded-xl bg-white/95 hover:bg-white dark:bg-slate-900 border text-slate-800 dark:text-slate-200 text-xs font-bold transition flex items-center gap-1.5 active:scale-95 ${
-              themeColor === "sky"
-                ? "border-sky-200 hover:border-sky-300 shadow-[0_2px_8px_rgba(123,189,232,0.12)]"
-                : "border-[#ED1A53]/25 shadow-[0_2px_8px_rgba(237,26,83,0.04)]"
-            }`}
+            className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-[var(--crm-card-border)] text-[var(--crm-text-body)] text-xs font-bold transition flex items-center gap-1.5 active:scale-95 shadow-[0_1px_3px_rgba(15,37,64,0.06)]"
             title="Open Master 12-Week Rolling Gantt Matrix"
           >
-            <Maximize2 className={`w-3.5 h-3.5 ${themeColor === "sky" ? "text-[#144A7E]" : "text-[#ED1A53]"}`} />
+            <Maximize2 className="w-3.5 h-3.5 text-[var(--crm-primary)]" />
             <span>Open Multi-Hub Gantt</span>
           </button>
           <button
             onClick={() => alert("Dispatch manifest exported for transport & logistics teams.")}
-            className="px-3 py-1.5 rounded-xl bg-white/95 hover:bg-white dark:bg-slate-900 border border-slate-200 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
+            className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-[var(--crm-card-border)] text-[var(--crm-text-body)] text-xs font-bold transition flex items-center gap-1.5 shadow-[0_1px_3px_rgba(15,37,64,0.06)]"
           >
-            <Truck className="w-3.5 h-3.5 text-slate-400" />
+            <Truck className="w-3.5 h-3.5 text-[var(--crm-text-muted)]" />
             <span>Export Sheet</span>
           </button>
           <button
             onClick={() => setIsBookingModalOpen(true)}
-            className={`px-3.5 py-1.5 rounded-xl text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 ${
-              themeColor === "sky"
-                ? "bg-gradient-to-r from-[#144A7E] via-[#0E355C] to-[#0A2744] hover:from-[#185591] hover:to-[#0D3054] shadow-[#0E355C]/35 border border-white/20"
-                : "bg-gradient-to-r from-[#ED1A53] to-[#B00F38] hover:from-[#d81248] hover:to-[#960a2d] shadow-[#ED1A53]/25"
-            }`}
+            className="px-3.5 py-1.5 rounded-xl text-white text-xs font-bold transition flex items-center gap-1.5 bg-[var(--crm-primary)] hover:bg-[var(--crm-primary-hover)] shadow-[0_2px_6px_rgba(37,99,235,0.25)] active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Create Spot Reservation</span>
@@ -729,18 +705,14 @@ export default function FleetAvailabilityDesk() {
       <section className="relative z-10">
         <div className="flex items-center justify-between mb-2 px-1">
           <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full animate-pulse ${
-              themeColor === "sky" ? "bg-[#144A7E]" : "bg-[#ED1A53]"
-            }`} />
-            <span className="text-[11px] uppercase tracking-wider font-extrabold text-slate-600 dark:text-slate-300">
+            <span className="w-2 h-2 rounded-full animate-pulse bg-[var(--crm-primary)]" />
+            <span className="text-[11px] uppercase tracking-wider font-extrabold text-[var(--crm-text-body)]">
               Commercial & Fleet Health • Executive North-Star KPIs
             </span>
           </div>
           <span
             onClick={() => navigate("/rental-contracts")}
-            className={`text-[11px] font-bold cursor-pointer hover:underline ${
-              themeColor === "sky" ? "text-[#144A7E]" : "text-[#ED1A53]"
-            }`}
+            className="text-[11px] font-bold cursor-pointer hover:underline text-[var(--crm-primary)]"
           >
             380 Active Asset Manifest ▾
           </span>
@@ -749,44 +721,44 @@ export default function FleetAvailabilityDesk() {
           {/* Card 1: Contract Revenue (MRR Run-rate) -> Navigates to /rental-contracts */}
           <div
             onClick={() => navigate("/rental-contracts")}
-            className="group cursor-pointer p-4 rounded-[20px] bg-[#FCFAF7] dark:bg-slate-900 border-2 border-[#E7DDD0] dark:border-[#5C4528]/40 hover:border-[#B58D4B] shadow-[0_4px_20px_rgba(181,141,75,0.06)] hover:shadow-[0_8px_28px_rgba(181,141,75,0.14)] transition-all flex flex-col justify-between"
+            className="group cursor-pointer p-4 rounded-[20px] bg-white border border-[var(--crm-card-border)] hover:border-[var(--crm-primary)] shadow-[0_1px_3px_rgba(15,37,64,0.06)] hover:shadow-md transition-all flex flex-col justify-between"
             title="Click to manage all Active Hire Agreements & Revenue Run-rate in Rental Contracts Desk"
           >
             <div>
               {/* Distinct High-Contrast Header Bar */}
-              <div className="flex items-center justify-between pb-2.5 border-b border-[#F0E5D8] dark:border-slate-800">
+              <div className="flex items-center justify-between pb-2.5 border-b border-[var(--crm-row-divider)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-[#F5ECE0] dark:bg-[#3D2C17] border border-[#DFCDB7] flex items-center justify-center text-[#8C6228] dark:text-[#E0B571] shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center text-[var(--crm-primary)] shadow-2xs">
                     <DollarSign className="w-4 h-4 stroke-[2.5]" />
                   </div>
                   <div>
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white block leading-tight">
+                    <span className="text-xs font-black uppercase tracking-wider text-[var(--crm-text-heading)] block leading-tight">
                       Contract Revenue
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Monthly Run-rate (MRR)</span>
+                    <span className="text-[10px] font-semibold text-[var(--crm-text-muted)]">Monthly Run-rate (MRR)</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-[#F5ECE0] dark:bg-[#3D2C17] text-[#78511E] dark:text-[#E0B571] text-[10px] font-black border border-[#DFCDB7]">
+                <span className="px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#16A34A] text-[10px] font-black border border-emerald-200">
                   ▲ +10.4%
                 </span>
               </div>
 
               {/* Big Bold Metric */}
               <div className="my-2.5">
-                <div className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                  SAR 24.85M <span className="text-xs font-bold text-[#8C6228] dark:text-[#E0B571]">/ mo</span>
+                <div className="text-2xl font-black text-[var(--crm-text-heading)] leading-tight">
+                  SAR 24.85M <span className="text-xs font-bold text-[var(--crm-text-muted)]">/ mo</span>
                 </div>
               </div>
 
               {/* Regional Revenue Breakdown Chips */}
-              <div className="pt-2 border-t border-[#F0E5D8] dark:border-slate-800 flex items-center justify-between text-[10px] font-medium text-slate-500">
-                <span>Riyadh: <b className="text-[#4A3722] dark:text-slate-200 font-bold">9.8M</b></span>
-                <span>Jubail: <b className="text-[#4A3722] dark:text-slate-200 font-bold">8.4M</b></span>
-                <span>Dammam: <b className="text-[#4A3722] dark:text-slate-200 font-bold">6.6M</b></span>
+              <div className="pt-2 border-t border-[var(--crm-row-divider)] flex items-center justify-between text-[10px] font-medium text-[var(--crm-text-body)]">
+                <span>Riyadh: <b className="text-[var(--crm-text-heading)] font-bold">9.8M</b></span>
+                <span>Jubail: <b className="text-[var(--crm-text-heading)] font-bold">8.4M</b></span>
+                <span>Dammam: <b className="text-[var(--crm-text-heading)] font-bold">6.6M</b></span>
               </div>
             </div>
 
-            <p className="text-[10px] text-[#8C6228] dark:text-[#E0B571] font-bold mt-2 pt-1.5 border-t border-[#F0E5D8] dark:border-slate-800 flex items-center justify-between group-hover:underline">
+            <p className="text-[10px] text-[var(--crm-primary)] font-bold mt-2 pt-1.5 border-t border-[var(--crm-row-divider)] flex items-center justify-between group-hover:underline">
               <span>View Active Contracts & SLAs</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </p>
@@ -795,43 +767,43 @@ export default function FleetAvailabilityDesk() {
           {/* Card 2: Fleet Financial Yield -> Navigates to /rental-cpq/builder */}
           <div
             onClick={() => navigate("/rental-cpq/builder")}
-            className="group cursor-pointer p-4 rounded-[20px] bg-[#FCFAF7] dark:bg-slate-900 border-2 border-[#E7DDD0] dark:border-[#5C4528]/40 hover:border-[#B58D4B] shadow-[0_4px_20px_rgba(181,141,75,0.06)] hover:shadow-[0_8px_28px_rgba(181,141,75,0.14)] transition-all flex flex-col justify-between"
+            className="group cursor-pointer p-4 rounded-[20px] bg-white border border-[var(--crm-card-border)] hover:border-[var(--crm-primary)] shadow-[0_1px_3px_rgba(15,37,64,0.06)] hover:shadow-md transition-all flex flex-col justify-between"
             title="Click to open Rental CPQ Builder & Rate Optimisation"
           >
             <div>
               {/* Distinct High-Contrast Header Bar */}
-              <div className="flex items-center justify-between pb-2.5 border-b border-[#F0E5D8] dark:border-slate-800">
+              <div className="flex items-center justify-between pb-2.5 border-b border-[var(--crm-row-divider)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-[#F5ECE0] dark:bg-[#3D2C17] border border-[#DFCDB7] flex items-center justify-center text-[#8C6228] dark:text-[#E0B571] shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center text-[var(--crm-primary)] shadow-2xs">
                     <Activity className="w-4 h-4 stroke-[2.5]" />
                   </div>
                   <div>
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white block leading-tight">
+                    <span className="text-xs font-black uppercase tracking-wider text-[var(--crm-text-heading)] block leading-tight">
                       Fleet Yield
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Power Monetisation</span>
+                    <span className="text-[10px] font-semibold text-[var(--crm-text-muted)]">Power Monetisation</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-[#F5ECE0] dark:bg-[#3D2C17] text-[#78511E] dark:text-[#E0B571] text-[10px] font-black border border-[#DFCDB7]">
+                <span className="px-2 py-0.5 rounded-full bg-[#DBEAFE] text-[#2563EB] text-[10px] font-black border border-blue-200">
                   68.4% Yield
                 </span>
               </div>
 
               {/* Big Bold Metric */}
               <div className="my-2.5">
-                <div className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                  SAR 72.50 <span className="text-xs font-bold text-[#8C6228] dark:text-[#E0B571]">/ kVA / mo</span>
+                <div className="text-2xl font-black text-[var(--crm-text-heading)] leading-tight">
+                  SAR 72.50 <span className="text-xs font-bold text-[var(--crm-text-muted)]">/ kVA / mo</span>
                 </div>
               </div>
 
               {/* kVA Yield & Power Deployment */}
-              <div className="pt-2 border-t border-[#F0E5D8] dark:border-slate-800 flex items-center justify-between text-[10px] font-medium text-slate-500">
-                <span>Dispatched: <b className="text-[#4A3722] dark:text-slate-200 font-bold">342 (90%)</b></span>
-                <span>Live Grid: <b className="text-[#4A3722] dark:text-slate-200 font-bold">142.8 MW</b></span>
+              <div className="pt-2 border-t border-[var(--crm-row-divider)] flex items-center justify-between text-[10px] font-medium text-[var(--crm-text-body)]">
+                <span>Dispatched: <b className="text-[var(--crm-text-heading)] font-bold">342 (90%)</b></span>
+                <span>Live Grid: <b className="text-[var(--crm-text-heading)] font-bold">142.8 MW</b></span>
               </div>
             </div>
 
-            <p className="text-[10px] text-[#8C6228] dark:text-[#E0B571] font-bold mt-2 pt-1.5 border-t border-[#F0E5D8] dark:border-slate-800 flex items-center justify-between group-hover:underline">
+            <p className="text-[10px] text-[var(--crm-primary)] font-bold mt-2 pt-1.5 border-t border-[var(--crm-row-divider)] flex items-center justify-between group-hover:underline">
               <span>Open Rental CPQ Builder</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </p>
@@ -840,43 +812,43 @@ export default function FleetAvailabilityDesk() {
           {/* Card 3: Cycle Win Velocity -> Navigates to /pipeline */}
           <div
             onClick={() => navigate("/pipeline")}
-            className="group cursor-pointer p-4 rounded-[20px] bg-[#FCFAF7] dark:bg-slate-900 border-2 border-[#E7DDD0] dark:border-[#5C4528]/40 hover:border-[#B58D4B] shadow-[0_4px_20px_rgba(181,141,75,0.06)] hover:shadow-[0_8px_28px_rgba(181,141,75,0.14)] transition-all flex flex-col justify-between"
+            className="group cursor-pointer p-4 rounded-[20px] bg-white border border-[var(--crm-card-border)] hover:border-[var(--crm-primary)] shadow-[0_1px_3px_rgba(15,37,64,0.06)] hover:shadow-md transition-all flex flex-col justify-between"
             title="Click to view Commercial Pipeline velocity and open opportunities"
           >
             <div>
               {/* Distinct High-Contrast Header Bar */}
-              <div className="flex items-center justify-between pb-2.5 border-b border-[#F0E5D8] dark:border-slate-800">
+              <div className="flex items-center justify-between pb-2.5 border-b border-[var(--crm-row-divider)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-[#F5ECE0] dark:bg-[#3D2C17] border border-[#DFCDB7] flex items-center justify-center text-[#8C6228] dark:text-[#E0B571] shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center text-[var(--crm-primary)] shadow-2xs">
                     <Target className="w-4 h-4 stroke-[2.5]" />
                   </div>
                   <div>
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white block leading-tight">
+                    <span className="text-xs font-black uppercase tracking-wider text-[var(--crm-text-heading)] block leading-tight">
                       Win Velocity
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Deal Conversion SLA</span>
+                    <span className="text-[10px] font-semibold text-[var(--crm-text-muted)]">Deal Conversion SLA</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-[#F5ECE0] dark:bg-[#3D2C17] text-[#78511E] dark:text-[#E0B571] text-[10px] font-black border border-[#DFCDB7]">
+                <span className="px-2 py-0.5 rounded-full bg-[#DBEAFE] text-[#2563EB] text-[10px] font-black border border-blue-200">
                   18.4h SLA
                 </span>
               </div>
 
               {/* Big Bold Metric */}
               <div className="my-2.5">
-                <div className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                  64.8% <span className="text-xs font-bold text-[#8C6228] dark:text-[#E0B571]">Win Rate</span>
+                <div className="text-2xl font-black text-[var(--crm-text-heading)] leading-tight">
+                  64.8% <span className="text-xs font-bold text-[var(--crm-text-muted)]">Win Rate</span>
                 </div>
               </div>
 
               {/* Turnaround & Pipeline Depth */}
-              <div className="pt-2 border-t border-[#F0E5D8] dark:border-slate-800 flex items-center justify-between text-[10px] font-medium text-slate-500">
-                <span>Pipeline: <b className="text-[#4A3722] dark:text-slate-200 font-bold">SAR 14.2M</b></span>
-                <span>Open: <b className="text-[#4A3722] dark:text-slate-200 font-bold">18 Deals (0 Errors)</b></span>
+              <div className="pt-2 border-t border-[var(--crm-row-divider)] flex items-center justify-between text-[10px] font-medium text-[var(--crm-text-body)]">
+                <span>Pipeline: <b className="text-[var(--crm-text-heading)] font-bold">SAR 14.2M</b></span>
+                <span>Open: <b className="text-[var(--crm-text-heading)] font-bold">18 Deals (0 Errors)</b></span>
               </div>
             </div>
 
-            <p className="text-[10px] text-[#8C6228] dark:text-[#E0B571] font-bold mt-2 pt-1.5 border-t border-[#F0E5D8] dark:border-slate-800 flex items-center justify-between group-hover:underline">
+            <p className="text-[10px] text-[var(--crm-primary)] font-bold mt-2 pt-1.5 border-t border-[var(--crm-row-divider)] flex items-center justify-between group-hover:underline">
               <span>Inspect Commercial Pipeline</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </p>
@@ -885,43 +857,43 @@ export default function FleetAvailabilityDesk() {
           {/* Card 4: Cash & Credit Health -> Navigates to /credit-kyc */}
           <div
             onClick={() => navigate("/credit-kyc")}
-            className="group cursor-pointer p-4 rounded-[20px] bg-[#FCFAF7] dark:bg-slate-900 border-2 border-[#E7DDD0] dark:border-[#5C4528]/40 hover:border-[#B58D4B] shadow-[0_4px_20px_rgba(181,141,75,0.06)] hover:shadow-[0_8px_28px_rgba(181,141,75,0.14)] transition-all flex flex-col justify-between"
+            className="group cursor-pointer p-4 rounded-[20px] bg-white border border-[var(--crm-card-border)] hover:border-[var(--crm-primary)] shadow-[0_1px_3px_rgba(15,37,64,0.06)] hover:shadow-md transition-all flex flex-col justify-between"
             title="Click to view Cash Protection, Advance Guarantees & KYC Underwriting"
           >
             <div>
               {/* Distinct High-Contrast Header Bar */}
-              <div className="flex items-center justify-between pb-2.5 border-b border-[#F0E5D8] dark:border-slate-800">
+              <div className="flex items-center justify-between pb-2.5 border-b border-[var(--crm-row-divider)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-[#F5ECE0] dark:bg-[#3D2C17] border border-[#DFCDB7] flex items-center justify-center text-[#8C6228] dark:text-[#E0B571] shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center text-[var(--crm-primary)] shadow-2xs">
                     <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
                   </div>
                   <div>
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white block leading-tight">
+                    <span className="text-xs font-black uppercase tracking-wider text-[var(--crm-text-heading)] block leading-tight">
                       Cash & Credit
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Security & Risk Guard</span>
+                    <span className="text-[10px] font-semibold text-[var(--crm-text-muted)]">Security & Risk Guard</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-[#F5ECE0] dark:bg-[#3D2C17] text-[#78511E] dark:text-[#E0B571] text-[10px] font-black border border-[#DFCDB7]">
+                <span className="px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#16A34A] text-[10px] font-black border border-emerald-200">
                   0.0% Bad Debt
                 </span>
               </div>
 
               {/* Big Bold Metric */}
               <div className="my-2.5">
-                <div className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                  SAR 4.82M <span className="text-xs font-bold text-[#8C6228] dark:text-[#E0B571]">Advance</span>
+                <div className="text-2xl font-black text-[var(--crm-text-heading)] leading-tight">
+                  SAR 4.82M <span className="text-xs font-bold text-[var(--crm-text-muted)]">Advance</span>
                 </div>
               </div>
 
               {/* Working Capital & Advance Compliance */}
-              <div className="pt-2 border-t border-[#F0E5D8] dark:border-slate-800 flex items-center justify-between text-[10px] font-medium text-slate-500">
-                <span>DSO: <b className="text-[#4A3722] dark:text-slate-200 font-bold">32 Days</b></span>
-                <span>Security: <b className="text-[#4A3722] dark:text-slate-200 font-bold">100% Locked</b></span>
+              <div className="pt-2 border-t border-[var(--crm-row-divider)] flex items-center justify-between text-[10px] font-medium text-[var(--crm-text-body)]">
+                <span>DSO: <b className="text-[var(--crm-text-heading)] font-bold">32 Days</b></span>
+                <span>Security: <b className="text-[var(--crm-text-heading)] font-bold">100% Locked</b></span>
               </div>
             </div>
 
-            <p className="text-[10px] text-[#8C6228] dark:text-[#E0B571] font-bold mt-2 pt-1.5 border-t border-[#F0E5D8] dark:border-slate-800 flex items-center justify-between group-hover:underline">
+            <p className="text-[10px] text-[var(--crm-primary)] font-bold mt-2 pt-1.5 border-t border-[var(--crm-row-divider)] flex items-center justify-between group-hover:underline">
               <span>Open Credit & KYC Desk</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </p>
@@ -935,36 +907,26 @@ export default function FleetAvailabilityDesk() {
           {/* A. Left Speedometer Card (lg:col-span-4) */}
           <div
             onClick={() => setIsDiagnosticsModalOpen(true)}
-            className={`lg:col-span-4 rounded-[24px] p-5 relative overflow-hidden flex flex-col justify-between cursor-pointer group hover:scale-[1.01] transition-transform ${
-              themeColor === "sky"
-                ? "bg-gradient-to-b from-[#7BBDE8] via-[#65AEE4] to-[#4F9FDA] text-slate-900 shadow-[0_16px_36px_-8px_rgba(123,189,232,0.35)] border border-sky-300/50"
-                : "bg-gradient-to-b from-[#2B081B] via-[#200614] to-[#15030D] text-white shadow-[0_25px_80px_rgba(20,2,12,0.95),0_0_50px_rgba(237,26,83,0.18)] border border-[#ED1A53]/35"
-            }`}
+            style={{
+              background: "var(--crm-perf-gradient)",
+              borderColor: "var(--crm-perf-border)"
+            }}
+            className="lg:col-span-4 rounded-[24px] p-5 relative overflow-hidden flex flex-col justify-between cursor-pointer group hover:scale-[1.01] transition-transform border shadow-[0_1px_3px_rgba(15,37,64,0.06)]"
           >
             {/* Ambient Background Warm Glow */}
-            <div className="absolute top-0 right-0 w-36 h-36 bg-white/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-36 h-36 bg-white/40 rounded-full blur-3xl pointer-events-none" />
 
-            <div className={`flex items-center justify-between relative z-10 pb-2 border-b ${
-              themeColor === "sky" ? "border-sky-300/40" : "border-white/10"
-            }`}>
+            <div className="flex items-center justify-between relative z-10 pb-2 border-b border-black/5">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-300 animate-pulse shadow-sm shadow-amber-300/50" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] animate-pulse shadow-sm shadow-[#F59E0B]/50" />
                 <div>
-                  <span className={`text-xs sm:text-[13px] font-black tracking-wider uppercase block leading-tight ${
-                    themeColor === "sky" ? "text-sky-950" : "text-white"
-                  }`}>
+                  <span className="text-xs sm:text-[13px] font-black tracking-wider uppercase block leading-tight text-[#0F172A]">
                     Active Fleet Performance
                   </span>
-                  <span className={`text-[10px] font-semibold ${
-                    themeColor === "sky" ? "text-sky-950/75" : "text-slate-300"
-                  }`}>Real-time Load Balancing</span>
+                  <span className="text-[10px] font-semibold text-[#64748B]">Real-time Load Balancing</span>
                 </div>
               </div>
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center transition ${
-                themeColor === "sky"
-                  ? "bg-white/30 text-sky-950 group-hover:bg-white/40"
-                  : "bg-white/10 text-white group-hover:bg-white/20"
-              }`}>
+              <div className="w-7 h-7 rounded-full flex items-center justify-center transition bg-white text-[var(--crm-primary)] shadow-xs group-hover:shadow-sm">
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </div>
             </div>
@@ -978,7 +940,7 @@ export default function FleetAvailabilityDesk() {
                     cy="80"
                     r="62"
                     fill="transparent"
-                    stroke={themeColor === "sky" ? "rgba(255, 255, 255, 0.4)" : "rgba(255, 255, 255, 0.15)"}
+                    stroke="rgba(255, 255, 255, 0.7)"
                     strokeWidth="13"
                     strokeDasharray="390"
                     strokeDashoffset="195"
@@ -998,12 +960,8 @@ export default function FleetAvailabilityDesk() {
                   />
                 </svg>
                 <div className="absolute bottom-1 flex flex-col items-center">
-                  <span className={`text-2xl font-black tracking-tight ${
-                    themeColor === "sky" ? "text-sky-950" : "text-white"
-                  }`}>90%</span>
-                  <span className={`text-[9px] font-extrabold uppercase tracking-widest ${
-                    themeColor === "sky" ? "text-sky-950/80" : "text-slate-400"
-                  }`}>
+                  <span className="text-2xl font-black tracking-tight text-[#0F172A]">90%</span>
+                  <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#64748B]">
                     Load Factor
                   </span>
                 </div>
@@ -1011,12 +969,8 @@ export default function FleetAvailabilityDesk() {
             </div>
 
             {/* Bottom Financial & Asset Stat -> Navigates to /invoices */}
-            <div className={`relative z-10 border-t pt-3 ${
-              themeColor === "sky" ? "border-sky-300/40" : "border-white/10"
-            }`}>
-              <span className={`text-[11px] font-bold uppercase tracking-wider block ${
-                themeColor === "sky" ? "text-sky-950/80" : "text-slate-400"
-              }`}>
+            <div className="relative z-10 border-t border-black/5 pt-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider block text-[#64748B]">
                 Total Active Contract Valuation
               </span>
               <div
@@ -1024,25 +978,19 @@ export default function FleetAvailabilityDesk() {
                   e.stopPropagation();
                   navigate("/invoices");
                 }}
-                className={`text-2xl font-black tracking-tight mt-0.5 transition ${
-                  themeColor === "sky" ? "text-sky-950 hover:text-white" : "text-white hover:text-amber-400"
-                }`}
+                className="text-2xl font-black tracking-tight mt-0.5 transition text-[#0F172A] hover:text-[var(--crm-primary)]"
                 title="Open Invoices & Billing Desk"
               >
                 SAR 24,850,000
               </div>
-              <div className={`flex items-center justify-between text-[10px] mt-1 ${
-                themeColor === "sky" ? "text-sky-950/80" : "text-slate-400"
-              }`}>
+              <div className="flex items-center justify-between text-[10px] mt-1 text-[#334155]">
                 <span>342 Units Dispatched • GPS Sat: Locked</span>
                 <span
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsDiagnosticsModalOpen(true);
                   }}
-                  className={`${
-                    themeColor === "sky" ? "text-amber-800" : "text-amber-400"
-                  } font-extrabold group-hover:underline`}
+                  className="text-[var(--crm-primary)] font-extrabold group-hover:underline"
                 >
                   Deep Diagnostics ↗
                 </span>
@@ -1055,43 +1003,35 @@ export default function FleetAvailabilityDesk() {
             {/* Top Stacked Card: Dispatched Power Peak */}
             <div
               onClick={() => setIsDiagnosticsModalOpen(true)}
-              className={`flex-1 p-4 rounded-[20px] bg-white dark:bg-slate-900 border-2 flex flex-col justify-between cursor-pointer transition ${
-                themeColor === "sky"
-                  ? "border-sky-200 dark:border-sky-950/60 hover:border-sky-400 shadow-[0_6px_20px_rgba(123,189,232,0.1)] hover:shadow-[0_10px_28px_rgba(123,189,232,0.2)]"
-                  : "border-rose-200 dark:border-rose-950/60 hover:border-[#ED1A53] shadow-[0_6px_20px_rgba(237,26,83,0.06)] hover:shadow-[0_10px_28px_rgba(237,26,83,0.15)]"
-              }`}
+              className="flex-1 p-4 rounded-[20px] bg-white border border-[var(--crm-card-border)] hover:border-[var(--crm-primary)] shadow-[0_1px_3px_rgba(15,37,64,0.06)] flex flex-col justify-between cursor-pointer transition"
               title="Inspect Real-time Load Factor & Electrical Telemetry"
             >
               {/* Distinct High-Contrast Header Bar */}
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between pb-2 border-b border-[var(--crm-row-divider)]">
                 <div className="flex items-center gap-2">
-                  <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shadow-sm ${
-                    themeColor === "sky"
-                      ? "bg-sky-50 dark:bg-sky-950/50 border-sky-200/60 text-[#144A7E]"
-                      : "bg-rose-50 dark:bg-rose-950/50 border-rose-200/60 text-[#ED1A53]"
-                  }`}>
+                  <div className="w-8 h-8 rounded-xl bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center text-[var(--crm-primary)] shadow-2xs">
                     <Zap className="w-4 h-4 stroke-[2.5]" />
                   </div>
                   <div>
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white block leading-tight">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#0F172A] block leading-tight">
                       Dispatched Power
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Live Grid Generation</span>
+                    <span className="text-[10px] font-semibold text-[#64748B]">Live Grid Generation</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-[#F5ECE0] dark:bg-[#3D2C17] text-[#78511E] dark:text-[#E0B571] text-[10px] font-black border border-[#DFCDB7]">
+                <span className="px-2 py-0.5 rounded-full bg-[#DBEAFE] text-[#2563EB] text-[10px] font-black border border-blue-200">
                   +5% Target
                 </span>
               </div>
 
               {/* Big Bold Metric */}
               <div className="my-2">
-                <div className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                  142.8 <span className="text-xs font-bold text-slate-400">MW</span>
+                <div className="text-2xl font-black text-[#0F172A] leading-tight">
+                  142.8 <span className="text-xs font-bold text-[#64748B]">MW</span>
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1">
-                  <span>Peak: <b className="text-slate-700 dark:text-slate-300">158 MW</b></span>
-                  <span className={`font-bold ${themeColor === "sky" ? "text-[#144A7E]" : "text-[#ED1A53]"}`}>50.0 Hz Stable</span>
+                <div className="flex items-center justify-between text-[10px] text-[#64748B] mt-1">
+                  <span>Peak: <b className="text-[#334155]">158 MW</b></span>
+                  <span className="font-bold text-[#16A34A]">50.0 Hz Stable</span>
                 </div>
               </div>
             </div>
@@ -1099,39 +1039,39 @@ export default function FleetAvailabilityDesk() {
             {/* Bottom Stacked Card: Yard Readiness & PM Overhaul (Industrial Reserve Desk) */}
             <div
               onClick={() => navigate("/assets")}
-              className="flex-1 p-4 rounded-[20px] bg-white dark:bg-slate-900 border-2 border-[#D6DFD6] dark:border-[#2C4830]/40 hover:border-[#2C4830] shadow-[0_6px_20px_rgba(44,82,52,0.05)] hover:shadow-[0_10px_28px_rgba(44,82,52,0.12)] flex flex-col justify-between cursor-pointer transition"
+              className="flex-1 p-4 rounded-[20px] bg-white border border-[var(--crm-card-border)] hover:border-[var(--crm-primary)] shadow-[0_1px_3px_rgba(15,37,64,0.06)] flex flex-col justify-between cursor-pointer transition"
               title="Inspect 38 Standby Units: 26 Dispatch-Ready in Yard vs 12 in 250h PM Service"
             >
               {/* Distinct High-Contrast Header Bar */}
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between pb-2 border-b border-[var(--crm-row-divider)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/60 flex items-center justify-center text-emerald-600 shadow-sm">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center text-[var(--crm-primary)] shadow-2xs">
                     <Wrench className="w-4 h-4 stroke-[2.5]" />
                   </div>
                   <div>
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white block leading-tight">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#0F172A] block leading-tight">
                       Yard Readiness
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Standby & PM Overhaul</span>
+                    <span className="text-[10px] font-semibold text-[#64748B]">Standby & PM Overhaul</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-black border border-emerald-200">
+                <span className="px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#16A34A] text-[10px] font-black border border-emerald-200">
                   26 Ready
                 </span>
               </div>
 
               {/* Big Bold Metric */}
               <div className="my-2">
-                <div className="text-2xl font-black text-slate-900 dark:text-white leading-tight flex items-baseline gap-1.5">
+                <div className="text-2xl font-black text-[#0F172A] leading-tight flex items-baseline gap-1.5">
                   <span>26</span>
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">Deployable</span>
-                  <span className="text-slate-300 dark:text-slate-600 mx-1">•</span>
-                  <span className="text-base font-extrabold text-amber-600 dark:text-amber-400">12</span>
-                  <span className="text-xs font-bold text-slate-400">in Shop</span>
+                  <span className="text-xs font-bold text-[#64748B]">Deployable</span>
+                  <span className="text-slate-300 mx-1">•</span>
+                  <span className="text-base font-extrabold text-[#0F172A]">12</span>
+                  <span className="text-xs font-bold text-[#64748B]">in Shop</span>
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1">
-                  <span>Mob SLA: <b className="text-slate-700 dark:text-slate-300">&lt;4 hrs</b></span>
-                  <span className="text-emerald-600 font-bold">100% PM Compliant</span>
+                <div className="flex items-center justify-between text-[10px] text-[#64748B] mt-1">
+                  <span>Mob SLA: <b className="text-[#334155]">&lt;4 hrs</b></span>
+                  <span className="text-[#16A34A] font-bold">100% PM Compliant</span>
                 </div>
               </div>
             </div>
@@ -1140,23 +1080,19 @@ export default function FleetAvailabilityDesk() {
           {/* C. Right Rounded Bar Chart Card (lg:col-span-5) */}
           <div
             onClick={() => setIsGanttModalOpen(true)}
-            className="lg:col-span-5 p-5 rounded-[24px] bg-white dark:bg-slate-900 border-2 border-[#D6DFD6] dark:border-[#2C4830]/40 hover:border-[#2C4830] shadow-[0_6px_20px_rgba(44,82,52,0.05)] hover:shadow-[0_10px_28px_rgba(44,82,52,0.12)] flex flex-col justify-between relative cursor-pointer transition"
+            className="lg:col-span-5 p-5 rounded-[24px] bg-white border border-[var(--crm-card-border)] hover:border-[var(--crm-primary)] shadow-[0_1px_3px_rgba(15,37,64,0.06)] flex flex-col justify-between relative cursor-pointer transition group"
             title="Open 12-Week Master Multi-Hub Gantt Timeline"
           >
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between pb-2 border-b border-[var(--crm-row-divider)]">
               <div className="flex items-center gap-2.5">
-                <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shadow-sm ${
-                  themeColor === "sky"
-                    ? "bg-sky-50 dark:bg-sky-950/50 border-sky-200/60 text-[#144A7E]"
-                    : "bg-rose-50 dark:bg-rose-950/50 border border-rose-200/60 text-[#ED1A53]"
-                }`}>
+                <div className="w-8 h-8 rounded-xl bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center text-[var(--crm-primary)] shadow-2xs">
                   <BarChart3 className="w-4 h-4 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h3 className="font-black text-slate-900 dark:text-white text-xs sm:text-[13px] uppercase tracking-wider">
+                  <h3 className="font-black text-[#0F172A] text-xs sm:text-[13px] uppercase tracking-wider">
                     Fleet Utilization Trend
                   </h3>
-                  <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Monthly Average Dispatch Load • Q2 Off-Hire Horizon</span>
+                  <span className="text-[10px] font-semibold text-[#64748B]">Monthly Average Dispatch Load • Q2 Off-Hire Horizon</span>
                 </div>
               </div>
               <button
@@ -1164,30 +1100,19 @@ export default function FleetAvailabilityDesk() {
                   e.stopPropagation();
                   setIsGanttModalOpen(true);
                 }}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 border ${
-                  themeColor === "sky"
-                    ? "bg-sky-50 hover:bg-[#144A7E] hover:text-white text-[#144A7E] border-sky-200/60"
-                    : "bg-rose-50 hover:bg-[#ED1A53] hover:text-white text-[#ED1A53] dark:text-rose-300 border-rose-200/50"
-                }`}
+                className="px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 bg-white border border-[var(--crm-card-border)] text-[var(--crm-primary)] hover:bg-slate-50"
               >
                 <span>Full Gantt</span>
                 <ArrowUpRight className="w-3 h-3" />
               </button>
             </div>
 
-            {/* Floating Tooltip Pill */}
+            {/* Utilization Bar Chart Container */}
             <div className="relative mt-4 mb-1">
-              <div className={`absolute -top-6 left-[22%] -translate-x-1/2 text-[9px] font-black px-2 py-0.5 rounded shadow-md flex items-center gap-1 z-10 pointer-events-none border ${
-                themeColor === "sky"
-                  ? "bg-[#7BBDE8] text-sky-950 border-sky-300"
-                  : "bg-slate-900 text-white border-slate-700"
-              }`}>
+              {/* Tooltip bubble - appears only on hover without overlapping chart */}
+              <div className="absolute -top-7 left-[22%] -translate-x-1/2 text-[9px] font-black px-2 py-0.5 rounded shadow-sm flex items-center gap-1 z-20 pointer-events-none bg-white text-[var(--crm-primary)] border border-blue-200 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <span>Mar 2026: 90% Peak</span>
-                <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rotate-45 border-r border-b ${
-                  themeColor === "sky"
-                    ? "bg-[#7BBDE8] border-sky-300"
-                    : "bg-slate-900 border-slate-700"
-                }`} />
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rotate-45 border-r border-b bg-white border-blue-200" />
               </div>
 
               {/* 8 Modern Rounded Vertical Pillars */}
@@ -1202,26 +1127,22 @@ export default function FleetAvailabilityDesk() {
                   { month: "Aug", height: "60%", active: false },
                   { month: "Sep", height: "78%", active: false }
                 ].map((bar, idx) => (
-                  <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
+                  <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
                     <div className="w-full h-full flex items-end">
                       <div
                         style={{ height: bar.height }}
-                        className={`w-full rounded-full transition-all duration-300 group-hover:opacity-90 ${
+                        className={`w-full rounded-full transition-all duration-300 hover:opacity-90 ${
                           bar.active
-                            ? (themeColor === "sky"
-                                ? "bg-gradient-to-t from-[#7BBDE8] via-[#5BA4DC] to-[#3B8BC8] shadow-md shadow-[#7BBDE8]/30"
-                                : "bg-gradient-to-t from-[#ED1A53] via-[#D81248] to-[#45142B] shadow-md shadow-[#ED1A53]/30")
-                            : (themeColor === "sky"
-                                ? "bg-[#E1EFF8] hover:bg-[#D0E5F5] dark:bg-slate-800"
-                                : "bg-rose-50 hover:bg-rose-100 dark:bg-slate-800")
+                            ? "bg-[var(--crm-primary)] shadow-sm"
+                            : "bg-[var(--crm-chip-light)] hover:bg-[var(--crm-primary-soft)]"
                         }`}
                       />
                     </div>
                     <span
                       className={`text-[10px] font-semibold ${
                         bar.active 
-                          ? (themeColor === "sky" ? "text-[#144A7E] font-black" : "text-[#ED1A53] font-black")
-                          : "text-slate-400"
+                          ? "text-[var(--crm-primary)] font-black"
+                          : "text-[#64748B]"
                       }`}
                     >
                       {bar.month}
@@ -1232,11 +1153,9 @@ export default function FleetAvailabilityDesk() {
             </div>
 
             {/* Bottom Insight */}
-            <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Peak: <b className="text-slate-700 dark:text-slate-200">March (90%)</b> • 14 Off-Hire Expirations (42 MVA) in Q2</span>
-              <span className={`font-bold hover:underline flex items-center gap-0.5 ${
-                themeColor === "sky" ? "text-[#144A7E] dark:text-sky-300" : "text-[#ED1A53] dark:text-rose-400"
-              }`}>
+            <div className="mt-2 pt-2 border-t border-[var(--crm-row-divider)] flex items-center justify-between text-[11px] text-[#64748B]">
+              <span>Peak: <b className="text-[#0F172A]">March (90%)</b> • 14 Off-Hire Expirations (42 MVA) in Q2</span>
+              <span className="font-bold hover:underline flex items-center gap-0.5 text-[var(--crm-primary)]">
                 <span>12-Week Gantt</span>
                 <ArrowUpRight className="w-3 h-3" />
               </span>
@@ -1249,40 +1168,30 @@ export default function FleetAvailabilityDesk() {
       <section className="relative z-10">
         <div className="flex items-center justify-between mb-2.5 px-1">
           <div className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shadow-sm ${
-              themeColor === "sky"
-                ? "bg-sky-50 dark:bg-sky-950/50 border-sky-200/60 text-[#144A7E]"
-                : "bg-rose-50 dark:bg-rose-950/50 border border-rose-200/60 text-[#ED1A53]"
-            }`}>
-              <Radio className={`w-4 h-4 stroke-[2.5] animate-pulse ${
-                themeColor === "sky" ? "text-[#144A7E]" : "text-[#ED1A53]"
-              }`} />
+            <div className="w-8 h-8 rounded-xl bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center text-[var(--crm-primary)] shadow-2xs">
+              <Radio className="w-4 h-4 stroke-[2.5] animate-pulse text-[var(--crm-primary)]" />
             </div>
             <div>
-              <span className="text-xs sm:text-[13px] font-black uppercase tracking-wider text-slate-900 dark:text-white block leading-tight">
+              <span className="text-xs sm:text-[13px] font-black uppercase tracking-wider text-[#0F172A] block leading-tight">
                 Live Fleet Dispatch & Telemetry Stream
               </span>
-              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+              <span className="text-[10px] font-semibold text-[#64748B]">
                 Real-time SCADA Field Nodes, Active Contract Values & Engine Diagnostics
               </span>
             </div>
           </div>
           <button
             onClick={() => navigate("/rental-contracts")}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 border ${
-              themeColor === "sky"
-                ? "bg-sky-50 hover:bg-[#144A7E] hover:text-white text-[#144A7E] border-sky-200/60"
-                : "bg-rose-50 hover:bg-[#ED1A53] hover:text-white text-[#ED1A53] dark:text-rose-300 border border-rose-200/50"
-            }`}
+            className="px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 bg-white border border-[var(--crm-card-border)] text-[var(--crm-primary)] hover:bg-slate-50"
           >
             <span>View All Contracts</span>
             <ArrowUpRight className="w-3 h-3" />
           </button>
         </div>
 
-        <div className="rounded-[20px] bg-white dark:bg-slate-900 border-2 border-[#D6DFD6] dark:border-[#2C4830]/40 shadow-[0_6px_20px_rgba(44,82,52,0.05)] overflow-hidden">
+        <div className="rounded-[20px] bg-white border border-[var(--crm-card-border)] shadow-[0_1px_3px_rgba(15,37,64,0.06)] overflow-hidden">
           {/* High-Contrast Table Column Headers */}
-          <div className="py-2.5 px-4 sm:px-5 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <div className="py-2.5 px-4 sm:px-5 bg-slate-50 border-b border-[var(--crm-row-divider)] flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-[#64748B]">
             <div className="min-w-[260px] flex-1">Generator Node & Client Project</div>
             <div className="hidden lg:block w-52">Live SCADA Sensors (Fuel / Temp)</div>
             <div className="hidden md:flex items-center justify-between w-56 px-2">
@@ -1292,7 +1201,7 @@ export default function FleetAvailabilityDesk() {
             <div className="w-44 text-right">Deployment Status & Diagnostics</div>
           </div>
 
-          <div className="divide-y divide-slate-100 dark:divide-slate-800">
+          <div className="divide-y divide-[var(--crm-row-divider)]">
             {[
               {
                 asset: DEFAULT_ENRICHED_ASSETS[0],
@@ -1302,7 +1211,7 @@ export default function FleetAvailabilityDesk() {
                 fuelPct: 82,
                 tempC: 84,
                 status: "On-Hire",
-                badgeColor: "bg-emerald-50 text-emerald-700 border border-emerald-200/80"
+                badgeColor: "bg-[#DCFCE7] text-[#16A34A] border border-emerald-200"
               },
               {
                 asset: DEFAULT_ENRICHED_ASSETS[1],
@@ -1311,8 +1220,8 @@ export default function FleetAvailabilityDesk() {
                 val: "SAR 85,000",
                 fuelPct: 94,
                 tempC: 81,
-                status: "Mobilisation Ready",
-                badgeColor: "bg-rose-50 text-[#ED1A53] border border-rose-200/80"
+                status: "Ready",
+                badgeColor: "bg-[#DBEAFE] text-[#2563EB] border border-blue-200"
               },
               {
                 asset: DEFAULT_ENRICHED_ASSETS[2],
@@ -1322,7 +1231,7 @@ export default function FleetAvailabilityDesk() {
                 fuelPct: 76,
                 tempC: 88,
                 status: "Heavy Grid On-Hire",
-                badgeColor: "bg-amber-50 text-amber-800 border border-amber-200/80"
+                badgeColor: "bg-[#FEF3C7] text-[#D97706] border border-amber-200"
               },
               {
                 asset: DEFAULT_ENRICHED_ASSETS[3],
@@ -1332,54 +1241,54 @@ export default function FleetAvailabilityDesk() {
                 fuelPct: 98,
                 tempC: 79,
                 status: "Completed",
-                badgeColor: "bg-slate-100 text-slate-700 border border-slate-200/80"
+                badgeColor: "bg-slate-100 text-slate-700 border border-slate-200"
               }
             ].map((row, idx) => (
               <div
                 key={idx}
                 onClick={() => navigate("/rental-contracts")}
-                className="py-3 px-4 sm:px-5 flex items-center justify-between gap-3 hover:bg-rose-50/30 transition-colors cursor-pointer text-xs"
+                className="py-3 px-4 sm:px-5 flex items-center justify-between gap-3 hover:bg-[var(--crm-primary-soft)]/40 transition-colors cursor-pointer text-xs"
                 title="View Contract in Rental Contracts Manager"
               >
                 {/* Unit & Client */}
                 <div className="flex items-center gap-3 min-w-[260px] flex-1">
-                  <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200/60 flex items-center justify-center font-bold text-xs text-[#ED1A53] shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center font-bold text-xs text-[var(--crm-primary)] shrink-0 shadow-2xs">
                     <Zap className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <div className="font-black text-[#0F172A] flex items-center gap-1.5">
                       <span>{row.asset.code}</span>
-                      <span className="text-slate-500 font-semibold">({row.client})</span>
+                      <span className="text-[#334155] font-semibold">({row.client})</span>
                     </div>
-                    <span className="text-[10px] text-slate-400 font-medium">
-                      {row.asset.model} • <b className="text-slate-700 dark:text-slate-300">{row.asset.ratingKva} kVA</b> • Hub: {row.asset.hub}
+                    <span className="text-[10px] text-[#64748B] font-medium">
+                      {row.asset.model} • <b className="text-[#334155]">{row.asset.ratingKva} kVA</b> • Hub: {row.asset.hub}
                     </span>
                   </div>
                 </div>
 
                 {/* Inline Real-Time Telemetry Meters */}
                 <div className="hidden lg:flex items-center gap-4 w-52">
-                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60" title="Fuel Tank Level">
-                    <Fuel className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="font-black text-slate-800 dark:text-slate-200 font-mono text-[11px]">{row.fuelPct}%</span>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase">Fuel</span>
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[#DCFCE7] border border-emerald-200 text-[#16A34A]" title="Fuel Tank Level">
+                    <Fuel className="w-3.5 h-3.5 text-[#16A34A]" />
+                    <span className="font-black font-mono text-[11px]">{row.fuelPct}%</span>
+                    <span className="text-[9px] font-bold uppercase">OK</span>
                   </div>
-                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60" title="Operating Temperature">
-                    <Thermometer className="w-3.5 h-3.5 text-[#ED1A53]" />
-                    <span className="font-black text-slate-800 dark:text-slate-200 font-mono text-[11px]">{row.tempC}°C</span>
-                    <span className="text-[9px] text-emerald-700 font-bold uppercase">OK</span>
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[#DCFCE7] border border-emerald-200 text-[#16A34A]" title="Operating Temperature">
+                    <Thermometer className="w-3.5 h-3.5 text-[#16A34A]" />
+                    <span className="font-black font-mono text-[11px]">{row.tempC}°C</span>
+                    <span className="text-[9px] font-bold uppercase">OK</span>
                   </div>
                 </div>
 
                 {/* Financials & Date with Clear Sub-labels */}
                 <div className="hidden md:flex items-center justify-between w-56 px-2 text-[11px]">
                   <div className="flex flex-col">
-                    <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400">Timestamp</span>
-                    <span className="text-slate-700 dark:text-slate-300 font-mono font-bold">{row.date}</span>
+                    <span className="text-[9px] uppercase tracking-wider font-extrabold text-[#64748B]">Timestamp</span>
+                    <span className="text-[#0F172A] font-mono font-bold">{row.date}</span>
                   </div>
                   <div className="flex flex-col text-right">
-                    <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400">Monthly Rate</span>
-                    <span className="font-black text-slate-900 dark:text-white font-mono">{row.val}</span>
+                    <span className="text-[9px] uppercase tracking-wider font-extrabold text-[#64748B]">Monthly Rate</span>
+                    <span className="font-black text-[#0F172A] font-mono">{row.val}</span>
                   </div>
                 </div>
 
@@ -1394,7 +1303,7 @@ export default function FleetAvailabilityDesk() {
                       setSelectedAsset(row.asset);
                       setIsDiagnosticsModalOpen(true);
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-[#ED1A53] hover:text-white text-[#ED1A53] text-[10px] font-black transition flex items-center gap-1 border border-rose-200/60 shadow-sm"
+                    className="px-2.5 py-1 rounded-lg bg-[var(--crm-primary-soft)] hover:bg-[var(--crm-primary)] hover:text-white text-[var(--crm-primary)] text-[10px] font-black transition flex items-center gap-1 border border-[var(--crm-chip-light)] shadow-xs"
                     title="Inspect Unit Live Telemetry"
                   >
                     <span>Telemetry</span>

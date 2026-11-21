@@ -473,53 +473,53 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
           <button
             type="button"
             onClick={() => setIsMinimized(false)}
-            className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[#7BBDE8] via-[#65AEE4] to-[#519DDA] hover:from-[#89C5EC] hover:to-[#5FA6E0] text-sky-950 shadow-[0_10px_30px_rgba(123,189,232,0.45)] border-2 border-white/60 cursor-pointer active:scale-95 transition-all group"
+            className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-[var(--crm-text-heading)] shadow-[0_8px_24px_rgba(37,99,235,0.18)] border border-[var(--crm-primary)] cursor-pointer active:scale-95 transition-all group"
             title="Expand Volvi Guide Next Step Guidance"
           >
-            <div className="w-6 h-6 rounded-lg bg-white/30 flex items-center justify-center text-sky-950 ring-1 ring-white/40 shadow-xs">
-              {isPaused ? <Pause className="w-3.5 h-3.5 text-amber-600" /> : <Bot className="w-3.5 h-3.5 animate-pulse text-sky-950" />}
+            <div className="w-6 h-6 rounded-lg bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center text-[var(--crm-primary)] shadow-2xs">
+              {isPaused ? <Pause className="w-3.5 h-3.5 text-amber-600" /> : <Bot className="w-3.5 h-3.5 animate-pulse text-[var(--crm-primary)]" />}
             </div>
             <div className="text-left">
-              <div className="text-[9px] font-black uppercase tracking-wider text-sky-900 flex items-center gap-1.5">
+              <div className="text-[9px] font-black uppercase tracking-wider text-[#64748B] flex items-center gap-1.5">
                 <span>{isPaused ? "Volvi Guide • Paused" : `Volvi Guide • Step ${currentStep} of 8`}</span>
                 {parkedTasks.length > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-900 text-[9px] font-black shadow-xs">
+                  <span className="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 text-[9px] font-black shadow-xs border border-amber-200">
                     {parkedTasks.length} Paused
                   </span>
                 )}
               </div>
-              <div className="text-xs font-black text-sky-950 flex items-center gap-1">
+              <div className="text-xs font-black text-[#0F172A] flex items-center gap-1">
                 <span>{isPaused ? "Free Exploration Mode" : displayedGuidance.actionLabel}</span>
-                {!isPaused && <ArrowRight className="w-3 h-3 text-sky-900 group-hover:translate-x-0.5 transition-transform" />}
+                {!isPaused && <ArrowRight className="w-3 h-3 text-[var(--crm-primary)] group-hover:translate-x-0.5 transition-transform" />}
               </div>
             </div>
-            <Maximize2 className="w-3.5 h-3.5 text-sky-900/60 ml-1 group-hover:text-sky-950 transition-colors" />
+            <Maximize2 className="w-3.5 h-3.5 text-[#64748B] ml-1 group-hover:text-[var(--crm-primary)] transition-colors" />
           </button>
         </aside>
       ) : (
         /* Full Floating Step Box Pop-up (Permanently Docked) */
         <aside
           aria-label="Volvi Guide Next Step Guidance"
-          className="fixed bottom-6 right-6 z-50 max-w-sm sm:max-w-md w-full bg-gradient-to-br from-[#12314E] via-[#0E2841] to-[#0A1D30] text-white rounded-3xl shadow-[0_25px_60px_rgba(18,49,78,0.65)] border-2 border-[#7BBDE8]/45 p-5 backdrop-blur-md animate-fade-in transition-all pointer-events-auto"
+          className="fixed bottom-6 right-6 z-50 max-w-sm sm:max-w-md w-full bg-white text-[var(--crm-text-body)] rounded-3xl shadow-[0_8px_24px_rgba(37,99,235,0.18)] border border-[var(--crm-primary)] p-5 animate-fade-in transition-all pointer-events-auto"
         >
           {/* Header */}
-          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center justify-between pb-3 border-b border-[var(--crm-row-divider)]">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-xl bg-white/15 flex items-center justify-center text-amber-300 shadow-xs ring-1 ring-white/20">
-                {isPaused ? <Pause className="w-4 h-4 text-amber-300" /> : <Bot className="w-4 h-4 animate-pulse" />}
+              <div className="w-7 h-7 rounded-xl bg-[var(--crm-primary-soft)] border border-[var(--crm-chip-light)] flex items-center justify-center text-[var(--crm-primary)] shadow-2xs">
+                {isPaused ? <Pause className="w-4 h-4 text-amber-600" /> : <Bot className="w-4 h-4 animate-pulse" />}
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-black tracking-tight text-white uppercase">Volvi Guide</span>
+                  <span className="text-xs font-black tracking-tight text-[#0F172A] uppercase">Volvi Guide</span>
                   <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${
                     isPaused 
-                      ? "bg-amber-400/25 text-amber-300 border-amber-400/30" 
-                      : "bg-emerald-500/25 text-emerald-300 border-emerald-400/30"
+                      ? "bg-amber-50 text-amber-700 border-amber-200" 
+                      : "bg-[#DCFCE7] text-[#16A34A] border-emerald-200"
                   }`}>
                     {isPaused ? "Free Roam Mode" : `Step ${currentStep} of 8`}
                   </span>
                 </div>
-                <div className="text-[10px] text-rose-200/80 font-semibold mt-0.5">
+                <div className="text-[10px] text-[#64748B] font-semibold mt-0.5">
                   {isPaused ? "Next-step nudges paused" : displayedGuidance.stageName}
                 </div>
               </div>
@@ -533,7 +533,7 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
                 className={`p-1.5 rounded-lg transition cursor-pointer ${
                   isPaused 
                     ? "bg-amber-400 text-slate-900 font-black shadow-xs ring-1 ring-amber-300" 
-                    : "text-white/60 hover:text-white hover:bg-white/10"
+                    : "text-[#64748B] hover:text-[#0F172A] hover:bg-slate-100"
                 }`}
                 title={isPaused ? "Resume Smart Guidance" : "Pause Guidance (Free Exploration Mode)"}
               >
@@ -544,7 +544,7 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => setIsMinimized(true)}
-                className="p-1.5 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
+                className="p-1.5 text-[#64748B] hover:text-[#0F172A] hover:bg-slate-100 rounded-lg transition cursor-pointer"
                 title="Minimize Volvi Guide"
               >
                 <Minus className="w-3.5 h-3.5" />
@@ -554,18 +554,18 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
 
           {/* Multi-Task Queue (Up to 5 Paused Tasks) */}
           {parkedTasks.length > 0 && !isPaused && (
-            <div className="mt-3 p-2.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-rose-500/15 to-amber-500/20 border border-amber-400/40 backdrop-blur-md shadow-xs animate-fade-in">
+            <div className="mt-3 p-2.5 rounded-2xl bg-amber-50/80 border border-amber-200 shadow-xs animate-fade-in">
               {/* Header */}
-              <div className="flex items-center justify-between pb-1.5 border-b border-amber-400/20">
+              <div className="flex items-center justify-between pb-1.5 border-b border-amber-200/80">
                 <button
                   type="button"
                   onClick={() => setIsParkedTrayOpen(prev => !prev)}
                   className="flex items-center gap-2 cursor-pointer group text-left"
                 >
-                  <div className="w-5 h-5 rounded-lg bg-amber-400/25 flex items-center justify-center text-amber-300 shrink-0">
+                  <div className="w-5 h-5 rounded-lg bg-amber-200/60 flex items-center justify-center text-amber-800 shrink-0">
                     <Pause className="w-3 h-3" />
                   </div>
-                  <span className="text-[10px] uppercase font-black text-amber-300 tracking-wider flex items-center gap-1 group-hover:text-amber-200">
+                  <span className="text-[10px] uppercase font-black text-amber-800 tracking-wider flex items-center gap-1 group-hover:text-amber-900">
                     <span>Paused Tasks ({parkedTasks.length}/5)</span>
                     <ChevronDown className={`w-3 h-3 transition-transform ${isParkedTrayOpen ? "rotate-180" : ""}`} />
                   </span>
@@ -574,7 +574,7 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={clearAllParkedTasks}
-                  className="text-[9px] font-bold text-white/50 hover:text-rose-300 transition cursor-pointer"
+                  className="text-[9px] font-bold text-slate-500 hover:text-rose-600 transition cursor-pointer"
                   title="Clear all paused tasks"
                 >
                   Clear All
@@ -584,12 +584,12 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
               {/* Parked Tasks List */}
               <div className="mt-2 space-y-1.5 max-h-48 overflow-y-auto pr-0.5">
                 {(isParkedTrayOpen ? parkedTasks : [parkedTasks[0]]).map((task) => (
-                  <div key={task.id} className="p-2 rounded-xl bg-white/10 flex items-center justify-between gap-2 text-xs">
+                  <div key={task.id} className="p-2 rounded-xl bg-white border border-amber-100 flex items-center justify-between gap-2 text-xs">
                     <div className="min-w-0 pr-1">
-                      <div className="text-[9px] font-bold text-amber-300 truncate">
+                      <div className="text-[9px] font-bold text-amber-700 truncate">
                         Step {task.stepNumber} of 8
                       </div>
-                      <div className="text-[11px] font-bold text-white truncate" title={task.title}>
+                      <div className="text-[11px] font-bold text-[#0F172A] truncate" title={task.title}>
                         {task.title}
                       </div>
                     </div>
@@ -598,7 +598,7 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
                       <button
                         type="button"
                         onClick={() => resumeParkedTask(task.id)}
-                        className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-[#ED1A53] to-[#B00F38] hover:from-[#f0295f] hover:to-[#960a2d] text-white text-[10px] font-black shadow-md flex items-center gap-1 cursor-pointer transition active:scale-95"
+                        className="px-2.5 py-1 rounded-xl bg-[var(--crm-primary)] hover:bg-[var(--crm-primary-hover)] text-white text-[10px] font-black shadow-xs flex items-center gap-1 cursor-pointer transition active:scale-95"
                         title="Resume this task where you left off"
                       >
                         <span>Resume</span>
@@ -607,7 +607,7 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
                       <button
                         type="button"
                         onClick={() => clearParkedTask(task.id)}
-                        className="p-1 text-white/50 hover:text-rose-300 rounded-lg transition cursor-pointer"
+                        className="p-1 text-slate-400 hover:text-rose-600 rounded-lg transition cursor-pointer"
                         title="Cancel / Dismiss this paused task"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -621,7 +621,7 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => setIsParkedTrayOpen(true)}
-                  className="w-full text-center text-[10px] text-amber-200/90 hover:text-amber-100 font-bold mt-1.5 pt-1 border-t border-white/10 transition cursor-pointer"
+                  className="w-full text-center text-[10px] text-amber-700 hover:text-amber-900 font-bold mt-1.5 pt-1 border-t border-amber-200 transition cursor-pointer"
                 >
                   + {parkedTasks.length - 1} more paused task{parkedTasks.length > 2 ? "s" : ""} (Click to expand)
                 </button>
@@ -631,18 +631,18 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
 
           {/* Body: Paused Free Exploration Mode */}
           {isPaused ? (
-            <div className="mt-3 p-3 rounded-2xl bg-white/10 border border-white/15">
-              <div className="flex items-center gap-2 text-amber-300 text-xs font-black">
+            <div className="mt-3 p-3 rounded-2xl bg-amber-50/60 border border-amber-200">
+              <div className="flex items-center gap-2 text-amber-800 text-xs font-black">
                 <Pause className="w-4 h-4 shrink-0" />
                 <span>Guidance Paused • Free Exploration Mode</span>
               </div>
-              <p className="text-[11px] text-white/80 mt-1.5 leading-relaxed font-medium">
+              <p className="text-[11px] text-[#334155] mt-1.5 leading-relaxed font-medium">
                 You can test inbound leads, browse opportunities, or inspect reports freely. Volvi Guide won't interrupt you until you resume.
               </p>
               <button
                 type="button"
                 onClick={() => setIsPaused(false)}
-                className="mt-3 w-full py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 shadow-md"
+                className="mt-3 w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95 shadow-xs"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Resume Smart Guidance</span>
@@ -651,34 +651,30 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
           ) : (
             /* Body: Active Smart Guidance */
             <div className="mt-3">
-              <div className="flex items-start gap-1.5 text-emerald-400 text-xs font-black">
+              <div className="flex items-start gap-1.5 text-emerald-600 text-xs font-black">
                 <span>✓</span>
-                <span>{displayedGuidance.message}</span>
+                <span className="text-[#0F172A]">{displayedGuidance.message}</span>
               </div>
 
-              <div className="mt-2 text-xs text-white/90 leading-relaxed font-medium">
-                <span className="text-rose-300 font-extrabold mr-1">Recommended Next Step:</span>
+              <div className="mt-2 text-xs text-[#334155] leading-relaxed font-medium">
+                <span className="text-[var(--crm-primary)] font-extrabold mr-1">Recommended Next Step:</span>
                 {displayedGuidance.explanation}
               </div>
 
               {/* Technical RAG Callout Tip */}
               {displayedGuidance.technicalTip && (
-                <div className="mt-3 p-2.5 rounded-xl bg-amber-400/15 border border-amber-400/30 text-[11px] text-amber-200 flex items-start gap-2 shadow-xs">
-                  <Zap className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5" />
+                <div className="mt-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 flex items-start gap-2 shadow-2xs">
+                  <Zap className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
                   <span className="font-semibold leading-tight">{displayedGuidance.technicalTip}</span>
                 </div>
               )}
 
               {/* Action Buttons Row with Dismiss / Cancel Task */}
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center gap-2">
+              <div className="mt-4 pt-3 border-t border-[var(--crm-row-divider)] flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleActionClick}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-black text-xs shadow-lg transition-all cursor-pointer active:scale-95 ${
-                    themeColor === "sky"
-                      ? "bg-gradient-to-r from-[#144A7E] via-[#0E355C] to-[#0A2744] hover:from-[#185591] hover:to-[#0D3054] shadow-[#0E355C]/35 border border-white/20"
-                      : "bg-gradient-to-r from-[#ED1A53] via-[#C71042] to-[#ED1A53] hover:from-[#d81548] hover:to-[#b00d38] shadow-[#ED1A53]/35"
-                  }`}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-black text-xs shadow-xs transition-all cursor-pointer active:scale-95 bg-[var(--crm-primary)] hover:bg-[var(--crm-primary-hover)]"
                 >
                   <span>{displayedGuidance.actionLabel}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -689,7 +685,7 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
                   <button
                     type="button"
                     onClick={dismissActiveTask}
-                    className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-rose-500/25 hover:text-rose-200 text-white/75 font-bold text-xs border border-white/15 flex items-center gap-1 transition cursor-pointer active:scale-95 shrink-0"
+                    className="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 font-bold text-xs border border-slate-200 flex items-center gap-1 transition cursor-pointer active:scale-95 shrink-0"
                     title="Cancel or dismiss this recommendation"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -703,17 +699,17 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
                     const prompt = displayedGuidance.suggestedPrompt || `Explain next step for ${displayedGuidance.message}`;
                     openAssist(prompt, "copilot");
                   }}
-                  className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/15 flex items-center gap-1.5 transition cursor-pointer active:scale-95 shrink-0"
+                  className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#334155] font-bold text-xs border border-slate-200 flex items-center gap-1.5 transition cursor-pointer active:scale-95 shrink-0"
                   title="Open in Volvi Copilot"
                 >
-                  <Bot className="w-3.5 h-3.5 text-amber-300" />
+                  <Bot className="w-3.5 h-3.5 text-[var(--crm-primary)]" />
                   <span>Ask Copilot</span>
                 </button>
               </div>
 
               {/* 8-Stage Lifecycle Progress Segment */}
-              <div className="mt-3.5 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/60">
-                <span className={`font-bold ${themeColor === "sky" ? "text-sky-300" : "text-rose-200"}`}>
+              <div className="mt-3.5 pt-2 border-t border-[var(--crm-row-divider)] flex items-center justify-between text-[10px] text-[#64748B]">
+                <span className="font-bold text-[var(--crm-text-heading)]">
                   Lifecycle Progress
                 </span>
                 <div className="flex items-center gap-1">
@@ -726,12 +722,10 @@ export function VolviAssistProvider({ children }: { children: ReactNode }) {
                         title={`Step ${step.num}: ${step.name}`}
                         className={`h-1.5 rounded-full transition-all ${
                           isCurrent
-                            ? (themeColor === "sky"
-                                ? "w-4 bg-[#7BBDE8] ring-2 ring-[#7BBDE8]/50 animate-pulse"
-                                : "w-4 bg-[#ED1A53] ring-2 ring-[#ED1A53]/50 animate-pulse")
+                            ? "w-4 bg-[var(--crm-primary)] ring-2 ring-[var(--crm-primary)]/40 animate-pulse"
                             : isDone
-                            ? "w-2 bg-emerald-400"
-                            : "w-1.5 bg-white/20"
+                            ? "w-2 bg-emerald-500"
+                            : "w-1.5 bg-slate-200"
                         }`}
                       />
                     );

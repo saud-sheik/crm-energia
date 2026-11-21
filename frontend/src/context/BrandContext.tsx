@@ -69,6 +69,16 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [brandMode]);
 
+  useEffect(() => {
+    if (themeColor === "velvet") {
+      document.documentElement.classList.add("theme-velvet");
+      document.documentElement.classList.remove("theme-sky");
+    } else {
+      document.documentElement.classList.add("theme-sky");
+      document.documentElement.classList.remove("theme-velvet");
+    }
+  }, [themeColor]);
+
   const brand: BrandConfig = brandMode === "energia"
     ? {
         mode: "energia",

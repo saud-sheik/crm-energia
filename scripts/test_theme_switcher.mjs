@@ -26,17 +26,46 @@ async function run() {
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForTimeout(1000);
 
-  // 1. Take screenshot with Sky Blue theme (expanded)
-  console.log("Capturing Sky Blue expanded state...");
-  await page.screenshot({ path: path.join(artifactDir, "test_theme_sky_expanded.png") });
+  // Close any director countersign banner if open
+  const closeAlertBtn = page.locator('button:has-text("✕"), button[aria-label*="close" i], .lucide-x').first();
+  if (await closeAlertBtn.isVisible().catch(() => false)) {
+    await closeAlertBtn.click().catch(() => {});
+    await page.waitForTimeout(300);
+  }
+
+  // 1. Take fullpage screenshot with Light Blue theme
+  console.log("Capturing Light Blue full page...");
+  await page.screenshot({ path: path.join(artifactDir, "test_theme_sky_fullpage.png"), fullPage: true });
+
+  // 1b. Minimize Volvi Guide to see the minimized pill and table
+  const minimizeGuideBtn = page.getByTitle("Minimize Volvi Guide");
+  if (await minimizeGuideBtn.isVisible().catch(() => false)) {
+    await minimizeGuideBtn.click();
+    await page.waitForTimeout(400);
+  }
+
+  // Scroll the main content container to show the table
+  await page.evaluate(() => {
+    const mainEl = document.querySelector('main');
+    if (mainEl) mainEl.scrollTop = 450;
+  });
+  await page.waitForTimeout(500);
+  console.log("Capturing Light Blue table section with minimized Volvi Guide...");
+  await page.screenshot({ path: path.join(artifactDir, "test_theme_sky_table.png") });
+
+  await page.evaluate(() => {
+    const mainEl = document.querySelector('main');
+    if (mainEl) mainEl.scrollTop = 0;
+  });
+  await page.waitForTimeout(400);
 
   // 2. Click Velvet Maroon switcher button
   console.log("Switching to Velvet Maroon...");
   const velvetBtn = page.getByRole("button", { name: /Velvet Maroon/i });
   await velvetBtn.click();
   await page.waitForTimeout(600);
-  console.log("Capturing Velvet Maroon expanded state...");
-  await page.screenshot({ path: path.join(artifactDir, "test_theme_velvet_expanded.png") });
+  console.log("Capturing Velvet Maroon full page...");
+  await page.screenshot({ path: path.join(artifactDir, "test_theme_velvet_fullpage.png"), fullPage: true });
 
   // 3. Switch back to Light Blue
   console.log("Switching back to Light Blue...");
