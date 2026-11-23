@@ -1,0 +1,17 @@
+{
+  "appId": "com.nexus.fieldinspector",
+  "appName": "Nexus Field Inspector",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#17614A",
+      "showSpinner": false
+    }
+  }
+}

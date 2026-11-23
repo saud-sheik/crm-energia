@@ -24,6 +24,7 @@ import {
   Compass,
   Navigation,
   MessageSquare,
+  Smartphone,
 } from "lucide-react";
 import { siteInspectionApi } from "../api/siteInspection";
 import { getStatusStyle, getInspectionRag, SiteInspectionRecord, APPROVER_ROLES } from "../lib/siteInspection";
@@ -269,6 +270,16 @@ export default function SiteInspections() {
             <Compass className="w-3.5 h-3.5" />
             <span>Plan Route</span>
           </button>
+
+          {/* Mobile App View Link */}
+          <Link
+            to="/inspector/mobile"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#F8F4F6] hover:bg-[#F0E4EC] text-[#551938] dark:bg-slate-800 dark:text-slate-200 border border-[#E5D4DE] dark:border-slate-700 text-sm font-bold rounded-xl transition-all cursor-pointer"
+            title="Switch to Field Inspector Mobile View"
+          >
+            <Smartphone className="w-3.5 h-3.5 text-[#ED1A53]" />
+            <span>Mobile App</span>
+          </Link>
 
           {/* Engine Settings button for approvers / ops managers */}
           {isApprover && (

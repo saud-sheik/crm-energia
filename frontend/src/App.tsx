@@ -59,6 +59,7 @@ import CampaignDetail from "./pages/CampaignDetail";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import SupportTickets from "./pages/SupportTickets";
 import FieldService from "./pages/FieldService";
+import FieldInspectorMobile from "./pages/mobile/FieldInspectorMobile";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { BrandProvider, useBrand } from "./context/BrandContext";
 import { Navigate, Outlet } from "react-router-dom";
@@ -89,7 +90,13 @@ const RoleBasedLayout = () => {
 const RoleBasedHome = () => {
   const { user } = useAuth();
   const { brand } = useBrand();
-  if (user?.role === "site_manager" || user?.role === "ops_manager") {
+  if (user?.role === "site_manager") {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      return <Navigate to="/inspector/mobile" replace />;
+    }
+    return <Navigate to="/site-inspections" replace />;
+  }
+  if (user?.role === "ops_manager") {
     return <Navigate to="/site-inspections" replace />;
   }
   if (brand.isEnergia) {
@@ -101,7 +108,13 @@ const RoleBasedHome = () => {
 /** Restricts sales data, user management, and admin pages from inspection-only roles */
 const NonInspectionGuard = () => {
   const { user } = useAuth();
-  if (user?.role === "site_manager" || user?.role === "ops_manager") {
+  if (user?.role === "site_manager") {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      return <Navigate to="/inspector/mobile" replace />;
+    }
+    return <Navigate to="/site-inspections" replace />;
+  }
+  if (user?.role === "ops_manager") {
     return <Navigate to="/site-inspections" replace />;
   }
   return <Outlet />;
@@ -123,6 +136,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           
           <Route element={<ProtectedRoute />}>
+            {/* Dedicated Mobile View for Field Inspectors */}
+            <Route path="/inspector/mobile" element={<FieldInspectorMobile />} />
+            <Route path="/field-inspector" element={<FieldInspectorMobile />} />
+
             <Route element={<RoleBasedLayout />}>
               <Route path="/" element={<RoleBasedHome />} />
               
