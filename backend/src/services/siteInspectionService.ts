@@ -434,7 +434,11 @@ export async function requestSiteInspection(
       }
 
       if (assignedManagerId) {
-        await inspection.update({ assignedToId: assignedManagerId });
+        await inspection.update({
+          assignedToId: assignedManagerId,
+          assignmentState: "ASSIGNED",
+          assignedAt: new Date(),
+        });
         try {
           const { createNotification } = require("./notificationService");
           await createNotification(

@@ -327,6 +327,7 @@ export default function FieldInspectorMobile() {
   } = useQuery({
     queryKey: ["site-inspections", "mine"],
     queryFn: () => siteInspectionApi.listInspections({ mine: true }),
+    refetchInterval: 5000,
   });
 
   // Fetch Master Data
