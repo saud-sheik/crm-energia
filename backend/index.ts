@@ -66,6 +66,51 @@ async function ensureDatabaseInitialized() {
       } else {
         console.log("[STARTUP] ✓ Admin account verified: admin@nexus.com");
       }
+
+      // Ensure Field Inspector account exists for mobile demo
+      const existingInspector = await UserModel.findOne({ where: { email: "site_manager@nexus.com" } }).catch(() => null);
+      if (!existingInspector) {
+        const hashedPassword = await bcrypt.hash("password123", 10);
+        await UserModel.create({
+          id: "7fbfe9a4-c292-4ac6-88d3-273032c319a3",
+          name: "Zaid Al-Harbi (Field Inspector)",
+          email: "site_manager@nexus.com",
+          password: hashedPassword,
+          role: "site_manager",
+          department: "Field Feasibility & Survey",
+          territory: "Eastern Province & Riyadh",
+          isAvailable: true,
+          maxOpenLeads: 50
+        });
+        console.log("[STARTUP] ✓ Verified and created Field Inspector: site_manager@nexus.com");
+      }
+
+      // Ensure demo SiteInspection exists and is assigned to the Field Inspector
+      const SiteInspectionModel = sequelize.models.SiteInspection;
+      if (SiteInspectionModel) {
+        await SiteInspectionModel.sync().catch(e => console.warn("[STARTUP] SiteInspection.sync warning:", e));
+        const existingInspection = await SiteInspectionModel.findOne({ where: { inspectionNumber: "SI-2026-0001" } }).catch(() => null);
+        if (!existingInspection) {
+          await SiteInspectionModel.create({
+            id: "25abe91d-d14d-4aed-b6ac-b677d9a2cf20",
+            inspectionNumber: "SI-2026-0001",
+            status: "REQUESTED",
+            assignmentState: "ASSIGNED",
+            assignedToId: "7fbfe9a4-c292-4ac6-88d3-273032c319a3",
+            clientOrganization: "Aramco Khurais PKG-4 & Utilities",
+            siteName: "Khurais Oilfield Substation & Wellhead Cluster 9",
+            siteAreaName: "Eastern Province - Khurais",
+            siteAddress: "Khurais Main Gate 3, Eastern Province",
+            clientRepName: "Eng. Mansoor Al-Ghamdi",
+            clientRepPhone: "+966551234567",
+            latitude: 25.08,
+            longitude: 48.02,
+            priority: "URGENT",
+            scopeSummary: "Site Electrical Feasibility, Inrush Multiplier, and Megger Earth Ground Audit"
+          });
+          console.log("[STARTUP] ✓ Seeded demo site inspection SI-2026-0001 assigned to site_manager@nexus.com");
+        }
+      }
     }
   } catch (err) {
     console.error("[STARTUP] User initialization error:", err);

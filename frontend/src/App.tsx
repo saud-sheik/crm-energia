@@ -91,10 +91,7 @@ const RoleBasedHome = () => {
   const { user } = useAuth();
   const { brand } = useBrand();
   if (user?.role === "site_manager") {
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      return <Navigate to="/inspector/mobile" replace />;
-    }
-    return <Navigate to="/site-inspections" replace />;
+    return <Navigate to="/inspector/mobile" replace />;
   }
   if (user?.role === "ops_manager") {
     return <Navigate to="/site-inspections" replace />;
@@ -109,10 +106,7 @@ const RoleBasedHome = () => {
 const NonInspectionGuard = () => {
   const { user } = useAuth();
   if (user?.role === "site_manager") {
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      return <Navigate to="/inspector/mobile" replace />;
-    }
-    return <Navigate to="/site-inspections" replace />;
+    return <Navigate to="/inspector/mobile" replace />;
   }
   if (user?.role === "ops_manager") {
     return <Navigate to="/site-inspections" replace />;

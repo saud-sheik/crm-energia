@@ -622,8 +622,9 @@ export default function FieldInspectorMobile() {
   };
 
   return (
-    <div className="min-h-screen bg-face-field dark:bg-slate-950 text-face-ink dark:text-slate-100 flex flex-col font-sans pb-20 select-none">
-      {/* ─── Top Mobile App Bar ──────────────────────────────────────────────── */}
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex justify-center">
+      <div className="w-full max-w-md min-h-screen bg-face-field dark:bg-slate-950 text-face-ink dark:text-slate-100 flex flex-col font-sans pb-24 select-none shadow-2xl border-x border-face-line dark:border-slate-800 relative">
+        {/* ─── Top Mobile App Bar ──────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-face-line dark:border-slate-800 px-4 py-3 shadow-xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -1009,7 +1010,7 @@ export default function FieldInspectorMobile() {
       )}
 
       {/* ─── Bottom Mobile Navigation Bar ───────────────────────────────────── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-face-line dark:border-slate-800 py-1.5 px-6 flex items-center justify-around shadow-lg">
+      <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-face-line dark:border-slate-800 py-1.5 px-6 flex items-center justify-around shadow-lg">
         <button
           onClick={() => {
             setBottomNav("duties");
@@ -1139,7 +1140,8 @@ export default function FieldInspectorMobile() {
 
       {/* ─── Full-Screen Mobile Survey Stepper Modal ─────────────────────────── */}
       {activeSurveyInspection && (
-        <div className="fixed inset-0 z-50 bg-face-field dark:bg-slate-950 flex flex-col animate-fade-in overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex justify-center animate-fade-in overflow-hidden">
+          <div className="w-full max-w-md h-full bg-face-field dark:bg-slate-950 flex flex-col shadow-2xl overflow-hidden">
           {/* Top Wizard Bar */}
           <div className="bg-white dark:bg-slate-900 border-b border-face-line dark:border-slate-800 px-4 py-3 flex items-center justify-between shrink-0">
             <button
@@ -1693,7 +1695,9 @@ export default function FieldInspectorMobile() {
             )}
           </div>
         </div>
+      </div>
       )}
     </div>
+  </div>
   );
 }

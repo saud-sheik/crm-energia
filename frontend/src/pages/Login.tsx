@@ -162,6 +162,13 @@ export default function Login() {
             >
               Rep 2 (salesperson2@nexus.com)
             </button>
+            <button
+              type="button"
+              onClick={() => { setEmail("site_manager@nexus.com"); setPassword("password123"); }}
+              className="px-2.5 py-1 text-xs font-semibold bg-surface hover:bg-amber-50 text-amber-700 border border-amber-300 rounded-lg transition-colors cursor-pointer"
+            >
+              Field Inspector (site_manager@nexus.com)
+            </button>
           </div>
         </div>
       </div>
